@@ -9,9 +9,7 @@ export const PHONE_NUMBER_STRING = "+080-263000050";
 export const EMAIL_STRING = "info@echikitsa.com";
 
 
-// Header
-
-// Footer
+// HeaderHelper & FooterHelper
 export const COPYRIGHT_STRING = "Copyright © 2024 eChikitsa - All Rights Reserved.";
 export const HOME_STRING = "Home";
 export const ABOUT_STRING = "About";

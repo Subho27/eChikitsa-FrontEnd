@@ -6,7 +6,7 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 
-function Header () {
+function HeaderHelper () {
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -82,4 +82,4 @@ function Header () {
     );
 }
 
-export default Header;
+export default HeaderHelper;

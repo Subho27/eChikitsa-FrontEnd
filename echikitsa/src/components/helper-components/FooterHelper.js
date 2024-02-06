@@ -5,7 +5,7 @@ import '../../css/helper-components/footer-style.css'
 import * as Constant from '../../resources/constant.js';
 import {Link} from "react-router-dom";
 
-function Footer () {
+function FooterHelper () {
     return (
         <div className="footer">
             <div className="container">
@@ -39,4 +39,4 @@ function Footer () {
     );
 }
 
-export default Footer;
+export default FooterHelper;
