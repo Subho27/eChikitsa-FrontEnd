@@ -5,6 +5,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
+import '../helper-components/patient_landing'
 
 function HeaderHelper () {
     return (
@@ -61,6 +62,7 @@ function HeaderHelper () {
                                 <Link to="/" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.WORKS_STRING}</Link>
+                                <Link to="/pateint" className="nav-item nav-link">Patient</Link>
                                 <div className="nav-item dropdown">
                                     <Link to="/" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</Link>
                                     <div className="dropdown-menu m-0">
