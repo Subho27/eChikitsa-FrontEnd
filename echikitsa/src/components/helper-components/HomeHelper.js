@@ -49,7 +49,7 @@ function homeHelper() {
                             <h5 className="d-inline-block text-primary text-uppercase text-white border-style">Welcome to eChikitsa</h5>
                             <h1 className="display-3 text-white mb-md-4">Best Consultation Solution</h1>
                             <div className="pt-2">
-                                <Link to="/" className="btn btn-light rounded-pill py-md-3 px-md-5 mx-2">LOGIN</Link>
+                                <Link to="/login" className="btn btn-light rounded-pill py-md-3 px-md-5 mx-2">LOGIN</Link>
                                 <Link to="/signup" className="btn btn-outline-light rounded-pill py-md-3 px-md-5 mx-2">SIGNUP</Link>
                             </div>
                         </div>
@@ -148,7 +148,6 @@ function homeHelper() {
                                             <p className="text-xl font-semibold">{d.name}</p>
                                             <p className="text-xl font-semibold">{d.spec}</p>
                                             <p className="">{d.review}</p>
-                                            {/*<button className='bg-indigo-500 text-white text-lg px-6 py-1 rounded-xl'>Read More</button>*/}
                                         </div>
                                     </div>
                                 ))}
