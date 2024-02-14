@@ -1,9 +1,10 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 
 function Home () {
     return (
         <div>
-            <p>Hello from our application!!</p>
+            <Link to="/signup">Sign Up</Link>
         </div>
     );
 }
