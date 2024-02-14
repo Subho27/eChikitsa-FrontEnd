@@ -1,0 +1,283 @@
+.orange-button1 {
+    background-color: orange;
+    color: white;
+    padding: 0.9% 1.4%; /* Adjust padding using percentages */
+    border: none;
+    border-radius: 17px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.2vw; /* Adjust font size using vw (viewport width) */
+    font-weight: bold;
+    margin: 0 2%; /* Adjust margins using percentages */
+    margin-right: 60%;
+}
+
+.orange-button1:hover {
+    background-color: darkorange;
+}
+
+.image1 {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.image-with-text {
+    background: url(../images/patient_landing_page/image1.jpg);
+    background-size: cover;
+    width: 100%;
+    height: 60%;
+    background-position: center;
+    color: #0E2F44;
+    padding: 5%; /* Adjust padding using percentages */
+    text-align: center;
+    font-size: 3vw; /* Adjust font size using vw (viewport width) */
+    margin-top: -18%;
+}
+
+.onlyText {
+    margin-top: -2%; /* Adjust margins using percentages */
+    margin-right: 60%; /* Adjust margins using percentages */
+}
+
+/* Media query for small screens */
+@media only screen and (max-width: 768px) {
+    .image-with-text {
+        font-size: 4vw; /* Adjust font size for smaller screens */
+    }
+
+
+}
+
+.stats{
+
+
+    height: 2.5%;
+    width: 100%;
+    border: 1px solid black;
+    background-color: #262626;
+    color: white;
+    font-size:1.3vw ;
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+
+
+
+}
+
+@media only screen and (max-width: 768px) {
+    .stats {
+        font-size: 2vw; /* Adjust font size for smaller screens */
+        padding: 0 10%; /* Adjust padding for smaller screens */
+    }
+}
+
+.stats_content{
+    margin-top: 1.5%;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 1.5%;
+
+}
+
+.howItWorks
+{
+
+margin-top: 2%;
+
+}
+
+.howItWorksText{
+    font-size:1.3vw ;
+    color: black;
+    text-align: center;
+    font-weight: 1000;
+
+}
+.howItWorksImg{
+    margin-left: 10%;
+    width: 80%;
+    height: 1%;
+
+}
+
+.benefits_box{
+    margin-left: 8%;
+    margin-right: 3%;
+    height: 50%;
+    width: 80%;
+    border: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+
+
+}
+
+.benefits_box_content{
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+
+}
+
+.benefits_title{
+    margin-left: 8%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    font-size: 1.7vw;
+    font-weight: 700;
+}
+
+.benefits{
+    margin-bottom: 2%;
+
+}
+
+@media only screen and (max-width: 768px) {
+    .benefits_box {
+        margin-left: 5%; /* Adjust margin for smaller screens */
+        margin-right: 5%; /* Adjust margin for smaller screens */
+        width: 90%; /* Adjust width for smaller screens */
+    }
+
+    .benefits_title {
+        font-size: 2vw; /* Adjust font size for smaller screens */
+        margin-left: 5%; /* Adjust margin for smaller screens */
+    }
+}
+
+
+
+
+/* Carousel container */
+.carousel-container {
+    max-width: 100%;
+    margin: 50px auto;
+    overflow: hidden;
+}
+
+/* Carousel wrapper */
+.carousel-wrapper {
+    margin-top: 0%;
+    display: flex;
+    transition: transform 0.5s ease;
+    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+    scroll-snap-type: x mandatory; /* Enable snap scrolling */
+}
+
+/* Carousel card */
+.card {
+    flex: 0 0 auto; /* Prevent cards from shrinking */
+    width: 300px; /* Set a fixed width for desktop */
+    margin-right: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    scroll-snap-align: start; /* Ensure cards align to start when scrolling */
+    height: 70px; /* Decrease the height of the cards */
+}
+
+/* Carousel card content */
+.card-content {
+    padding: 20px;
+}
+
+/* Card title */
+.card-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+/* Card text */
+.card-text {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Card image */
+.card-img {
+    max-width: 50%;
+    height: 50%; /* Ensure image height is auto to maintain aspect ratio */
+    margin-bottom: 10px;
+}
+
+.doctors {
+    margin-top: -20%;
+    margin-left: 8%;
+    margin-right: 3%;
+}
+
+/* Media query for smaller screens */
+@media only screen and (max-width: 768px) {
+    /* Adjustments for smaller screens */
+    .carousel-container {
+        margin: 20px auto; /* Reduce top margin on smaller screens */
+    }
+
+    .carousel-wrapper {
+        flex-wrap: nowrap; /* Prevent cards from wrapping */
+    }
+
+    .card {
+        width: 80%; /* Set a percentage width for responsiveness */
+        margin-right: 10px; /* Reduce right margin on smaller screens */
+        height: 1px; /* Decrease the height of the cards further for smaller screens */
+    }
+
+    .doctors {
+        margin-top: -10%; /* Adjust margin-top for smaller screens */
+        margin-left: 5%; /* Adjust margin-left for smaller screens */
+        margin-right: 5%; /* Adjust margin-right for smaller screens */
+    }
+}
+
+.seeMore{
+    float: right;
+    cursor: pointer;
+    margin-top: -1%;
+    font-size: 1vw;
+    margin-right: 8%;
+    border: 3px solid #13C5DD;
+    background-color: #13C5DD;
+    color: white;
+}
+
+
+/* Media query for smaller screens */
+@media only screen and (max-width: 768px) {
+    .seeMore {
+        float: none;
+        margin-top: 10px; /* Adjust as needed */
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 14px; /* Adjust font size for smaller screens */
+        width: 50%; /* Adjust width for smaller screens */
+        text-align: center; /* Center text */
+    }
+}
+
+.doctor_title{
+
+    margin-bottom: 2%;
+
+}
+
+
+.hospitals {
+    margin-top: 2%;
+    margin-left: 8%;
+    margin-right: 3%;
+}
+
+
+
