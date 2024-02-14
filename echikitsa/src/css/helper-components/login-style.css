@@ -164,6 +164,10 @@ input[type="submit"]:active {
     transform: scale(0.95);
 }
 
+.button-background {
+    background-color: #13c5dd !important;
+}
+
 button {
     height: 40px;
     width: 100%;
@@ -178,7 +182,7 @@ button {
     transition: all 0.3s ease;
 }
 
-.button_via {
+.button_ver {
     margin-left: 30%; /* Adjust for smaller screens */
     margin-bottom: 2%;
     height: 60%;

@@ -1,10 +1,14 @@
 import React from 'react';
-import {Link} from "react-router-dom";
+import HeaderHelper from "./helper-components/HeaderHelper";
+import HomeHelper from "./helper-components/HomeHelper";
+import FooterHelper from "./helper-components/FooterHelper";
 
 function Home () {
     return (
         <div>
-            <Link to="/signup">Sign Up</Link>
+            <HeaderHelper/>
+            <HomeHelper/>
+            <FooterHelper/>
         </div>
     );
 }
