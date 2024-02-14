@@ -1,20 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 
-/** {*/
-/*    margin: 0;*/
-/*    padding: 0;*/
-/*    box-sizing: border-box;*/
-/*    font-family: 'Poppins', sans-serif;*/
-/*}*/
-
-/*html, body {*/
-/*    display: grid;*/
-/*    height: 100%;*/
-/*    width: 100%;*/
-/*    place-items: center;*/
-/*    background: #f2f2f2;*/
-/*}*/
-
 ::selection {
     background: #4158d0;
     color: #fff;
@@ -22,7 +7,7 @@
 
 .wrapper {
     margin: auto;
-    width: 60%;
+    width: 50%;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
@@ -145,12 +130,6 @@ input:valid ~ label {
     justify-content: center;
 }
 
-
-.remember-text {
-    margin-left: 5px;
-    font-size: 14px;
-    color: #262626;
-}
 .gen
 {
     margin-left: 5px;
@@ -183,17 +162,6 @@ input[type="submit"] {
     transition: all 0.3s ease;
 }
 
-/*input::file-selector-button {*/
-/*    color: #fff;*/
-/*    border: none;*/
-/*    padding-left: 0;*/
-/*    margin-top: -10px;*/
-/*    font-size: 20px;*/
-/*    font-weight: 500;*/
-/*    cursor: pointer;*/
-/*    background: #13c5dd;*/
-/*    transition: all 0.3s ease;*/
-/*}*/
 
 input[type="submit"]:active {
     transform: scale(0.95);

@@ -1,30 +1,19 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-html, body {
-    display: grid;
-    height: 100%;
-    width: 100%;
-    place-items: center;
-    background: #f2f2f2;
-}
-
 ::selection {
     background: #4158d0;
     color: #fff;
 }
 
 .wrapper {
-    width: 380px;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
+}
+
+#wrap{
+    width: 30%;
+    margin-top: 1.5%;
 }
 
 .title {
@@ -35,7 +24,7 @@ html, body {
     color: #fff;
     user-select: none;
     border-radius: 15px 15px 0 0;
-    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    background: #13c5dd;
 }
 
 .login-options {
@@ -54,13 +43,13 @@ html, body {
     border-radius: 50%;
     cursor: pointer;
     background-color: #fff;
-    color: #344a99;
+    color: #848e9f;
     transition: all 0.3s ease;
     padding: 10px;
 }
 
 .login-option-circle.active {
-    background-color: #c850c0;
+    background-color: #13c5dd;
     color: #fff;
     font-weight: bold;
     transform: scale(1.1);
@@ -77,13 +66,14 @@ html, body {
 }
 
 form {
-    padding: 10px 30px 50px 30px;
+    padding: 10px 30px 10px 30px;
 }
 
-.field {
+.field1 {
     height: 50px;
     width: 100%;
     margin-top: 20px;
+    margin-bottom: 20px;
     position: relative;
 }
 
@@ -117,7 +107,7 @@ label {
 
 input:focus ~ label,
 input:valid ~ label {
-    top: 0%;
+    top: 0;
     font-size: 16px;
     color: #4158d0;
     background: #fff;
@@ -165,7 +155,7 @@ input[type="submit"] {
     font-size: 20px;
     font-weight: 500;
     cursor: pointer;
-    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    background: #13c5dd;
     transition: all 0.3s ease;
 }
 
@@ -175,19 +165,23 @@ input[type="submit"]:active {
 
 button {
     height: 40px;
-    width: 50%;
+    width: 100%;
     position: relative;
-    margin-left: 25%;
     color: #fff;
     border: none;
     border-radius: 50px;
-    /*padding-left: 0;*/
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
-    padding: 2.5%;
-    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    background: #13c5dd;
     transition: all 0.3s ease;
+}
+
+.button_via{
+    margin-left: 25%;
+    margin-bottom: 2%;
+    height: 60%;
+    width: 50%;
 }
 
 button:active {
@@ -198,7 +192,7 @@ button:active {
 .signup-link {
     color: #262626;
     margin-top: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 20px;
     text-align: center;
 }
 
@@ -211,4 +205,33 @@ button:active {
 .pass-link a:hover,
 .signup-link a:hover {
     text-decoration: underline;
+}
+
+
+.mobile-number-field{
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    color: #999999;
+    font-weight: 400;
+    font-size: 17px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.send-otp-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 40px;
+    background-color: #13c5dd;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
