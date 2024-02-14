@@ -77,7 +77,7 @@ const SignUpHelper = () => {
     };
 
     return (
-        <div className="wrapper wrapper-margin">
+        <div className="wrapper wrapper-margin" id="wrap1">
             <div className="title">
                 Registration Form
             </div>

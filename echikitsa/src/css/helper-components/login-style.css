@@ -11,9 +11,10 @@
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
 }
 
-#wrap{
-    width: 30%;
+#wrap {
     margin-top: 1.5%;
+    width: 80%; /* Adjust width for smaller screens */
+    max-width: 500px; /* Limit the maximum width */
 }
 
 .title {
@@ -177,16 +178,15 @@ button {
     transition: all 0.3s ease;
 }
 
-.button_via{
-    margin-left: 25%;
+.button_via {
+    margin-left: 30%; /* Adjust for smaller screens */
     margin-bottom: 2%;
     height: 60%;
-    width: 50%;
+    width: 40%; /* Occupy full width */
 }
 
 button:active {
     transform: scale(0.95);
-
 }
 
 .signup-link {
@@ -207,8 +207,7 @@ button:active {
     text-decoration: underline;
 }
 
-
-.mobile-number-field{
+.mobile-number-field {
     position: absolute;
     top: 50%;
     left: 20px;
