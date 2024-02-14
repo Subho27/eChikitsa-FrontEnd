@@ -1,21 +1,13 @@
 import React from 'react';
 import HeaderHelper from "../helper-components/HeaderHelper";
 import FooterHelper from "../helper-components/FooterHelper";
-import SignUpHelper from "../helper-components/SignUpHelper";
 
 
 const Hospital = () => {
 
-    const cardStyles = {
-
-        height: '0%', // Height for desktop view
-    };
-
     const handleSeeMoreClick = (route) => {
-        // Define what happens when "See More" is clicked
         console.log("See More clicked");
         window.location.href = route;
-        // For example, you can navigate to another page or display a modal
     };
 
     return (
@@ -23,15 +15,8 @@ const Hospital = () => {
 
         <div>
             <HeaderHelper/>
-
             <div className="hospitals" >
                 <div className="carousel-container">
-                    {/*<div className="doctor_title">*/}
-                    {/*    <h2><b>Top Hospitals</b></h2>*/}
-                    {/*    <div className='seeMore' onClick={()=>handleSeeMoreClick('/')}>*/}
-                    {/*        See More*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                     <div className="carousel-wrapper" style={{ height:'10cm'  }}>
                         {/* Your existing doctor cards */}
                         <div className="card" >
@@ -73,10 +58,6 @@ const Hospital = () => {
             <div className="hospitals" >
                 <div className="carousel-container">
                     <div className="doctor_title">
-                        {/*<h2><b>Top Hospitals</b></h2>*/}
-                        {/*<div className='seeMore' onClick={()=>handleSeeMoreClick('/')}>*/}
-                        {/*    See More*/}
-                        {/*</div>*/}
                     </div>
                     <div className="carousel-wrapper" style={{ height:'10cm'  }}>
                         {/* Your existing doctor cards */}
@@ -113,8 +94,6 @@ const Hospital = () => {
                     </div>
                 </div>
             </div>
-
-
             <FooterHelper/>
         </div>
     );
