@@ -1,0 +1,122 @@
+.containerprofile
+{
+    display:flex;
+    background: whitesmoke;
+    box-shadow: 3px 3px 3px 3px gray;
+    border-radius: 10px;
+    margin-top: 10%;
+    margin-right: 25%;
+    margin-left: 25%;
+
+}
+.profile-picture {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 3px 3px 3px 6px;
+}
+.profile-info {
+    margin-top: 20px;
+    padding-left: 20px;
+
+}
+.profile-info h3 {
+    margin-right: 16px;
+    /*background:white;*/
+    padding: 1%;
+    border-radius: 2px;
+    text-align: center;
+    color: white;
+
+}
+.update-button {
+    background-color: #FF416C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /*margin-left: 6px;*/
+    margin-top: 20%;
+    margin-left: 26%;
+
+
+}
+
+.update-button:hover {
+    background-color: #FF4B2B;
+}
+
+.leftsidecontents {
+    width: 30%;
+    background: #13C5DD;
+    padding: 1%;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+
+}
+
+.rightsidecontents{
+    width: 70%;
+    padding:2%;
+
+}
+hr {
+
+    border-top: 2px solid black;
+}
+
+.information
+{
+    color: #848E9F;
+}
+.thevalues{
+    font-size: 18px;
+    font-weight: bold;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+.value{
+    padding-right: 20px;
+    padding-left: 20px;
+}
+.UploadsRecords{
+    color: #848E9F;
+}
+.upload-button{
+    background-color: #FF416C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20%;
+    margin-left: 26%;
+
+}
+.cc{
+    width: 80%;
+    font-family: 'Poppins', sans-serif;
+    margin-left: 2%;
+    margin-top: 2%;
+    margin-right: 2%;
+    font-weight:500;
+}
+.records-button{
+    background-color: #FF416C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin:auto;
+
+}
+.records-button:hover {
+    background-color: #FF4B2B;
+}
