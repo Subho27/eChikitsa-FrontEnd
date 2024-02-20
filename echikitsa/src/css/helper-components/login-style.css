@@ -6,19 +6,15 @@
 }
 
 .wrapper {
-    margin: auto;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
 }
 
-.wrapper-margin {
+#wrap {
     margin-top: 1.5%;
-    margin-bottom: 30px;
-}
-
-#wrap1{
-    width: 50%;
+    width: 80%; /* Adjust width for smaller screens */
+    max-width: 500px; /* Limit the maximum width */
 }
 
 .title {
@@ -32,13 +28,13 @@
     background: #13c5dd;
 }
 
-.signup-options {
+.login-options {
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
 }
 
-.signup-option-circle {
+.login-option-circle {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,31 +49,32 @@
     padding: 10px;
 }
 
-.signup-option-circle.active {
+.login-option-circle.active {
     background-color: #13c5dd;
     color: #fff;
     font-weight: bold;
     transform: scale(1.1);
 }
 
-.signup-option-circle svg {
+.login-option-circle svg {
     font-size: 20px;
 }
 
-.signup-option-circle span {
+.login-option-circle span {
     margin-top: 5px;
     font-size: 12px;
     color: #262626;
 }
 
 form {
-    padding: 10px 30px 0 30px;
+    padding: 10px 30px 10px 30px;
 }
 
-.field {
-    height: 40px;
+.field1 {
+    height: 50px;
     width: 100%;
     margin-top: 20px;
+    margin-bottom: 20px;
     position: relative;
 }
 
@@ -128,19 +125,17 @@ input:valid ~ label {
 }
 
 .content .checkbox {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.gen
-{
+.remember-text {
     margin-left: 5px;
-    font-size: 16px;
+    font-size: 14px;
     color: #262626;
-    font-family: 'Poppins', sans-serif;
-
 }
+
 .content input {
     width: 15px;
     height: 15px;
@@ -165,149 +160,81 @@ input[type="submit"] {
     transition: all 0.3s ease;
 }
 
-
 input[type="submit"]:active {
+    transform: scale(0.95);
+}
+
+.button-background {
+    background-color: #13c5dd !important;
+}
+
+button {
+    height: 40px;
+    width: 100%;
+    position: relative;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #13c5dd;
+    transition: all 0.3s ease;
+}
+
+.button_ver {
+    margin-left: 30%; /* Adjust for smaller screens */
+    margin-bottom: 2%;
+    height: 60%;
+    width: 40%; /* Occupy full width */
+}
+
+button:active {
     transform: scale(0.95);
 }
 
 .signup-link {
     color: #262626;
     margin-top: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 20px;
     text-align: center;
-    padding-bottom: 1%;
 }
 
 .pass-link a,
 .signup-link a {
-    color: #1d2a4d;
+    color: #4158d0;
     text-decoration: none;
 }
 
 .pass-link a:hover,
 .signup-link a:hover {
-    font-weight:bold;
+    text-decoration: underline;
 }
 
-.content form .user-details{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 20px 0 12px 0;
-}
-form .user-details .input-box{
-    margin-bottom: 15px;
-    width: calc(100% / 2 - 20px);
-}
-form .input-box span.details{
-    display: block;
-    font-weight: 500;
-    margin-bottom: 5px;
-}
-.user-details .input-box input{
-    height: 45px;
-    width: 100%;
-    outline: none;
-    font-size: 16px;
-    border-radius: 5px;
-    padding-left: 15px;
-    border: 1px solid #ccc;
-    border-bottom-width: 2px;
+.mobile-number-field {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    color: #999999;
+    font-weight: 400;
+    font-size: 17px;
+    pointer-events: none;
     transition: all 0.3s ease;
 }
-.fg {
-    display: flex;
-    column-gap: 2%;
-}
-.cc {
-    font-size: 12px;
-    color: #333;
-    margin: auto;
-}
 
-.file-input-wrapper {
-    margin-top: 15px;
-}
-
-.file-input {
-    color: black;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    outline: none;
-    transition: background-color 0.3s ease;
-}
-
-
-.selected-file {
-
-    color: #333;
-}
-.cc{
-    width: 80%;
-    font-family: 'Poppins', sans-serif;
-    margin-left: 2%;
-    margin-top: 2%;
-    margin-right: 2%;
-    font-weight:500;
-}
-
-.ver{
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 13%;
-    height: 100%;
-    border-radius: 25px;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    color: #FFFFFF;
-    background: #13c5dd;
-    border: none;
-
-}
-
-/*OTP field style*/
-.container-otp {
+.send-otp-btn {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: auto;
-    padding: 5px;
-}
-
-.inputs {
-    margin: 5px;
-}
-
-.input-otp {
-    width: 30px;
-    height: 50px;
-    border: 1px solid lightgrey;
-    margin: 0 5px;
-    font-size: 25px;
-    padding: 0;
-    text-align: center;
-    /*cursor: not-allowed;*/
-    /*pointer-events: none;*/
-}
-
-.input-otp:focus {
-    border: 3px solid lightgrey;
-    outline: none;
-}
-
-.input-otp:nth-child(1) {
+    width: 100px;
+    height: 40px;
+    background-color: #13c5dd;
+    color: #fff;
+    border: none;
     cursor: pointer;
-    pointer-events: all;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
-
-.input-otp-submit {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    text-align: center;
-}
-

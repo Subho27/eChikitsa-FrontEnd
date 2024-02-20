@@ -1,16 +1,18 @@
 import React from 'react';
 import HeaderHelper from "./helper-components/HeaderHelper";
-import HomeHelper from "./helper-components/HomeHelper";
 import FooterHelper from "./helper-components/FooterHelper";
+import LoginHelper from "./helper-components/LoginHelper";
 
-function Home () {
+
+const Login = () => {
+
     return (
         <div>
             <HeaderHelper/>
-            <HomeHelper/>
+            <LoginHelper/>
             <FooterHelper/>
         </div>
     );
-}
+};
 
-export default Home;
+export default Login;
