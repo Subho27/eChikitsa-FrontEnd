@@ -49,22 +49,24 @@ function ProfilePage() {
 
                 <div className="information">
 
-                        <h4>Information</h4>
+                    <h4>Information</h4>
 
-                        <hr/>
+                    <hr/>
 
                 </div>
 
                 <table className="infoContent">
+                    <thead>
                     <tr>
                         <th className="thevalues">Email</th>
                         <th className="thevalues">Mobile</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <tr>
                         <td className="value">xxxxxxxxx@gmail.com</td>
                         <td className="value">xxxxxxxxx</td>
                     </tr>
-
                     <tr>
                         <th className="thevalues">Age</th>
                         <th className="thevalues">Aadhaar</th>
@@ -81,9 +83,10 @@ function ProfilePage() {
                         <td className="value">M</td>
                         <td className="value">XXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
                     </tr>
-
+                    </tbody>
                 </table>
-            <br/>
+
+                <br/>
 
                 <div className="UploadsRecords">
                     <h4>Uploads</h4>
@@ -98,9 +101,6 @@ function ProfilePage() {
 
 
             </div>
-
-
-
 
 
         </div>
