@@ -5,7 +5,8 @@ function Home () {
     return (
         <div>
             <Link to="/signup">Sign Up</Link>
-            <Link to="/patient/callpage">Patient Call</Link>
+            <Link to="/patient/profile">Patient Profile</Link>
+            {/*<Link to="/patient/land"> Landing</Link>*/}
         </div>
     );
 }
