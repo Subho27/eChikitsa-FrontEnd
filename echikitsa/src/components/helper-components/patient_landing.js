@@ -247,7 +247,8 @@ function patient_landing(){
 
                 </div>
                 <div className="">
-                    <img className="howItWorksImg" src={require("./../../images/patient_landing_page/how_it_works.png")} alt="Logo" />
+                    {/*<img className="howItWorksImg" src={require("./../../images/patient_landing_page/how_it_works.png")}  alt="Logo" />*/}
+                    <img className="howItWorksImg" src={require("./../../images/landing_body_img/theflow.png")} alt="the flow" />
                 </div>
 
             </div>
