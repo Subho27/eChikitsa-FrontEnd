@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
+import {Link} from "react-router-dom";
 
 
 const SignUpHelper = () => {
@@ -299,7 +300,7 @@ const SignUpHelper = () => {
                 </form>
             )}
             <div className="signup-link">
-                Already Registered? <a href="#">Log In</a>
+                Already Registered? <Link to="/login">Login</Link>
             </div>
         </div>
     );

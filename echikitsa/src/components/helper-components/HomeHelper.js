@@ -121,7 +121,7 @@ function homeHelper() {
                     </div>
                     <div className='w-3/4 m-auto'>
                         <div className="mt-20">
-                            <img src={require("./../../images/landing_body_img/theflow.png")} alt="the flow" />
+                            {/*<img src={require("./../../images/landing_body_img/theflow.png")} alt="the flow" />*/}
                         </div>
                     </div>
                 </div>

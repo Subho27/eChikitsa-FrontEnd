@@ -1,0 +1,202 @@
+.mainDiv {
+    padding: 0;
+    width: 80%;
+    height: 100%;
+    margin-left: 10%;
+    margin-top: 1%;
+    justify-content: space-evenly;
+    display: flex;
+    border: 2px solid black;
+}
+
+.leftDiv {
+    width: 50%;
+    float: left;
+    margin-left: 5%;
+}
+
+.rightDiv {
+    float: right;
+    width: 50%;
+}
+
+.hospitalName {
+    margin-left: 20%;
+    font-size: 3vw;
+}
+
+.doctorNames {
+    font-size: 2vw;
+}
+
+
+select {
+    width: 70%;
+    height: 0.9cm;
+    font-size: 1.5vw;
+    text-align: center;
+    color: white;
+    background-color: tomato;
+    border-radius: 5px;
+    margin-left: 35%;
+    margin-top: 4%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    background-color: #0563af;
+}
+
+.hospitalImgdiv {
+    height: 50%;
+    width: 40%;
+    margin-top: 2%;
+    margin-left: 30%;
+}
+
+.hospitalImg {
+    height: 100%;
+    width: 100%;
+    border: 2px solid black;
+
+}
+.hospitalImg2 {
+    height: 100%;
+    width: 100%;
+    border: 2px solid black;
+    display: none;
+
+}
+
+.hospitalDetails {
+    margin-left: 30%;
+    margin-top: 2%;
+}
+
+.Consult-button {
+    background-color: green;
+    width: 50%;
+    margin-top: 2%;
+    margin-left: 20%;
+}
+
+.Consult-button:hover {
+    background-color: darkgreen;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 768px) {
+    .mainDiv {
+        flex-direction:column;
+        width: 90%;
+        margin-left: 5%;
+    }
+
+    .leftDiv, .rightDiv {
+        width: 100%;
+        float: none;
+    }
+    select{
+        margin-left: 15%;
+        width: 8cm;
+    }
+    .doctorDetails{
+    margin-right: 10%;
+
+    }
+    .Consult-button{
+        width: 5cm;
+    }
+    .hospitalImgdiv {
+        width: 80%;
+        margin-left: 10%;
+
+    }
+    .hospitalDetails {
+        margin-left: 5%;
+
+    }
+
+    .hospitalImg {
+        margin-left: 20%;
+        display: none;
+
+        height: 40%;
+        width: 60%;
+
+    }
+
+    .imageForSmall {
+        height: 50%;
+        width: 40%;
+        margin-top: 1%;
+        margin-left: 0%;
+        margin-bottom: 2%;
+    }
+    .hospitalImg2 {
+        height: 100%;
+        width: 100%;
+        border: 2px solid black;
+        display: block;
+
+
+    }
+    .hospitalName{
+        font-size: 5vw;
+
+    }
+
+
+     .doctorNames {
+        margin-left: 10%;
+        width: 80%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .hospitalName {
+        font-size: 7vw;
+    }
+
+    .doctorNames h4 {
+        font-size: 5vw;
+    }
+    .doctorDetails{
+
+        font-size: 3vw;
+        margin-right: 10%;
+
+    }
+
+
+    select {
+        margin-left: 40%;
+
+        font-size: 3vw;
+        height: 0.5cm;
+    }
+
+    .hospitalImgdiv {
+        width: 80%;
+        margin-left: 10%;
+
+    }
+
+    .hospitalImg {
+        height: auto;
+        width: 100%;
+
+    }
+
+    .hospitalDetails {
+        margin-left: 10%;
+        font-size: 3vw;
+
+    }
+
+    .Consult-button {
+        width: 50%;
+        height: 0.5cm;
+        font-size: 3vw;
+        margin-left: 20%;
+    }
+}
+

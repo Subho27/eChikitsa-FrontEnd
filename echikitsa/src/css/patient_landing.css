@@ -1,5 +1,5 @@
 .orange-button1 {
-    background-color: orange;
+    background-color: Green;
     color: white;
     padding: 0.9% 1.4%; /* Adjust padding using percentages */
     border: none;
@@ -12,10 +12,12 @@
     font-weight: bold;
     margin: 0 2%; /* Adjust margins using percentages */
     margin-right: 60%;
+    width: 13%;
+    height: 2%;
 }
 
 .orange-button1:hover {
-    background-color: darkorange;
+    background-color: darkgreen;
 }
 
 .image1 {
