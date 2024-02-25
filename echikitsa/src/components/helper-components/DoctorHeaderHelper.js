@@ -7,7 +7,7 @@ import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 import '../helper-components/patient_landing'
 
-function HeaderHelper () {
+const DoctorHeaderHelper = (props) => {
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -45,7 +45,7 @@ function HeaderHelper () {
             <div className="container-fluid sticky-top bg-white shadow-sm">
                 <div className="container">
                     <nav className="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
-                        <Link to="/" className="navbar-brand">
+                        <Link to="/doctor" className="navbar-brand">
                             <h1 className="m-0 text-uppercase text-primary full-logo-container">
                                 <div className="logo-container">
                                     <img className="logo-photo" src={require("./../../images/Logo/logo-nobg.png")} alt="Logo" />
@@ -58,24 +58,18 @@ function HeaderHelper () {
                         </button>
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
-                                <Link to="/" className="nav-item nav-link active">{Constant.HOME_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.WORKS_STRING}</Link>
-                                <Link to="/pateint" className="nav-item nav-link">Patient</Link>
-                                <Link to="/doctor" className="nav-item nav-link">Doctor</Link>
+                                <Link to="/consult-page"><button className="join-call">JOIN CALL</button></Link>
+                                <Link to="/doctor" className={`nav-item nav-link ${props.data === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
+                                <Link to="/records" className={`nav-item nav-link ${props.data === 'records' ? 'active' : ''}`} >Records</Link>
+                                <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>
                                 <div className="nav-item dropdown">
-                                    <Link to="/" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</Link>
+                                    <Link to="/" className={`nav-link dropdown-toggle ${props.data === 'records' ? 'active' : ''}`} data-bs-toggle="dropdown" id="more">More</Link>
                                     <div className="dropdown-menu m-0">
-                                        <Link to="/" className="dropdown-item">Blog Grid</Link>
-                                        <Link to="/" className="dropdown-item">Blog Detail</Link>
-                                        <Link to="/" className="dropdown-item">The Team</Link>
-                                        <Link to="/" className="dropdown-item">Testimonial</Link>
-                                        <Link to="/" className="dropdown-item">Appointment</Link>
-                                        <Link to="/" className="dropdown-item">Search</Link>
+                                        <Link to="/doctor" className="dropdown-item">Profile</Link>
+                                        <Link to="/doctor" className="dropdown-item">Settings</Link>
+                                        <Link to="/" className="dropdown-item">Logout</Link>
                                     </div>
                                 </div>
-                                <Link to="/" className="nav-item nav-link">{Constant.CONTACT_STRING}</Link>
                             </div>
                         </div>
                     </nav>
@@ -85,4 +79,4 @@ function HeaderHelper () {
     );
 }
 
-export default HeaderHelper;
+export default DoctorHeaderHelper;
