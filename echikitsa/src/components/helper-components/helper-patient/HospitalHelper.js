@@ -1,15 +1,13 @@
-//import React from 'react';
 import React, { useState } from 'react';
-import HeaderHelper from "../helper-components/HeaderHelper";
-import HomeHelper from "../helper-components/HomeHelper";
-import FooterHelper from "../helper-components/FooterHelper";
-import '../../css/helper-components/hospitalDetailing-style.css'
-function HospitalDetailing () {
+import HeaderHelper from "../HeaderHelper";
+import FooterHelper from "../FooterHelper";
+import '../../../css/helper-components/helper-patient/hospital-style.css'
+function HospitalHelper () {
 
     const doctors = [
         {
             id: 1,
-            img:require("../../images/landing_body_img/doctor9.jpg"),
+            img:require("../../../images/landing_body_img/doctor9.jpg"),
             name: 'Dr. John Smith',
             specialty: 'Cardiology',
             qualifications: 'MD, FACC',
@@ -27,7 +25,7 @@ function HospitalDetailing () {
         {
             id: 2,
             name: 'Dr. Jane Doe',
-            img:require("../../images/landing_body_img/doctor8.jpg"),
+            img:require("../../../images/landing_body_img/doctor8.jpg"),
             specialty: 'Pediatrics',
             qualifications: 'MD, FAAP',
             experience: 10,
@@ -83,7 +81,7 @@ function HospitalDetailing () {
 
                     </div>
                     <div className="imageForSmall">
-                        <img  className="hospitalImg2"src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
+                        <img  className="hospitalImg2" src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
                     </div >
                     <div className="doctorDetails">
 
@@ -108,7 +106,7 @@ function HospitalDetailing () {
                 <div className="rightDiv">
 
                     <div className="hospitalImgdiv">
-                        <img  className="hospitalImg"src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
+                        <img  className="hospitalImg" src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
                     </div >
                     <div className="hospitalDetails">
 
@@ -135,4 +133,4 @@ function HospitalDetailing () {
     );
 }
 
-export default HospitalDetailing;
+export default HospitalHelper

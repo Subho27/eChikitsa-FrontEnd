@@ -1,23 +1,20 @@
-import "../../css/patient_landing.css"
-import React, { useState, useEffect } from 'react';
-import '../../css/helper-components/header-style.css'
+import React from 'react';
+import '../../../css/helper-components/header-style.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
-import Footer from './FooterHelper'
+import Footer from '../FooterHelper'
+
 import {Link} from "react-router-dom";
-import * as Constant from "../../resources/constant";
+import * as Constant from "../../../resources/constant";
+import "../../../css/helper-components/helper-patient/welcome-style.css"
 
 
 
 
-function patient_landing(){
+function WelcomeHelper(){
 
 
-    const cardStyles = {
-
-        height: '0%', // Height for desktop view
-    };
 
 
 
@@ -76,7 +73,7 @@ function patient_landing(){
                         <Link to="/" className="navbar-brand">
                             <h1 className="m-0 text-uppercase text-primary full-logo-container">
                                 <div className="logo-container">
-                                    <img className="logo-photo" src={require("./../../images/Logo/logo-nobg.png")} alt="Logo" />
+                                    <img className="logo-photo" src={require("./../../../images/Logo/logo-nobg.png")} alt="Logo" />
                                 </div>
                                 <div className="logo-name">{Constant.APP_NAME_STRING}</div>
                             </h1>
@@ -99,10 +96,10 @@ function patient_landing(){
                                 <div className="nav-item dropdown">
                                     <Link to="/" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Profile</Link>
                                     <div className="dropdown-menu m-0">
-                                        <Link to="/" className="dropdown-item">My Profile</Link>
-                                        <Link to="/" className="dropdown-item">My Appointment</Link>
-                                        <Link to="/" className="dropdown-item">My Feedback</Link>
-                                        <Link to="/" className="dropdown-item">Update Profile</Link>
+                                        <Link to="/patient-profile" className="dropdown-item">My Profile</Link>
+                                        <Link to="/patient-records" className="dropdown-item">My Records</Link>
+                                        {/*<Link to="/" className="dropdown-item">My Feedback</Link>*/}
+                                        {/*<Link to="/" className="dropdown-item"></Link>*/}
                                         <Link to="/" className="dropdown-item">Logout</Link>
                                     </div>
                                 </div>
@@ -150,7 +147,7 @@ function patient_landing(){
                     <div className="carousel-wrapper" style={{ height:'10cm'  }}>
                         {/* Your existing doctor cards */}
                         <div className="card" >
-                            <img src={require("../../images/landing_body_img/doctor8.jpg")} className="card-img" alt="Image 1" />
+                            <img src={require("../../../images/landing_body_img/doctor8.jpg")} className="card-img" alt="Image 1" />
 
                             <div className="card-content" >
                                 <h2 className="card-title">Doctor Name</h2>
@@ -158,21 +155,21 @@ function patient_landing(){
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/landing_body_img/doctor11.jpg")} className="card-img" alt="Image 2" />
+                            <img src={require("../../../images/landing_body_img/doctor11.jpg")} className="card-img" alt="Image 2" />
                             <div className="card-content">
                                 <h2 className="card-title">Doctor Name</h2>
                                 <p className="card-text"></p>
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/landing_body_img/doctor10.jpg")} className="card-img" alt="Image 3" />
+                            <img src={require("../../../images/landing_body_img/doctor10.jpg")} className="card-img" alt="Image 3" />
                             <div className="card-content">
                                 <h2 className="card-title">Doctor Name</h2>
                                 <p className="card-text"></p>
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/landing_body_img/doctor9.jpg")} className="card-img" alt="Image 3" />
+                            <img src={require("../../../images/landing_body_img/doctor9.jpg")} className="card-img" alt="Image 3" />
                             <div className="card-content">
                                 <h2 className="card-title">Doctor Name</h2>
                                 <p className="card-text"></p>
@@ -201,7 +198,7 @@ function patient_landing(){
                     <div className="carousel-wrapper" style={{ height:'10cm'  }}>
                         {/* Your existing doctor cards */}
                         <div className="card" >
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 1" />
+                            <img src={require("../../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 1" />
 
                             <div className="card-content" >
                                 <h2 className="card-title">Hospital Name</h2>
@@ -209,21 +206,21 @@ function patient_landing(){
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital2.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 2" />
+                            <img src={require("../../../images/patient_landing_page/Hospital_Img/hospital2.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 2" />
                             <div className="card-content">
                                 <h2 className="card-title">Hospital Name</h2>
                                 <p className="card-text"></p>
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital3.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 3" />
+                            <img src={require("../../../images/patient_landing_page/Hospital_Img/hospital3.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 3" />
                             <div className="card-content">
                                 <h2 className="card-title">Hospital Name</h2>
                                 <p className="card-text"></p>
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital4.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/hospital')} className="card-img" alt="Image 3" />
+                            <img src={require("../../../images/patient_landing_page/Hospital_Img/hospital4.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/hospital')} className="card-img" alt="Image 3" />
                             <div className="card-content">
                                 <h2 className="card-title">Hospital Name</h2>
                                 <p className="card-text"></p>
@@ -248,7 +245,7 @@ function patient_landing(){
                 </div>
                 <div className="">
                     {/*<img className="howItWorksImg" src={require("./../../images/patient_landing_page/how_it_works.png")}  alt="Logo" />*/}
-                    <img className="howItWorksImg" src={require("./../../images/landing_body_img/theflow.png")} alt="the flow" />
+                    <img className="howItWorksImg" src={require("./../../../images/landing_body_img/theflow.png")} alt="the flow" />
                 </div>
 
             </div>
@@ -348,4 +345,4 @@ function patient_landing(){
 
 }
 
-export default patient_landing;
+export default WelcomeHelper;
