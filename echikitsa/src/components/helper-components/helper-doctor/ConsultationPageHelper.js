@@ -117,7 +117,7 @@ function ConsultationPageHelper(effect, deps) {
                             <button className="call-buttons">
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
-                            <Link to="/doctor"><button className="call-buttons">
+                            <Link to="/dashboard"><button className="call-buttons">
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
                             </button></Link>
                         </div>

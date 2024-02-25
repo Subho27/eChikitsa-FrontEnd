@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css"
-import DoctorHeaderHelper from "../DoctorHeaderHelper";
-import FooterHelper from "../FooterHelper";
 import "../../../css/helper-components/helper-doctor/dashboard-style.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
@@ -123,7 +121,6 @@ function DashboardHelper() {
 
     return (
         <div>
-            <DoctorHeaderHelper data="dashboard" />
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
@@ -242,7 +239,6 @@ function DashboardHelper() {
                     </div>
                 </div>
             </div>
-            <FooterHelper/>
         </div>
     );
 
