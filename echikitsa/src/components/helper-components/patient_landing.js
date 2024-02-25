@@ -19,6 +19,8 @@ function patient_landing(){
         height: '0%', // Height for desktop view
     };
 
+
+
     const handleSeeMoreClick = (route) => {
         // Define what happens when "See More" is clicked
         console.log("See More clicked");
@@ -127,7 +129,7 @@ function patient_landing(){
                         <h4>Private consultation + Audio call</h4>
 
                     </div>
-                    <div><button  className="orange-button1" >CONSULT</button></div>
+                    <div><button   className={"orange-button1"} >CONSULT</button></div>
 
                 </div>
 
@@ -192,14 +194,14 @@ function patient_landing(){
                 <div className="carousel-container">
                     <div className="doctor_title">
                         <h2><b>Top Hospitals</b></h2>
-                        <div className='seeMore' onClick={()=>handleSeeMoreClick('/')}>
+                        <div className='seeMore' onClick={()=>handleSeeMoreClick('/Hospitals')}>
                             See More
                         </div>
                     </div>
                     <div className="carousel-wrapper" style={{ height:'10cm'  }}>
                         {/* Your existing doctor cards */}
                         <div className="card" >
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/hospital')} className="card-img" alt="Image 1" />
+                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 1" />
 
                             <div className="card-content" >
                                 <h2 className="card-title">Hospital Name</h2>
@@ -207,14 +209,14 @@ function patient_landing(){
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital2.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/hospital')} className="card-img" alt="Image 2" />
+                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital2.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 2" />
                             <div className="card-content">
                                 <h2 className="card-title">Hospital Name</h2>
                                 <p className="card-text"></p>
                             </div>
                         </div>
                         <div className="card">
-                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital3.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/hospital')} className="card-img" alt="Image 3" />
+                            <img src={require("../../images/patient_landing_page/Hospital_Img/hospital3.jpg")} style={{ cursor:'pointer'  }} onClick={()=>handleSeeMoreClick('/Hospitaldetailing')} className="card-img" alt="Image 3" />
                             <div className="card-content">
                                 <h2 className="card-title">Hospital Name</h2>
                                 <p className="card-text"></p>
@@ -245,7 +247,8 @@ function patient_landing(){
 
                 </div>
                 <div className="">
-                    <img className="howItWorksImg" src={require("./../../images/patient_landing_page/how_it_works.png")} alt="Logo" />
+                    {/*<img className="howItWorksImg" src={require("./../../images/patient_landing_page/how_it_works.png")}  alt="Logo" />*/}
+                    <img className="howItWorksImg" src={require("./../../images/landing_body_img/theflow.png")} alt="the flow" />
                 </div>
 
             </div>

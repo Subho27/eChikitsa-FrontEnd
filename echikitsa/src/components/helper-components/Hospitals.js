@@ -3,7 +3,7 @@ import HeaderHelper from "../helper-components/HeaderHelper";
 import FooterHelper from "../helper-components/FooterHelper";
 
 
-const Hospital = () => {
+const Hospitals = () => {
 
     const handleSeeMoreClick = (route) => {
         console.log("See More clicked");
@@ -99,4 +99,4 @@ const Hospital = () => {
     );
 };
 
-export default Hospital;
+export default Hospitals;
