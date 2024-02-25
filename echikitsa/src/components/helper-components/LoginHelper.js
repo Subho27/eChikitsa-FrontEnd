@@ -131,7 +131,10 @@ const LoginHelper = () => {
                     <button type="button" className="button_ver button-background" onClick={handleLoginMethodToggle}>
                         Login via {capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}
                     </button>
-                    <button type="submit" className="button-background" >Login</button>
+                    <Link to="/welcome-helper">
+
+                        <button type="submit" className="button-background">Login</button>
+                    </Link>
                 </div>
             </form>
 
