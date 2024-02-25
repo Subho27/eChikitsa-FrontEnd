@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
+import {Link} from "react-router-dom";
 
 
 const SignUpHelper = () => {
@@ -13,10 +14,13 @@ const SignUpHelper = () => {
         email: '',
         phoneNumber: '',
         password: '',
+        age:'',
+        aadhaar:'',
         state:'',
         city:'',
         confirmPassword: '',
         gender: '',
+
     });
 
     const [selectedGender, setSelectedGender] = useState('');
@@ -102,28 +106,45 @@ const SignUpHelper = () => {
                     <div className="fg">
 
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
+                            <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
+                                   required/>
                             <label>First Name</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required/>
+                            <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
+                                   required/>
                             <label>Last Name</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
+                            <input type="text" name="email" value={formData.email} onChange={handleInputChange}
+                                   required/>
                             <label>Email</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" value={formData.phoneNumber}
+                                   onChange={handleInputChange} required/>
                             <label>Phone Number</label>
                         </div>
                     </div>
 
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="state" value={formData.state} onChange={handleInputChange} required/>
+                            <input type="text" name="age" value={formData.age} onChange={handleInputChange}
+                                   required/>
+                            <label>Age</label>
+                        </div>
+                        <div className="field">
+                            <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange} required/>
+                            <label>Aadhaar</label>
+                        </div>
+                    </div>
+
+                    <div className="fg">
+                        <div className="field">
+                            <input type="text" name="state" value={formData.state} onChange={handleInputChange}
+                                   required/>
                             <label>State</label>
                         </div>
                         <div className="field">
@@ -134,11 +155,13 @@ const SignUpHelper = () => {
 
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.password} onChange={handleInputChange} required/>
+                            <input type="text" name="password" value={formData.password} onChange={handleInputChange}
+                                   required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="text" name="confirmPassword" value={formData.confirmPassword}
+                                   onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
                         </div>
                     </div>
@@ -147,16 +170,19 @@ const SignUpHelper = () => {
                         <div className="content">
                             <span className="gen">Gender</span>
                             <div className="radio">
-                                <input type="radio" id="male" name="gender" value="male" checked={selectedGender === 'male'} onChange={handleGenderChange}/>
+                                <input type="radio" id="male" name="gender" value="male"
+                                       checked={selectedGender === 'male'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Male</span>
                             </div>
                             <div className="radio">
-                                <input type="radio" id="female" name="gender" value="female" checked={selectedGender === 'female'} onChange={handleGenderChange}/>
+                                <input type="radio" id="female" name="gender" value="female"
+                                       checked={selectedGender === 'female'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Female</span>
                             </div>
 
                             <div className="radio">
-                                <input type="radio" id="others" name="gender" value="others" checked={selectedGender === 'others'} onChange={handleGenderChange}/>
+                                <input type="radio" id="others" name="gender" value="others"
+                                       checked={selectedGender === 'others'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Others</span>
                             </div>
                         </div>
@@ -177,7 +203,8 @@ const SignUpHelper = () => {
                 <form action="#">
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.hospitalname} onChange={handleInputChange} required/>
+                            <input type="text" name="firstName" value={formData.hospitalname}
+                                   onChange={handleInputChange} required/>
                             <label>Hospital Name</label>
                         </div>
                         <div className="field">
@@ -299,7 +326,7 @@ const SignUpHelper = () => {
                 </form>
             )}
             <div className="signup-link">
-                Already Registered? <a href="#">Log In</a>
+                Already Registered? <Link to="/login">Login</Link>
             </div>
         </div>
     );

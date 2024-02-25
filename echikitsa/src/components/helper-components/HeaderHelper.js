@@ -5,7 +5,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
-import '../helper-components/patient_landing'
+import '../helper-components/helper-patient/WelcomeHelper'
 
 function HeaderHelper () {
     return (
@@ -61,20 +61,6 @@ function HeaderHelper () {
                                 <Link to="/" className="nav-item nav-link active">{Constant.HOME_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.WORKS_STRING}</Link>
-                                <Link to="/pateint" className="nav-item nav-link">Patient</Link>
-                                <Link to="/doctor" className="nav-item nav-link">Doctor</Link>
-                                <div className="nav-item dropdown">
-                                    <Link to="/" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</Link>
-                                    <div className="dropdown-menu m-0">
-                                        <Link to="/" className="dropdown-item">Blog Grid</Link>
-                                        <Link to="/" className="dropdown-item">Blog Detail</Link>
-                                        <Link to="/" className="dropdown-item">The Team</Link>
-                                        <Link to="/" className="dropdown-item">Testimonial</Link>
-                                        <Link to="/" className="dropdown-item">Appointment</Link>
-                                        <Link to="/" className="dropdown-item">Search</Link>
-                                    </div>
-                                </div>
                                 <Link to="/" className="nav-item nav-link">{Constant.CONTACT_STRING}</Link>
                             </div>
                         </div>
