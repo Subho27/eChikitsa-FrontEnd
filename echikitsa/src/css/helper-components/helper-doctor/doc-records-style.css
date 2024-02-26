@@ -1,0 +1,207 @@
+.DocRecordContainer {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: white;
+}
+
+.DocRecordTitle {
+    padding-top: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background: #13C5DD;
+    border-radius: 10px;
+    text-align: center;
+    height: 50px;
+}
+
+.DocRecordFilters {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    background: #13C5DD;
+    padding: 5px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.DocRecordDateFilter {
+    width: 15%;
+    border-radius: 20px;
+}
+
+.DocRecordGenderFilter {
+    width: 15%;
+    height: 38px;
+    border-radius: 20px;
+}
+
+.DocRecordAgeFilter {
+    width: 15%;
+    border-radius: 20px;
+    height: 38px;
+}
+.DocRecordAgeFilter::placeholder{
+    color:black;
+}
+
+.DocRecordFilters select,
+.DocRecordFilters input {
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.DocRecordList {
+    margin: 10px 0 10px 0;
+    background: #13C5DD;
+    border-radius: 10px;
+}
+
+.DocRecordListItem {
+    display: flex;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border-bottom: 5px solid white;
+    padding: 10px;
+}
+
+.DocRecordListItem.expanded {
+    height: auto;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border: none;
+    margin-bottom: 0;
+    background: #848E9F;
+}
+
+.DocRecordField {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    background-color: #13C5DD;
+    border-radius: 10px;
+}
+
+.record{
+    display: flex;
+    padding: 10px;
+}
+.records{
+    background: #13C5DD;
+}
+
+.imp{
+    font-weight: bold !important;
+    background: #1D2A4D !important;
+}
+
+.field{
+    text-align: center;
+}
+
+.DocRecordToggleDetails {
+    cursor: pointer;
+}
+
+.DocRecordAdditionalDetails {
+    padding: 10px;
+    background: #848E9F;
+    margin-bottom: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom: 5px solid white;
+}
+
+.DocRecordAdditionalDetails table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+}
+
+.DocRecordAdditionalDetails th,
+.DocRecordAdditionalDetails td {
+    padding: 8px;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.DocRecordHistory {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.DocRecordBlood {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 30px;
+    background: #90959b;
+}
+
+.DocRecordBloodGroup {
+    width: 50px;
+    text-align: center;
+    padding: 3px;
+    border-radius: 10px;
+    background: white;
+    color: black;
+    font-weight: bold;
+}
+
+.DocRecordPatientHistory {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin-top: 20px;
+    margin-left: 1%;
+    padding: 20px;
+    border-radius: 30px;
+    background: #90959b;
+}
+
+.DocRecordTag {
+    width: fit-content;
+    text-align: center;
+    margin-right: 2.5%;
+    padding: 5px;
+    border-radius: 10px;
+    background: white;
+    color: black;
+    font-weight: bold;
+}
+
+.DocRecordPatientHistory h4 {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.DocRecordPatientHistory ul {
+    padding-left: 20px;
+}
+
+.DocRecordPatientHistory li {
+    list-style-type: disc;
+}
+
+.DocRecordActionButtons {
+    margin-top: 1%;
+    margin-left: 1%;
+    padding: 20px;
+}
+
+.DocRecordDocumentButton {
+    margin-top: 2%;
+}
+
+.DocRecordTable {
+    border: none;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
