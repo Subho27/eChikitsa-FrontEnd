@@ -1,7 +1,7 @@
 import React from 'react';
-import HeaderHelper from "./helper-components/HeaderHelper";
-import FooterHelper from "./helper-components/FooterHelper";
-import LoginHelper from "./helper-components/LoginHelper";
+import HeaderHelper from "../helper-components/HeaderHelper";
+import FooterHelper from "../helper-components/FooterHelper";
+import LoginHelper from "../helper-components/LoginHelper";
 
 
 const Login = () => {

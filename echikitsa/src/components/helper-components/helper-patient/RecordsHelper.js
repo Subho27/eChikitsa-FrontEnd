@@ -34,8 +34,6 @@ function RecordHelper() {
             <div className="RecordTitle">
               <div className="textjk">Previous Consultation</div>
             </div>
-            <div className="RecordContainer">
-
                 <div className="Recordright">
                     <div className="searchall">
                         <input
@@ -63,7 +61,7 @@ function RecordHelper() {
                                 </tr>
                             {isRowExpanded(item.id) && (
                                 <tr className="collapsed-row">
-                                    <td colSpan="4">
+                                    <td className="collapsed-td" colSpan="4">
                                         <div className="coll">
                                             <div className="collval">Next Consultation tentative: 23/02/2024</div>
                                             <div>
@@ -82,11 +80,7 @@ function RecordHelper() {
                             ))}
                             </tbody>
                     </table>
-
-                </div>
             </div>
-
-
         </div>
     );
 }

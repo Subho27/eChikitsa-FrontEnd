@@ -121,3 +121,11 @@
 .contact-text-body {
     font-family: 'Roboto', sans-serif;
 }
+
+.join-call {
+    background-color: red;
+    color: #FFFFFF;
+    padding: 10px 20px 10px 20px;
+    margin-top: 21%;
+    font-weight: bolder;
+}
