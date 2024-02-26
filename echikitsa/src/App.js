@@ -30,8 +30,6 @@ function App() {
           <Route path='/hospital' element={ <HospitalDetailPatient/> } />
           <Route path='/call' element={ <CallPagePatient/> } />
 
-          <Route path='/testing' element={ <TestingWelcome/> } />
-
           {/*Doctor Page Routes*/}
           <Route path='/dashboard' element={<DashboardDoctor/>}/>
           <Route path='/consult' element={<ConsultationPageDoctor/>}/>
