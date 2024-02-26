@@ -138,7 +138,7 @@ const LoginHelper = () => {
             </form>
 
             <div className="content">
-                <div className="checkbox">
+                <div className="checkbox-style">
                     <input type="checkbox" id="remember-me"/>
                     <span className="remember-text">Remember me</span>
                 </div>

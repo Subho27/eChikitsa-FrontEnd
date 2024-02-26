@@ -13,6 +13,7 @@ import ConsultationPageDoctor from "./components/doctor-components/ConsultationP
 import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
+import TestingWelcome from "./components/helper-components/helper-patient/TestingWelcome";
 
 function App() {
   return (
@@ -28,6 +29,8 @@ function App() {
           <Route path='/patient-records' element={<RecordsPatient/>}/>
           <Route path='/hospital' element={ <HospitalDetailPatient/> } />
           <Route path='/call' element={ <CallPagePatient/> } />
+
+          <Route path='/testing' element={ <TestingWelcome/> } />
 
           {/*Doctor Page Routes*/}
           <Route path='/dashboard' element={<DashboardDoctor/>}/>
