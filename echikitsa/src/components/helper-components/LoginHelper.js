@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
+import {Link} from "react-router-dom";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -130,7 +131,9 @@ const LoginHelper = () => {
                     <button type="button" className="button_ver button-background" onClick={handleLoginMethodToggle}>
                         Login via {capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}
                     </button>
-                    <button type="submit" className="button-background" >Login</button>
+                    <Link to={loginType === "patient" ? '/welcome' : '/dashboard'}>
+                        <button type="submit" className="button-background">Login</button>
+                    </Link>
                 </div>
             </form>
 
@@ -145,7 +148,7 @@ const LoginHelper = () => {
             </div>
 
             <div className="signup-link">
-                Not a member? <a href="#">Signup now</a>
+                Not a member? <Link to="/signup">SignUp</Link>
             </div>
         </div>
     );

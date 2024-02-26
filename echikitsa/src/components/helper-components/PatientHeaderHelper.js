@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -7,7 +7,9 @@ import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 
-function HeaderHelper () {
+function PatientHeaderHelper() {
+
+
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -58,10 +60,15 @@ function HeaderHelper () {
                         </button>
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
-                                <Link to="/" className="nav-item nav-link active">{Constant.HOME_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.CONTACT_STRING}</Link>
+                                <Link to="/welcome" className="nav-item nav-link" >Home</Link>
+                                <div className="nav-item dropdown">
+                                    <Link to="/" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Profile</Link>
+                                    <div className="dropdown-menu m-0">
+                                        <Link to="/patient-profile" className="dropdown-item">My Profile</Link>
+                                        <Link to="/patient-records" className="dropdown-item">My Records</Link>
+                                        <Link to="/" className="dropdown-item">Logout</Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </nav>
@@ -71,4 +78,4 @@ function HeaderHelper () {
     );
 }
 
-export default HeaderHelper;
+export default PatientHeaderHelper;
