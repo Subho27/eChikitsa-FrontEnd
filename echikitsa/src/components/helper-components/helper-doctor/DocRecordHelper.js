@@ -220,7 +220,7 @@ const DocRecordHelper = () => {
                     value={filters.age}
                     onChange={handleFilterChange}
                 />
-                <select name="gender" className="DocRecordGenderFilter" value={filters.gender} onChange={handleFilterChange}>
+                <select name="genders" className="DocRecordGenderFilter" value={filters.gender} onChange={handleFilterChange}>
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>

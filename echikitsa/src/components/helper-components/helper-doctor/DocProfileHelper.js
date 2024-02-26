@@ -93,21 +93,6 @@ function DocProfilePage() {
                     </tr>
                     </tbody>
                 </table>
-
-                {/*<br/>*/}
-
-                {/*<div className="UploadsRecords">*/}
-                {/*    <h4>Uploads</h4>*/}
-                {/*    <hr/>*/}
-
-                {/*    <div className="fg form-group mt-3">*/}
-                {/*        <span className="cc">Upload your Records</span>*/}
-                {/*        <input type="file" name="file" className="file-input"/>*/}
-                {/*    </div>*/}
-                {/*    <button className="records-button">View Previous Records</button>*/}
-                {/*</div>*/}
-
-
             </div>
 
 
