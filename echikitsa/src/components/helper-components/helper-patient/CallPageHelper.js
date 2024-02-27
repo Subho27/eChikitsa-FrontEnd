@@ -1,8 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
 import {Link} from "react-router-dom";
-import Popup from 'reactjs-popup';
-import styled from 'styled-components';
 import Collapsible from "react-collapsible";
 import "../../../css/helper-components/helper-patient/call-page-style.css"
 
@@ -98,41 +96,7 @@ function CallPageHelper(effect, deps) {
         overlay.style.display = "none";
     }
 
-    const StyledPopup = styled(Popup)`
-      // use your custom style for ".popup-overlay"
-      &-overlay {
-        ...;
-      }
-      // use your custom style for ".popup-content"
-      &-content {
-        ...;
-      }
-    `;
 
-    const StarRating = ({ totalStars }) => {
-        const [rating, setRating] = useState(0);
-
-        const handleStarClick = (star) => {
-            setRating(star);
-        };
-
-        return (
-            <div>
-                {[...Array(totalStars)].map((_, index) => {
-                    const starValue = index + 1;
-                    return (
-                        <span
-                            key={index}
-                            style={{ cursor: 'pointer', color: starValue <= rating ? 'gold' : 'gray' }}
-                            onClick={() => handleStarClick(starValue)}
-                        >
-            ★
-          </span>
-                    );
-                })}
-            </div>
-        );
-    };
 
     return (
 
@@ -166,26 +130,13 @@ function CallPageHelper(effect, deps) {
                                 <img className="button-icon"
                                      src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
-                            <StyledPopup className="Feedback"
-                                trigger={<button className="call-buttons">
+                            <Link to="/dashboard">
+                                <button className="call-buttons">
                                     <img className="button-icon"
                                          src={require("../../../images/doctor-page-images/call-end-icon.png")}
                                          alt="End"/>
-                                </button>}
-                                modal
-                                closeOnDocumentClick
-                            >
-                                <div className="Feedcontent">
-                                    <h4>FeedBack</h4>
-                                    <div>
-                                        <h1><StarRating className="stars" totalStars={5}/></h1>
-                                    </div>
-                                    <div className="Feedbutton">
-                                        <Link to="/welcome"><button className="submit-button">Submit</button></Link>
-                                        <Link to="/welcome"><button className="cancel-button">Cancel</button></Link>
-                                    </div>
-                                </div>
-                            </StyledPopup>
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
