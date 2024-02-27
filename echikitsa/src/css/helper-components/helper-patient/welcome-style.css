@@ -282,6 +282,17 @@ margin-top: 2%;
     margin-left: 8%;
     margin-right: 3%;
 }
+.specialization-label {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+    /*display: block;*/
+    font-weight: bold;
+}
+.specialsel
+{
+    margin-top: 11px;
+}
 
 
 
