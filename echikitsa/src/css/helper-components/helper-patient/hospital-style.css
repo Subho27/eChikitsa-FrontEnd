@@ -2,11 +2,12 @@
     padding: 0;
     width: 80%;
     height: 100%;
-    margin-left: 10%;
-    margin-top: 1%;
+    margin: 40px 10% 40px 10%;
     justify-content: space-evenly;
     display: flex;
-    border: 2px solid black;
+    /*border: 2px solid black;*/
+    border-radius: 10px;
+    box-shadow: 3px 5px 5px #888888;
 }
 
 .leftDiv {
@@ -30,20 +31,20 @@
 }
 
 
-/*select {*/
-/*    width: 70%;*/
-/*    height: 0.9cm;*/
-/*    font-size: 1.5vw;*/
-/*    text-align: center;*/
-/*    color: white;*/
-/*    background-color: tomato;*/
-/*    border-radius: 5px;*/
-/*    margin-left: 35%;*/
-/*    margin-top: 4%;*/
-/*    background-color: rgba(255, 255, 255, 0.2);*/
-/*    transform: translate(-50%, -50%);*/
-/*    background-color: #0563af;*/
-/*}*/
+.selected-doctor {
+    width: 70%;
+    height: 0.9cm;
+    font-size: 1.5vw;
+    text-align: center;
+    color: white;
+    background-color: tomato;
+    border-radius: 5px;
+    margin-left: 35%;
+    margin-top: 4%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    background-color: #0563af;
+}
 
 .hospitalImgdiv {
     height: 50%;
@@ -94,7 +95,7 @@
         width: 100%;
         float: none;
     }
-    select{
+    .selected-doctor{
         margin-left: 15%;
         width: 8cm;
     }
@@ -167,9 +168,8 @@
     }
 
 
-    select {
+    .selected-doctor {
         margin-left: 40%;
-
         font-size: 3vw;
         height: 0.5cm;
     }

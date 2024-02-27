@@ -13,6 +13,8 @@ import ConsultationPageDoctor from "./components/doctor-components/ConsultationP
 import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
+import TestingWelcome from "./components/helper-components/helper-patient/TestingWelcome";
+import AdminWelcome from "./components/helper-components/helper-admin/AdminWelcome";
 
 function App() {
   return (
@@ -35,6 +37,9 @@ function App() {
           <Route path='/monitor' element={<MonitorDoctor/>}/>
           <Route path='/doctor-profile' element={<ProfileDoctor/>}/>
           <Route path='/doctor-records' element={<RecordsDoctor/>}/>
+
+
+          <Route path='/admin' element={<AdminWelcome/>}/>
       </Routes>
   );
 }
