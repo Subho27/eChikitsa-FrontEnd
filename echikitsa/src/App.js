@@ -13,6 +13,7 @@ import ConsultationPageDoctor from "./components/doctor-components/ConsultationP
 import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
+import TestingWelcome from "./components/helper-components/helper-patient/TestingWelcome";
 
 function App() {
   return (

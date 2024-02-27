@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import HeaderHelper from "../HeaderHelper";
-import FooterHelper from "../FooterHelper";
 import '../../../css/helper-components/helper-patient/hospital-style.css'
 function HospitalHelper () {
 
@@ -54,62 +52,36 @@ function HospitalHelper () {
 
     return (
         <div>
-            <HeaderHelper/>
-
-            {/*------------------Hospital Details Start--------------------------*/}
             <div className="mainDiv">
                 <div className="leftDiv">
                     <div className="hospitalName">
                         <p>Sanjeevani Hospital</p>
-
                     </div>
                     <div className="doctorNames">
-                        {/*<h4>Select the Doctor</h4>*/}
-                        <select value={selectedDoctor.id} onChange={handleChange}>
-                            {/*<option>Select the doctor</option>*/}
-
+                        <select value={selectedDoctor.id} onChange={handleChange} className="selected-doctor">
                             {doctors.map(doctor => (
                                  <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
-
-
                             ))}
-
-
                         </select>
-
-
-
                     </div>
                     <div className="imageForSmall">
                         <img  className="hospitalImg2" src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
-                    </div >
+                    </div>
                     <div className="doctorDetails">
-
-                        {/*<h2>{selectedDoctor.name}</h2>*/}
                         <p><strong>Specialty:</strong> {selectedDoctor.specialty}</p>
                         <p><strong>Qualifications:</strong> {selectedDoctor.qualifications}</p>
                         <p><strong>Experience:</strong> {selectedDoctor.experience} years</p>
                         <p><strong>Bio:</strong> {selectedDoctor.bio}</p>
                         <p><strong>Languages Spoken:</strong> {selectedDoctor.languages.join(', ')}</p>
-                        {/*<p><strong>Appointment Availability:</strong> {selectedDoctor.appointmentAvailability}</p>*/}
-                        {/*<p><strong>Patient Reviews:</strong> {selectedDoctor.patientReviews}</p>*/}
-                        {/*{selectedDoctor.videoConsultation && (*/}
-                        {/*    <p><strong>Video Consultation:</strong> Available</p>*/}
-                        {/*)}*/}
-                        {/*<p><strong>Affiliation:</strong> {selectedDoctor.affiliation}</p>*/}
                         <p><strong>Contact:</strong> {selectedDoctor.contactInfo}</p>
                     </div>
                     <div><button   className={"Consult-button"} >CONSULT</button></div>
-
-
                 </div>
                 <div className="rightDiv">
-
                     <div className="hospitalImgdiv">
                         <img  className="hospitalImg" src={selectedDoctor.img} style={{ cursor:'pointer'  }}  alt="Image 2" />
                     </div >
                     <div className="hospitalDetails">
-
                         <h3>Hospital Details</h3>
                         <p><strong>General Inquiries:</strong> +1-123-456-7890</p>
                         <p><strong>Hospital Name:</strong> Harmony Medical Center</p>
@@ -117,19 +89,10 @@ function HospitalHelper () {
                         <p><strong>Phone Number:</strong> (555) 123-4567</p>
                         <p><strong>Email:</strong> info@harmonymedicalcenter.com</p>
                         <p><strong>Website:</strong> www.harmonymedicalcenter.com</p>
-
                     </div>
-
-
-
                 </div>
             </div>
-
-            {/*------------------Hospital Details End----------------------------*/}
-
-            <FooterHelper/>
         </div>
-
     );
 }
 

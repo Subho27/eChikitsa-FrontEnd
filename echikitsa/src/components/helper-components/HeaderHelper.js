@@ -59,7 +59,7 @@ function HeaderHelper () {
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/" className="nav-item nav-link active">{Constant.HOME_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
+                                <Link to="/testing" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
                                 <Link to="/" className="nav-item nav-link">{Constant.CONTACT_STRING}</Link>
                             </div>

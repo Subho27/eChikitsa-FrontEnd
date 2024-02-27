@@ -21,9 +21,7 @@
 }
 
 .image1 {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
+    /*height: 100vh;*/
     display: flex;
     justify-content: center;
     align-items: center;
@@ -34,13 +32,16 @@
     background: url(../../../images/patient_landing_page/image1.jpg);
     background-size: cover;
     width: 100%;
-    height: 60%;
+    height: 50%;
     background-position:center;
     color: #0E2F44;
-    padding: 5%; /* Adjust padding using percentages */
+    padding: 5%;
     text-align: center;
-    font-size: 3vw; /* Adjust font size using vw (viewport width) */
-    margin-top: -18%;
+    font-size: 3vw;
+}
+
+.consult-button {
+    font-weight: bold !important;
 }
 
 .onlyText {

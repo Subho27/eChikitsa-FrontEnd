@@ -1,0 +1,161 @@
+.testing-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.filter-options {
+    margin: 1%;
+    width: 24%;
+    height: 1270px;
+    border-radius: 10px;
+    box-shadow: 3px 5px 5px #888888;
+    padding-bottom: 15px;
+}
+
+.hospital-list {
+    margin: 1%;
+    width: 74%;
+    border-radius: 10px;
+    box-shadow: 3px 5px 5px #888888;
+}
+
+.filter-text {
+    padding: 10px;
+    text-align: center;
+}
+
+.hospital-location {
+    display: flex;
+    flex-direction: row;
+    margin: 6px;
+}
+
+.location-checkbox {
+    width: 10%;
+    margin-top: 7px;
+}
+
+.location-section {
+    margin-left: 10px;
+    height: 250px;
+    overflow: auto;
+}
+
+.rating-section {
+    margin-left: 10px;
+    height: 130px;
+}
+
+.filter-title {
+    margin: 10px;
+    font-weight: bold;
+}
+
+.stars-rating {
+    padding-left: 20px;
+}
+
+.custom-star {
+    margin: 3px;
+}
+
+.list-of-hospital {
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.list-of-hospital:nth-child(3n) {
+    justify-content: space-between;
+}
+
+.hospital-tab {
+    width: calc(33.33% - 20px);
+    /*margin-bottom: 20px;*/
+    height: 360px;
+    cursor: pointer;
+    margin: 0 10px 20px 10px;
+    border-width: 1px;
+    border-color: #1D2A4D;
+    border-radius: 10px;
+    box-shadow: 3px 5px 5px #888888;
+    transition: transform 0.3s ease-in-out;
+}
+
+.hospital-tab:hover {
+    transform: scale(1.02);
+    box-shadow: 3px 8px 8px #888888;
+}
+
+.hospital-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px 10px 0 0 ;
+}
+
+.image-container {
+    position: relative;
+    height: 68%;
+    width: 100%;
+    border-radius: 10px 10px 0 0 ;
+}
+
+.rating-container {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 5px;
+    background-color: #FFFFFF;
+    font-weight: bold;
+    border-radius: 50%;
+}
+
+.hospital-name {
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.location-of-hospital {
+    margin-left: 10px;
+}
+
+.specialisation-of-hospital {
+    margin-left: 10px;
+}
+
+.custom-pagination {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.page-link {
+    background-color: #1D2A4D;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.search-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.search-field-hospital {
+    height: 35px;
+}
+
+.search-field-doctor {
+    height: 35px;
+}
+
+.search-hospital {
+    width: 50%;
+    margin: 20px;
+}
+
+.search-doctor {
+    width: 50%;
+    margin: 20px;
+}
