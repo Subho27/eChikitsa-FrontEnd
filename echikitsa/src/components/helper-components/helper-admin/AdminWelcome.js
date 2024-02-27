@@ -6,21 +6,20 @@ import {dummy} from "./dummy";
 
 function AdminWelcome() {
     const [signupType, setSignUpType] = useState('patient');
-    // const [query, setQuery] = useState("");
-    // const [activeId, setActiveId] = useState(null); // State to track the currently active doctor ID
-    const [activeId, setActiveId] = useState(null); // State to track the currently active doctor ID
-    // const [filteredData, setFilteredData] = useState([]); // Initialize filteredData state
-    const [query, setQuery] = useState(""); // State for search query
 
-    // Function to handle activation/deactivation
+    const [activeId, setActiveId] = useState(null);
+
+    const [query, setQuery] = useState("");
+
+
     const toggleActivation = (id) => {
-        setActiveId((prevId) => (prevId === id ? null : id)); // Toggle activeId state
+        setActiveId((prevId) => (prevId === id ? null : id));
     };
 
-    // Update filteredData when query changes
+
     const handleSearch = (e) => {
         setQuery(e.target.value.toLowerCase());
-        // Perform filtering logic here and update filteredData state accordingly
+
     };
     const filteredData = dummy.filter(item =>
         item.DoctorName.toLowerCase().includes(query.toLowerCase()) ||
@@ -64,33 +63,6 @@ function AdminWelcome() {
             setSelectedValues([...selectedValues, department]);
         }
     };
-    // Function to handle activation
-    // const handleActivation = (id) => {
-    //     const updatedDoctors = dummy.map((doctor) => {
-    //         if (doctor.id === id) {
-    //             return { ...doctor, isActive: true }; // Assuming you have an 'isActive' property in your doctor object
-    //         }
-    //         return doctor;
-    //     });
-    //     // setDoctors(updatedDoctors);
-    //     // Here you can also make an API call to update the backend with the activation status change
-    //     // Example API call:
-    //     // updateDoctorActivationStatus(id, true);
-    // };
-
-// Function to handle deactivation
-//     const handleDeactivation = (id) => {
-//         const updatedDoctors = dummy.map((doctor) => {
-//             if (doctor.id === id) {
-//                 return {...doctor, isActive: false}; // Assuming you have an 'isActive' property in your doctor object
-//             }
-//             return doctor;
-//         });
-//     };
-//     const handleDeactivation = (id) => {
-//         setActiveId(null); // Reset activeId since no doctor is active now
-//         // Additional logic for deactivation
-//     };
 
 
 
@@ -187,12 +159,37 @@ function AdminWelcome() {
 
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="age" value={formData.age} onChange={handleInputChange}
-                                   required/>
-                            <label>Specialization </label>
+                            <div className="specialsel">
+                            <select name="specialization" value={formData.specialization} onChange={handleInputChange}
+                                    required>
+                                <option value="">Select Specialization</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                                <option value="Gastroenterology">Gastroenterology</option>
+                                <option value="Oncology">Oncology</option>
+                                <option value="Endocrinology">Endocrinology</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Nephrology">Nephrology</option>
+                                <option value="Pulmonology">Pulmonology</option>
+                                <option value="Rheumatology">Rheumatology</option>
+                                <option value="Urology">Urology</option>
+                                <option value="Hematology">Hematology</option>
+                                <option value="Psychiatry">Psychiatry</option>
+                                <option value="Dentistry">Dentistry</option>
+                                <option value="Emergency Medicine">Emergency Medicine</option>
+                                <option value="Radiology">Radiology</option>
+                                <option value="Anesthesiology">Anesthesiology</option>
+                                <option value="Pathology">Pathology</option>
+                            </select>
+                            </div>
+                            <label className="specialization-label">Specialization</label>
+
                         </div>
                         <div className="field">
-                            <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
+                        <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
                                    required/>
                             <label>Registration Number</label>
                         </div>
@@ -228,12 +225,12 @@ function AdminWelcome() {
                         <div className="field">
                             <input type="text" name="password" value={formData.password} onChange={handleInputChange}
                                    required/>
-                            <label>Password</label>
+                            <label>Years of Experience</label>
                         </div>
                         <div className="field">
                             <input type="text" name="confirmPassword" value={formData.confirmPassword}
                                    onChange={handleInputChange} required/>
-                            <label>Confirm Password</label>
+                            <label>Degree</label>
                         </div>
                     </div>
 
