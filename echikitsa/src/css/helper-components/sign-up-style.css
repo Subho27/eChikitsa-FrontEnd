@@ -127,7 +127,7 @@ input:valid ~ label {
     justify-content: space-around;
 }
 
-.content .checkbox {
+.content .checkbox-style {
     display: inline-flex;
     align-items: center;
     justify-content: center;

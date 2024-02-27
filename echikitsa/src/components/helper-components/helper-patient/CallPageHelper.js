@@ -1,19 +1,19 @@
 import React from 'react';
 
 function CallPageHelper() {
-    const { name, age, medicalConditions } = this.props;
+    // const { name, age, medicalConditions } = this.props;
 
     return (
         <div className="patient-profile">
             <h2>Patient Profile</h2>
             <div>
-                <strong>Name:</strong> {name}
+                <strong>Name:</strong> Suraj Subedi
             </div>
             <div>
-                <strong>Age:</strong> {age}
+                <strong>Age:</strong> Finish
             </div>
             <div>
-                <strong>Medical Conditions:</strong> {medicalConditions ? medicalConditions.join(', ') : 'None'}
+                <strong>Medical Conditions:</strong> This
             </div>
         </div>
     );
