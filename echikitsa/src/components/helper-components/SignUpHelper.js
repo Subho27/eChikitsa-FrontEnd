@@ -155,12 +155,12 @@ const SignUpHelper = () => {
 
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.password} onChange={handleInputChange}
+                            <input type="password" name="password" value={formData.password} onChange={handleInputChange}
                                    required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword}
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword}
                                    onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
                         </div>
@@ -306,11 +306,11 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.password} onChange={handleInputChange} required/>
+                            <input type="password" name="password" value={formData.password} onChange={handleInputChange} required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
                         </div>
                     </div>
