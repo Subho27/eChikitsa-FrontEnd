@@ -7,9 +7,7 @@ function CallPagePatient() {
 
     return(
         <div>
-            <PatientHeaderHelper/>
             <CallPageHelper/>
-            <FooterHelper/>
         </div>
     );
 }
