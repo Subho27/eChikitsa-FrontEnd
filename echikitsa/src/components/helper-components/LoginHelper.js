@@ -3,6 +3,8 @@ import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -13,6 +15,12 @@ const LoginHelper = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const inputRefs = useRef([]);
+//*****************************************************
+    const navigate = useNavigate();
+    //*******************************************
+
+
+
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -53,12 +61,33 @@ const LoginHelper = () => {
         setIsOtpSent(true);
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         // Logic to handle login based on login method
         if (loginMethod === 'password') {
             console.log('Logging in with email and password:', email, password);
-            // Implement login with email and password
+            //**********************************************
+            try {
+
+                const response = await axios.post('http://localhost:9191/api/login', {email, password}).then((response) => {
+
+                    if (response.data) {
+
+                        let path = '/welcome'
+                        navigate(path);
+
+                    }
+                     else {
+                        alert("email and password are incorrect")
+                    }
+                    //console.log('Response:', response);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+            //**********************************************
+
         } else if (loginMethod === 'otp') {
             console.log('Logging in with mobile number and OTP:', mobileNumber, otp);
             // Implement login with mobile number and OTP
@@ -131,9 +160,12 @@ const LoginHelper = () => {
                     <button type="button" className="button_ver button-background" onClick={handleLoginMethodToggle}>
                         Login via {capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}
                     </button>
-                    <Link to={loginType === "patient" ? '/welcome' : '/dashboard'}>
-                        <button type="submit" className="button-background">Login</button>
-                    </Link>
+                    {/*<Link to={loginType === "patient" ? '/welcome' : '/dashboard'}>*/}
+                    {/*    <button type="submit" className="button-background" >Login</button>*/}
+                    {/*</Link>*/}
+
+                        <button type="submit" className="button-background" onClick={handleLogin} >Login</button>
+
                 </div>
             </form>
 

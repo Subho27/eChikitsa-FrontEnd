@@ -3,14 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import axios from "axios";
 
 
 const SignUpHelper = () => {
+    const navigate = useNavigate();
     const [signupType, setSignUpType] = useState('patient');
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phoneNumber: '',
         password: '',
@@ -41,7 +43,10 @@ const SignUpHelper = () => {
     };
 
     const handleGenderChange = (e) => {
+        //console.log(e.target.value);
+        formData.gender = e.target.value;
         setSelectedGender(e.target.value);
+
     };
 
     // EMAIL - OTP functions
@@ -80,6 +85,40 @@ const SignUpHelper = () => {
         setRegistrationOtpValues(newerOtpValues);
     };
 
+    //*****************************************************
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        // Logic to handle login based on login method
+        if (signupType === 'patient') {
+
+            try {
+
+                const response = await axios.post('http://localhost:9191/api/patient/signup', formData).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+
+
+        } else if (signupType === 'doctor') {
+
+        }
+    };
+    //*****************************************************
+
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
             <div className="title">
@@ -102,7 +141,7 @@ const SignUpHelper = () => {
             </div>
 
             {signupType === 'patient' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
 
                         <div className="field">
@@ -195,7 +234,9 @@ const SignUpHelper = () => {
 
                     <div className="field">
                         <input type="submit" value={`Register`}/>
+
                     </div>
+
                 </form>
             )}
 
