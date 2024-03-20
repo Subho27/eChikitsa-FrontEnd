@@ -7,7 +7,7 @@ function RecordsPatient() {
 
     return(
         <div>
-            <PatientHeaderHelper/>
+            <PatientHeaderHelper data="record"/>
             <RecordsHelper/>
             <FooterHelper/>
         </div>

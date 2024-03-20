@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 
 function HeaderHelper () {
+
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -43,7 +44,7 @@ function HeaderHelper () {
                 </div>
             </div>
             <div className="container-fluid sticky-top bg-white shadow-sm">
-                <div className="container">
+                <div className="container custom-navbar">
                     <nav className="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
                         <Link to="/" className="navbar-brand">
                             <h1 className="m-0 text-uppercase text-primary full-logo-container">
@@ -56,14 +57,6 @@ function HeaderHelper () {
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                             <span className="navbar-toggler-icon"></span>
                         </button>
-                        <div className="collapse navbar-collapse" id="navbarCollapse">
-                            <div className="navbar-nav ms-auto py-0">
-                                <Link to="/" className="nav-item nav-link active">{Constant.HOME_STRING}</Link>
-                                <Link to="/testing" className="nav-item nav-link">{Constant.ABOUT_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.SERVICES_STRING}</Link>
-                                <Link to="/" className="nav-item nav-link">{Constant.CONTACT_STRING}</Link>
-                            </div>
-                        </div>
                     </nav>
                 </div>
             </div>

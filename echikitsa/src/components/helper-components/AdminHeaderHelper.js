@@ -7,7 +7,7 @@ import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 
-function PatientHeaderHelper(props) {
+function AdminHeaderHelper(props) {
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -59,13 +59,7 @@ function PatientHeaderHelper(props) {
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
-                                <Link to="/patient-records" className={`nav-item nav-link ${props.data === 'record' ? 'active' : ''}`} >Records</Link>
-                                <Link to="/patient-profile" className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >Profile</Link>
                                 <Link to="/" className="nav-item nav-link" >Logout</Link>
-                                {/*<Link to="/" className="custom-nav-item" >*/}
-                                {/*    <img className="logout" src={require("../../images/patient_landing_page/logout.png")} alt="Logout"/>*/}
-                                {/*    <span className="tooltip-text">Logout</span>*/}
-                                {/*</Link>*/}
                             </div>
                         </div>
                     </nav>
@@ -75,4 +69,4 @@ function PatientHeaderHelper(props) {
     );
 }
 
-export default PatientHeaderHelper;
+export default AdminHeaderHelper;

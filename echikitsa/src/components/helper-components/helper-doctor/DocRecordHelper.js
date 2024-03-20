@@ -236,13 +236,13 @@ const DocRecordHelper = () => {
             <div className="DocRecordList">
                 <div className="records">
                     <div className="record imp">
-                        <div className="field">ID</div>
-                        <div className="field">First Name</div>
-                        <div className="field">Last Name</div>
-                        <div className="field">Gender</div>
-                        <div className="field">Age</div>
-                        <div className="field">Repeat Patient</div>
-                        <div className="field">Date</div>
+                        <div className="field field-heading">ID</div>
+                        <div className="field field-heading">First Name</div>
+                        <div className="field field-heading">Last Name</div>
+                        <div className="field field-heading">Gender</div>
+                        <div className="field field-heading">Age</div>
+                        <div className="field field-heading">Repeat Patient</div>
+                        <div className="field field-heading">Date</div>
                     </div>
                     {filteredRecords.map((record) => (
                         <React.Fragment key={record.id}>
