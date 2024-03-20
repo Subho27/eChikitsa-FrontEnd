@@ -188,9 +188,11 @@ const SignUpHelper = () => {
                         </div>
                     </div>
 
-                    <div className="fg form-group mt-3">
-                        <span className="cc">Upload your Photo</span>
-                        <input type="file" name="file" className="file-input"/>
+                    <div className="fg form-group mt-3 upload-photo-section">
+                        <span className="upload-photo-label">Upload your Photo</span>
+                        <div className="upload-photo-button">
+                            <input type="file" name="file" className="file-input"/>
+                        </div>
                     </div>
 
                     <div className="field">
@@ -314,9 +316,9 @@ const SignUpHelper = () => {
                             <label>Confirm Password</label>
                         </div>
                     </div>
-                    <div className="fg form-group mt-3">
-                        <span className="cc">Upload Hospital Photo</span>
-                        <div className="field">
+                    <div className="fg form-group mt-3 upload-photo-section">
+                        <span className="upload-photo-label">Upload Hospital Photo</span>
+                        <div className="upload-photo-button">
                             <input type="file" name="file" className="file-input"/>
                         </div>
                     </div>

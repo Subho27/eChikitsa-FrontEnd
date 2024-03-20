@@ -7,7 +7,7 @@ function ProfilePatient() {
 
     return(
         <div>
-            <PatientHeaderHelper/>
+            <PatientHeaderHelper data="profile"/>
             <ProfileHelper/>
             <FooterHelper/>
         </div>

@@ -6,7 +6,7 @@
 .filter-options {
     margin: 1%;
     width: 24%;
-    height: 1270px;
+    height: 1285px;
     border-radius: 10px;
     box-shadow: 3px 5px 5px #888888;
     padding-bottom: 15px;
@@ -72,7 +72,6 @@
 
 .hospital-tab {
     width: calc(33.33% - 20px);
-    /*margin-bottom: 20px;*/
     height: 360px;
     cursor: pointer;
     margin: 0 10px 20px 10px;
