@@ -173,7 +173,6 @@ button {
     width: 100%;
     position: relative;
     color: #fff;
-    border: none;
     border-radius: 50px;
     font-size: 15px;
     font-weight: 500;
@@ -237,4 +236,16 @@ button:active {
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.otp-pass-section {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.otp-pass-section:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 16px;
+    font-weight: bold;
 }

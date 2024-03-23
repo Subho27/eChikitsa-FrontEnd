@@ -129,3 +129,35 @@
     margin-top: 21%;
     font-weight: bolder;
 }
+
+.custom-navbar {
+    margin: 10px;
+}
+
+.custom-nav-item {
+    width: 80px;
+}
+
+.logout {
+    margin-top: 32%;
+    margin-left: 45%;
+    height: 35px;
+    width: 35px;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 100px;
+    background-color: black;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: 70px;
+}
+
+.logout:hover ~ .tooltip-text {
+    visibility: visible;
+}

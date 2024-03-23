@@ -13,35 +13,34 @@ import ConsultationPageDoctor from "./components/doctor-components/ConsultationP
 import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
-import TestingWelcome from "./components/helper-components/helper-patient/TestingWelcome";
-import AdminWelcome from "./components/helper-components/helper-admin/AdminWelcome";
+import WelcomeAdmin from "./components/admin-components/WelcomeAdmin";
 
 function App() {
-  return (
-      <Routes>
-          {/*Common Page Routes*/}
-          <Route path='/' element={ <Home/> } />
-          <Route path='/signup' element={ <SignUp/> } />
-          <Route path='/login' element={ <Login/> } />
+    return (
+        <Routes>
+            {/*Common Page Routes*/}
+            <Route path='/' element={ <Home/> } />
+            <Route path='/signup' element={ <SignUp/> } />
+            <Route path='/login' element={ <Login/> } />
 
-          {/*Patient Page Routes*/}
-          <Route path='/welcome' element={<WelcomePatient/>}/>
-          <Route path='/patient-profile' element={<ProfilePatient/>}/>
-          <Route path='/patient-records' element={<RecordsPatient/>}/>
-          <Route path='/hospital' element={ <HospitalDetailPatient/> } />
-          <Route path='/call' element={ <CallPagePatient/> } />
+            {/*Patient Page Routes*/}
+            <Route path='/welcome' element={<WelcomePatient/>}/>
+            <Route path='/patient-profile' element={<ProfilePatient/>}/>
+            <Route path='/patient-records' element={<RecordsPatient/>}/>
+            <Route path='/hospital' element={ <HospitalDetailPatient/> } />
+            <Route path='/call' element={ <CallPagePatient/> } />
 
-          {/*Doctor Page Routes*/}
-          <Route path='/dashboard' element={<DashboardDoctor/>}/>
-          <Route path='/consult' element={<ConsultationPageDoctor/>}/>
-          <Route path='/monitor' element={<MonitorDoctor/>}/>
-          <Route path='/doctor-profile' element={<ProfileDoctor/>}/>
-          <Route path='/doctor-records' element={<RecordsDoctor/>}/>
+            {/*Doctor Page Routes*/}
+            <Route path='/dashboard' element={<DashboardDoctor/>}/>
+            <Route path='/consult' element={<ConsultationPageDoctor/>}/>
+            <Route path='/monitor' element={<MonitorDoctor/>}/>
+            <Route path='/doctor-profile' element={<ProfileDoctor/>}/>
+            <Route path='/doctor-records' element={<RecordsDoctor/>}/>
 
-
-          <Route path='/admin' element={<AdminWelcome/>}/>
-      </Routes>
-  );
+            {/*Admin Page Routes*/}
+            <Route path='/admin' element={<WelcomeAdmin/>}/>
+        </Routes>
+    );
 }
 
 export default App;
