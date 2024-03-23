@@ -5,6 +5,9 @@ import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
+import {authentication} from '../../firebase/firebaseConfig'
+import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -55,10 +58,18 @@ const LoginHelper = () => {
         setMobileNumber(e.target.value);
     };
 
-    const handleGenerateOtp = () => {
+    const handleGenerateOtp = async () => {
         // Simulate OTP generation and sending logic
         // You can replace this with actual OTP sending logic
+        console.log(mobileNumber);
         setIsOtpSent(true);
+        try {
+            const recaptcha = new RecaptchaVerifier(authentication, "recaptcha", {})
+            const confirmation = await signInWithPhoneNumber(authentication, "+919890259196", recaptcha)
+            console.log(confirmation)
+        } catch (err) {
+            console.error(err)
+        }
     };
 
     const handleLogin = async (e) => {
@@ -68,13 +79,29 @@ const LoginHelper = () => {
             console.log('Logging in with email and password:', email, password);
             //**********************************************
             try {
+                const headers = { 'Content-Type' : 'application/json' }
 
-                const response = await axios.post('http://localhost:9191/api/login', {email, password}).then((response) => {
+                const response = await axios.post('http://localhost:9191/api/login', {email, password},{headers}).then((response) => {
 
                     if (response.data) {
+                        saveJwtTokenToLocalStorage(response.data.token)
+                        if(loginType == 'patient')
+                        {
+                            let path = '/welcome'
+                            navigate(path);
+                        }
+                        if(loginType == 'doctor')
+                        {
+                            let path = '/dashboard'
+                            navigate(path);
+                        }
+                        if(loginType == 'admin'){
+                            let path = '/admin'
+                            navigate(path);
 
-                        let path = '/welcome'
-                        navigate(path);
+                        }
+
+
 
                     }
                      else {
@@ -129,6 +156,7 @@ const LoginHelper = () => {
                     {loginMethod === 'otp' && !isOtpSent && (
                         <button className="send-otp-btn" type="button" onClick={handleGenerateOtp}>Send OTP</button>
                     )}
+                    <div id="recaptcha"></div>
                     <label>{loginMethod === 'password' ? 'Email Address' : 'Mobile Number'}</label>
                 </div>
                 {loginMethod === 'password' && (

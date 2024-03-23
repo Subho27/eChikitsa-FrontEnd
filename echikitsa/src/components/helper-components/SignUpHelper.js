@@ -93,7 +93,7 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9191/api/patient/signup', formData).then((response) => {
+                const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
