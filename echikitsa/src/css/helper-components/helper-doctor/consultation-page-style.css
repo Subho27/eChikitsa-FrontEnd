@@ -58,18 +58,60 @@
 
 .video-section {
     margin: 5px;
+    position: relative;
+    /*width: 640px;*/
+    /*height: 480px;*/
 }
 
-.video-call {
+.large-video-call {
     border-radius: 10px;
+    border-width: 2px;
+    border-color: #1D2A4D;
     width: 100%;
-    height: auto;
-    object-fit: fill;
+    height: 680px;
+    object-fit: cover;
+    background-color: #1D2A4D;
+}
+
+.large-video-call-patient {
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #1D2A4D;
+    width: 100%;
+    height: 750px;
+    object-fit: cover;
+    background-color: #1D2A4D;
+}
+
+.small-video-call {
+    background-color: #13c5dd;
+    position: absolute;
+    border-width: 2px;
+    border-color: #1D2A4D;
+    top: 0;
+    right: 0;
+    width: 25%;
+    height: 25%;
+    margin: 20px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
 }
 
 .activity-section {
     width: 25%;
-    height: 660px;
+    height: 680px;
+    margin: 5px;
+    border-radius: 10px;
+    background-color: #13c5dd;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.activity-section-patient {
+    width: 25%;
+    height: 750px;
     margin: 5px;
     border-radius: 10px;
     background-color: #13c5dd;
@@ -79,9 +121,12 @@
 }
 
 .control-button-section {
+    width: 70%;
     display: flex;
     flex-direction: row;
-    margin-top: 10px;
+    margin: 20px;
+    position: absolute;
+    bottom: 0;
 }
 
 .time-duration-section {
@@ -91,8 +136,8 @@
 }
 
 .time-duration {
-    background-color: #1D2A4D;
-    color: #FFFFFF;
+    background-color: #848E9F;
+    color: #1D2A4D;
     font-weight: bolder;
     padding: 5px 10px 5px 10px;
     border-radius: 10px;

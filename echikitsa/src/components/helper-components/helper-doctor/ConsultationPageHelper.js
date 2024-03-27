@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
 import {Link} from "react-router-dom";
 import Collapsible from "react-collapsible";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 
 function ConsultationPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -22,6 +24,41 @@ function ConsultationPageHelper(effect, deps) {
             return updatedPrescription;
         });
     }
+
+    //region Call Handle
+    const [doctorLocalStream, setDoctorLocalStream] = useState(null);
+    const [doctorRemoteStream, setDoctorRemoteStream] = useState(null);
+    const [peerConnection, setPeerConnection] = useState(null);
+    const [isCaller, setIsCaller] = useState(true);
+    let oCount = 0;
+    let aCount = 0;
+
+    const constraints = {
+        'video': true,
+        'audio': true
+    }
+
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+            // console.log('Got MediaStream:', stream);
+        })
+        .catch(error => {
+            console.error('Error accessing media devices.', error);
+        });
+
+    async function playVideoFromCamera() {
+        try {
+            const constraints = {'video': true, 'audio': true};
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const videoElement = document.querySelector('video#doctorLocalStream');
+            videoElement.srcObject = stream;
+            return stream;
+        } catch(error) {
+            console.error('Error opening video camera.', error);
+            throw error;
+        }
+    }
+    //endregion
 
     const submittedMedicines = () => {
         const medicineName = document.getElementById("medicine").value;
@@ -63,6 +100,35 @@ function ConsultationPageHelper(effect, deps) {
         setSuggestDate(suggestedDate);
     };
 
+    //region handle Call button
+    const handleCallButton = async () => {
+        try {
+            let offerSender = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offerSender);
+            offerSender = JSON.stringify(offerSender);
+            const offerMessage = {
+                offer: offerSender,
+                recipient: "callee"
+            };
+            firebase.database().ref("signalling").push(offerMessage)
+                .then((data) => {
+                })
+                .catch((error) => {
+                    console.error('Error pushing data to Firebase:', error);
+                });
+        } catch (error) {
+            console.error('Error initiating call:', error);
+        }
+    };
+    //endregion
+
+    const switchView = async() => {
+        let videoArray = document.getElementsByName("switch-call-doctor");
+        const remote = videoArray.item(0).id;
+        videoArray.item(0).id = videoArray.item(1).id;
+        videoArray.item(1).id = remote;
+    }
+
     useEffect(() => {
         setPrevRecords(askRecord);
         const today = new Date();
@@ -70,6 +136,142 @@ function ConsultationPageHelper(effect, deps) {
         tomorrow.setDate(today.getDate() + 1);
         const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
         setToday(tomorrowFormatted);
+
+        //region Call Handle
+        let pc;
+
+        const initializePeerConnection = async () => {
+
+
+            const stream = await playVideoFromCamera();
+            setDoctorLocalStream(stream);
+
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+                apiKey: "AIzaSyDwzwWNy1tobd0RTnrNUqjfVyVOU3-FqlE",
+                authDomain: "echikitsa-b4fc8.firebaseapp.com",
+                databaseURL: "https://echikitsa-b4fc8-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "echikitsa-b4fc8",
+                storageBucket: "echikitsa-b4fc8.appspot.com",
+                messagingSenderId: "254572421559",
+                appId: "1:254572421559:web:f53a89bb97e76a1f038832",
+                measurementId: "G-0T5936KCPF"
+            };
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            // Set up signaling channel with Firebase
+            const database = firebase.database();
+            const signalingChannel = database.ref('signalling');
+
+            if(stream) {
+
+                // Create peer connection
+                pc = new RTCPeerConnection({
+                    iceServers: [{
+                        url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+                        credential: 'webrtc',
+                        username: 'webrtc'
+                    }]
+                });
+
+                pc.addEventListener('icecandidate', event => {
+                    if (event.candidate) {
+                        const candidate = JSON.stringify(event.candidate);
+                        signalingChannel.push({ iceCandidate: candidate });
+                    }
+                });
+                pc.addEventListener('connectionstatechange', event => {
+                    if (pc.connectionState === 'connected') {
+                        console.log("Connected");
+                    }
+                });
+
+                stream.getTracks().forEach(track => {
+                    pc.addTrack(track, stream);
+                });
+
+                const remoteVideo = document.querySelector('video#doctorRemoteStream');
+                pc.addEventListener('track', async (event) => {
+                    const [doctorRemoteStream] = event.streams;
+                    remoteVideo.srcObject = doctorRemoteStream;
+                });
+
+                setPeerConnection(pc);
+
+                return signalingChannel;
+            }
+            else{
+                console.log("Problem with stream");
+            }
+        };
+
+        initializePeerConnection().then((signalingChannel) => {
+            signalingChannel.on('child_added', async snapshot => {
+                let message = snapshot.val();
+                if (message.recipient === "callee" && !isCaller && message.offer) {
+                    oCount++;
+                    if(oCount === 2) return;
+                    let offer = JSON.parse(message.offer);
+                    await handleOffer(offer);
+                } else if (message.recipient === "caller" && isCaller && message.answer) {
+                    aCount++;
+                    if(aCount === 1) return;
+                    let answer = JSON.parse(message.answer);
+                    await handleAnswer(answer);
+                } else if (message.iceCandidate) {
+                    let answer = JSON.parse(message.iceCandidate);
+                    await handleIceCandidate(answer);
+                }
+            });
+        });
+
+        async function handleOffer(offer) {
+            console.log("Handle Offer");
+            console.log(pc);
+            if(pc) {
+                pc.setRemoteDescription(new RTCSessionDescription(offer))
+                    .then(async function () {
+                        let answerCallee = await pc.createAnswer();
+                        await pc.setLocalDescription(answerCallee);
+                        answerCallee = JSON.stringify(answerCallee);
+                        const answerMessage = {
+                            answer : answerCallee,
+                            recipient: "caller"
+                        }
+                        firebase.database().ref('signalling').push(answerMessage);
+                    })
+                    .then((data) => {
+                    })
+                    .catch((error) => {
+                        console.error('Error pushing data to Firebase:', error);
+                    });
+            }
+            else {
+                console.log("Peer connection not initialized");
+            }
+        }
+
+        async function handleAnswer(answer) {
+            console.log("Handle Answer");
+            console.log(pc);
+            if (pc.signalingState !== 'stable') {
+                pc.setRemoteDescription(new RTCSessionDescription(answer)).catch(error => {
+                    console.error('Error handling answer:', error);
+                });
+            } else {
+                console.log("Connection already in stable state, ignoring answer");
+            }
+        }
+
+        async function handleIceCandidate(iceCandidate) {
+            pc.addIceCandidate(iceCandidate).catch(error => {
+                console.error('Error adding ICE candidate:', error);
+            });
+        }
+        //endregion
+
     }, [])
 
 
@@ -100,13 +302,14 @@ function ConsultationPageHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section">
                     <div className="video-section">
-                        <img className="video-call" src={require("../../../images/doctor-page-images/video-call.jpg")} alt="video-call"/>
+                        <video className="large-video-call" id="doctorRemoteStream" name="switch-call-doctor" autoPlay playsInline controls={false}/>
+                        <video className="small-video-call" id="doctorLocalStream" name="switch-call-doctor" autoPlay playsInline controls={false} onClick={switchView}/>
                     </div>
                     <div className="control-button-section">
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>
                         <div className="button-section">
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
+                                <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} onClick={handleCallButton} alt="Sound"/>
                             </button>
                             <button className="call-buttons">
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>

@@ -129,7 +129,9 @@ const LoginHelper = () => {
                 )}
                 <div className="field1">
                     <div className="otp-pass-section" onClick={handleLoginMethodToggle}>
-                        Login via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
+                        <div className={(loginType === 'admin')? "visually-hidden" : ""}>
+                            Login via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
+                        </div>
                     </div>
                     <Link to={(loginType === "patient") ? '/welcome' : ((loginType === "admin") ? '/admin' : '/dashboard')}>
                         <button type="submit" className="button-background">Login</button>
@@ -147,8 +149,10 @@ const LoginHelper = () => {
                 </div>
             </div>
 
-            <div className="signup-link">
-                Not a member? <Link to="/signup">SignUp</Link>
+            <div className="signup-link" >
+                <div className={(loginType === 'doctor')? "visually-hidden" : ""}>
+                    Not a member? <Link to="/signup">SignUp</Link>
+                </div>
             </div>
         </div>
     );
