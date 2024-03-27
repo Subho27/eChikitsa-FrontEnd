@@ -7,117 +7,201 @@ import {Rating} from "react-simple-star-rating";
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
     const [patient, setPatient] = useState(0)
-    const [fiveStar, setFiveStar] = useState(0)
-    const [fourStar, setFourStar] = useState(0)
-    const [threeStar, setThreeStar] = useState(0)
-    const [twoStar, setTwoStar] = useState(0)
-    const [oneStar, setOneStar] = useState(0)
+    const [fiveStar, setFiveStar] = useState(totalFiveStar/totalPatient)
+    const [fourStar, setFourStar] = useState(totalFourStar/totalPatient)
+    const [threeStar, setThreeStar] = useState(totalThreeStar/totalPatient)
+    const [twoStar, setTwoStar] = useState(totalTwoStar/totalPatient)
+    const [oneStar, setOneStar] = useState(totalOneStar/totalPatient)
     const [patientsInQueue, setPatientsInQueue] = useState([])
     const [lastPatient, setLastPatient] = useState({})
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
-            //Set dummy values
-            let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
-            setRating(Number(average.toFixed(1)));
-            setPatient(totalPatient);
-            setFiveStar(totalFiveStar);
-            setFourStar(totalFourStar);
-            setThreeStar(totalThreeStar);
-            setTwoStar(totalTwoStar);
-            setOneStar(totalOneStar);
-            setPatientsInQueue(patientQueue);
-            setLastPatient(nextPatient);
+        //Set dummy values
+        let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
+        setRating(Number(average.toFixed(1)));
+        setPatient(totalPatient);
+        setPatientsInQueue(patientQueue);
+        setLastPatient(nextPatient);
 
-            const canvas = document.getElementById('non-repeat-repeat');
-            const canvasToday = document.getElementById('non-repeat-repeat-today');
-            const context = canvas.getContext('2d');
-            const contextToday = canvasToday.getContext('2d');
+        const canvas = document.getElementById('non-repeat-repeat');
+        const canvasToday = document.getElementById('non-repeat-repeat-today');
+        const context = canvas.getContext('2d');
+        const contextToday = canvasToday.getContext('2d');
+        if (canvas.chart) {
+            canvas.chart.destroy();
+        }
+        if (canvasToday.chart) {
+            canvasToday.chart.destroy();
+        }
+        canvas.chart = new Chart(context, {
+            type: 'bar',
+            data: {
+                labels: data.map(row => {
+                    const date = new Date(row.date);
+                    const month = date.getMonth() + 1;
+                    const day = date.getDate();
+                    return `${day}/${month}`;
+                }),
+                datasets: [{
+                    label: 'Repeat by date',
+                    data: data.map(row => row.repeat),
+                    backgroundColor: '#1D2A4D'
+                },
+                    {
+                        label: 'Non-Repeat by date',
+                        data: data.map(row => row.non_repeat),
+                        backgroundColor: '#848E9F'
+                    }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 0,
+                            padding: 10,
+                            color: "black"
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 0,
+                            padding: 10,
+                            color: "black"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'black'
+                        }
+                    }
+                }
+            }
+        });
+        canvasToday.chart = new Chart(contextToday, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [todayData.repeat, todayData.non_repeat],
+                    borderWidth: 0,
+                    backgroundColor: ['#1D2A4D', '#848E9F']
+                }],
+                labels: ['Repeat TODAY', 'Non-Repeat TODAY']
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'black'
+                        }
+                    }
+                }
+            }
+        })
+
+        // Ratings
+        // document.getElementById("progress-canvas5").style.width = fiveStar*100 +"%";
+        // document.getElementById("progress-canvas4").style.width = fourStar*100 + "%";
+        // document.getElementById("progress-canvas3").style.width = threeStar*100 + "%";
+        // document.getElementById("progress-canvas2").style.width = twoStar*100 + "%";
+        // document.getElementById("progress-canvas1").style.width = oneStar*100 + "%";
+
+
+
+        // //region Five rating
+        // const canvas5Rating = document.getElementById('progress-canvas5');
+        // if (canvas5Rating) {
+        //     const ctx5 = canvas5Rating.getContext('2d');
+        //     canvas5Rating.height = 18;
+        //     ctx5.fillStyle = '#4861AB';
+        //     ctx5.fillRect(0, 0, canvas5Rating.width, canvas5Rating.height);
+        //     ctx5.fillStyle = '#1D2A4D';
+        //     ctx5.fillRect(0, 0, canvas5Rating.width * fiveStar, canvas5Rating.height);
+        // }
+        // //endregion
+        //
+        // //region Four rating
+        // const canvas4Rating = document.getElementById('progress-canvas4');
+        // const ctx4 = canvas4Rating.getContext('2d');
+        // canvas4Rating.height = 18;
+        // ctx4.fillStyle = '#4861AB';
+        // ctx4.fillRect(0, 0, canvas4Rating.width, canvas4Rating.height);
+        // ctx4.fillStyle = '#1D2A4D';
+        // ctx4.fillRect(0, 0, canvas4Rating.width * fourStar, canvas4Rating.height);
+        // //endregion
+        //
+        // //region Three rating
+        // const canvas3Rating = document.getElementById('progress-canvas3');
+        // const ctx3 = canvas3Rating.getContext('2d');
+        // canvas3Rating.height = 18;
+        // ctx3.fillStyle = '#4861AB';
+        // ctx3.fillRect(0, 0, canvas3Rating.width, canvas3Rating.height);
+        // ctx3.fillStyle = '#1D2A4D';
+        // ctx3.fillRect(0, 0, canvas3Rating.width * threeStar, canvas3Rating.height);
+        // //endregion
+        //
+        // //region Two rating
+        // const canvas2Rating = document.getElementById('progress-canvas2');
+        // const ctx2 = canvas2Rating.getContext('2d');
+        // canvas2Rating.height = 18;
+        // ctx2.fillStyle = '#4861AB';
+        // ctx2.fillRect(0, 0, canvas2Rating.width, canvas2Rating.height);
+        // ctx2.fillStyle = '#1D2A4D';
+        // ctx2.fillRect(0, 0, canvas2Rating.width * twoStar, canvas2Rating.height);
+        // //endregion
+        //
+        // //region One rating
+        // const canvas1Rating = document.getElementById('progress-canvas1');
+        // const ctx1 = canvas1Rating.getContext('2d');
+        // canvas1Rating.height = 18;
+        // ctx1.fillStyle = '#4861AB';
+        // ctx1.fillRect(0, 0, canvas1Rating.width, canvas1Rating.height);
+        // ctx1.fillStyle = '#1D2A4D';
+        // ctx1.fillRect(0, 0, canvas1Rating.width * oneStar, canvas1Rating.height);
+        // //endregion
+
+        return () => {
             if (canvas.chart) {
                 canvas.chart.destroy();
+                delete canvas.chart;
             }
             if (canvasToday.chart) {
                 canvasToday.chart.destroy();
+                delete canvasToday.chart;
             }
-            canvas.chart = new Chart(context, {
-                type: 'bar',
-                data: {
-                    labels: data.map(row => {
-                        const date = new Date(row.date);
-                        const month = date.getMonth() + 1;
-                        const day = date.getDate();
-                        return `${day}/${month}`;
-                    }),
-                    datasets: [{
-                        label: 'Repeat by date',
-                        data: data.map(row => row.repeat)
-                    },
-                        {
-                            label: 'Non-Repeat by date',
-                            data: data.map(row => row.non_repeat)
-                        }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    scales: {
-                        x: {
-                            stacked: true,
-                            ticks: {
-                                autoSkip: true,
-                                maxRotation: 0,
-                                padding: 10
-                            },
-                        },
-                        y: {
-                            stacked: true,
-                            ticks: {
-                                autoSkip: true,
-                                maxRotation: 0,
-                                padding: 10
-                            },
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'white'
-                            }
-                        }
-                    }
-                }
-            });
-            canvasToday.chart = new Chart(contextToday, {
-                type: 'pie',
-                data: {
-                    datasets: [{
-                        data: [todayData.repeat, todayData.non_repeat],
-                        borderWidth: 0
-                    }],
-                    labels: ['Repeat TODAY', 'Non-Repeat TODAY']
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'white'
-                            }
-                        }
-                    }
-                }
-            })
-            return () => {
-                if (canvas.chart) {
-                    canvas.chart.destroy();
-                    delete canvas.chart;
-                }
-                if (canvasToday.chart) {
-                    canvasToday.chart.destroy();
-                    delete canvasToday.chart;
-                }
-            };
-        },
-        [data, todayData]);
+            // if (canvas5Rating.chart) {
+            //     canvas5Rating.chart.destroy();
+            //     delete  canvas5Rating.chart;
+            // }
+            // if (canvas4Rating.chart) {
+            //     canvas4Rating.chart.destroy();
+            //     delete  canvas4Rating.chart;
+            // }
+            // if (canvas3Rating.chart) {
+            //     canvas3Rating.chart.destroy();
+            //     delete  canvas3Rating.chart;
+            // }
+            // if (canvas2Rating.chart) {
+            //     canvas2Rating.chart.destroy();
+            //     delete  canvas2Rating.chart;
+            // }
+            // if (canvas1Rating.chart) {
+            //     canvas1Rating.chart.destroy();
+            //     delete  canvas1Rating.chart;
+            // }
+            //
+
+        };
+    },
+    [data, todayData]);
 
     return (
         <div>
@@ -165,11 +249,11 @@ function DashboardHelper() {
                         </div>
                         <p className="patient-rating-label"><span>{patient}</span> patients ratings</p>
                         <div>
-                            <div className="star-count-section"><span className="star-count-text">5 star</span> <progress className="patient-count" value={fiveStar} max={patient}/></div>
-                            <div className="star-count-section"><span className="star-count-text">4 star</span> <progress className="patient-count" value={fourStar} max={patient}/></div>
-                            <div className="star-count-section"><span className="star-count-text">3 star</span> <progress className="patient-count" value={threeStar} max={patient}/></div>
-                            <div className="star-count-section"><span className="star-count-text">2 star</span> <progress className="patient-count" value={twoStar} max={patient}/></div>
-                            <div className="star-count-section"><span className="star-count-text">1 star</span> <progress className="patient-count" value={oneStar} max={patient}/></div>
+                            <div className="star-count-section"><span className="star-count-text">5 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas5" style={{ width: fiveStar*100+"%" }}></div></div></div>
+                            <div className="star-count-section"><span className="star-count-text">4 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas4" style={{ width: fourStar*100+"%" }}></div></div></div>
+                            <div className="star-count-section"><span className="star-count-text">3 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas3" style={{ width: threeStar*100+"%" }}></div></div></div>
+                            <div className="star-count-section"><span className="star-count-text">2 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas2" style={{ width: twoStar*100+"%" }}></div></div></div>
+                            <div className="star-count-section"><span className="star-count-text">1 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas1" style={{ width: oneStar*100+"%" }}></div></div></div>
                         </div>
                     </div>
                     <div className="queue common-tab-2">
