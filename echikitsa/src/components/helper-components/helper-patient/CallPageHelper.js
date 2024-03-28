@@ -1,12 +1,14 @@
 import React, {useEffect, useRef, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
-import {Link} from "react-router-dom";
+import {Link, useNavigate, useLocation} from "react-router-dom";
 import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import styled from 'styled-components';
 import Collapsible from "react-collapsible";
 import "../../../css/helper-components/helper-patient/call-page-style.css"
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
+import {firebaseConfig} from "../../firebase-config/firebaseConfigs";
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -15,12 +17,16 @@ function CallPageHelper(effect, deps) {
     const [diagnosisSummary, setDiagnosisSummary] = useState("");
     const [medicines, setMedicines] = useState([]);
     const [prescription, setPrescription] = useState([]);
+    const [isOpen, setIsOpen] = useState(true);
+
+    const navigate = useNavigate();
+    const location = useLocation();
 
     //region Call Handle
     const [patientLocalStream, setPatientLocalStream] = useState(null);
     const [patientRemoteStream, setPatientRemoteStream] = useState(null);
     const [peerConnection, setPeerConnection] = useState(null);
-    const [isCaller, setIsCaller] = useState(false);
+    const [isCaller, setIsCaller] = useState(true);
     let oCount = 0;
     let aCount = 0;
 
@@ -63,18 +69,18 @@ function CallPageHelper(effect, deps) {
         });
     }
     const [emailOtpValues, setEmailOtpValues] = useState(Array(6).fill(''));
-    const inputRefs = useRef([]);
+    const inputRefsCall = useRef([]);
 
     const handleConsentOtp = (index, value) => {
         const newOtpValues = [...emailOtpValues];
         newOtpValues[index] = value;
         if (value === '') {
             if (index > 0) {
-                inputRefs.current[index].value = '';
-                inputRefs.current[index - 1].focus();
+                inputRefsCall.current[index].value = '';
+                inputRefsCall.current[index - 1].focus();
             }
         } else if (index < emailOtpValues.length - 1 && value.length === 1) {
-            inputRefs.current[index + 1].focus();
+            inputRefsCall.current[index + 1].focus();
         }
         setEmailOtpValues(newOtpValues);
     };
@@ -127,6 +133,29 @@ function CallPageHelper(effect, deps) {
         videoArray.item(1).id = remote;
     }
 
+    //region handle Call button
+    const handleCallButton = async () => {
+        try {
+            setIsOpen(false);
+            let offerSender = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offerSender);
+            offerSender = JSON.stringify(offerSender);
+            const offerMessage = {
+                offer: offerSender,
+                recipient: "callee"
+            };
+            firebase.database().ref("signalling").push(offerMessage)
+                .then((data) => {
+                })
+                .catch((error) => {
+                    console.error('Error pushing data to Firebase:', error);
+                });
+        } catch (error) {
+            console.error('Error initiating call:', error);
+        }
+    };
+    //endregion
+
     useEffect(() => {
         setPrevRecords(askRecord);
         const today = new Date();
@@ -144,17 +173,6 @@ function CallPageHelper(effect, deps) {
             const stream = await playVideoFromCamera();
             setPatientLocalStream(stream);
 
-            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-            const firebaseConfig = {
-                apiKey: "AIzaSyDwzwWNy1tobd0RTnrNUqjfVyVOU3-FqlE",
-                authDomain: "echikitsa-b4fc8.firebaseapp.com",
-                databaseURL: "https://echikitsa-b4fc8-default-rtdb.asia-southeast1.firebasedatabase.app",
-                projectId: "echikitsa-b4fc8",
-                storageBucket: "echikitsa-b4fc8.appspot.com",
-                messagingSenderId: "254572421559",
-                appId: "1:254572421559:web:f53a89bb97e76a1f038832",
-                measurementId: "G-0T5936KCPF"
-            };
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
@@ -269,6 +287,7 @@ function CallPageHelper(effect, deps) {
             });
         }
         //endregion
+
     }, [])
 
 
@@ -313,13 +332,31 @@ function CallPageHelper(effect, deps) {
         );
     };
 
+    const returnWelcome = () => {
+        navigate('/welcome');
+    }
+
+    const handleClose = () => setIsOpen(false);
+
     return (
 
         <div className="consult-page-container">
             <div id="overlay" onClick={off}>
                 <div id="text">Waiting</div>
             </div>
-
+            <div>
+                {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
+                    <div className="confirmation-content">
+                        <h3>Confirmation!!!</h3>
+                        <p>Are you sure?<br/>
+                        You want to join video consultation.</p>
+                        <div className="Feedbutton">
+                            <button className="confirm-call" onClick={handleCallButton}>YES</button>
+                            <button className="confirm-call" onClick={returnWelcome}>NO</button>
+                        </div>
+                    </div>
+                </StyledPopup>}
+            </div>
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
@@ -352,8 +389,7 @@ function CallPageHelper(effect, deps) {
                                          alt="End"/>
                                 </button>}
                                 modal
-                                closeOnDocumentClick
-                            >
+                                closeOnDocumentClick >
                                 <div className="Feedcontent">
                                     <h4>FeedBack</h4>
                                     <div>
@@ -395,7 +431,7 @@ function CallPageHelper(effect, deps) {
                                     <div className="container-otp">
                                         <div id="inputs" className="inputs">
                                             {emailOtpValues.map((value, index) => (
-                                                <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
+                                                <input key={index} ref={(ref) => (inputRefsCall.current[index] = ref)}
                                                        className="input-otp" type="text" inputMode="numeric"
                                                        maxLength="1" value={value}
                                                        onChange={(e) => handleConsentOtp(index, e.target.value)}/>

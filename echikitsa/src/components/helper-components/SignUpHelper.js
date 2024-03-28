@@ -1,12 +1,17 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
 import {Link} from "react-router-dom";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
+import 'firebase/compat/auth';
+import {firebaseConfig} from "../firebase-config/firebaseConfigs";
 
 
 const SignUpHelper = () => {
+
     const [signupType, setSignUpType] = useState('patient');
     const [formData, setFormData] = useState({
         firstname: '',
@@ -22,6 +27,8 @@ const SignUpHelper = () => {
         gender: '',
 
     });
+
+    const [confResult, setConfResult] = useState({});
 
     const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
@@ -44,44 +51,131 @@ const SignUpHelper = () => {
         setSelectedGender(e.target.value);
     };
 
-    // EMAIL - OTP functions
+    //region EMAIL Patient - OTP functions
     const [emailOtpValues, setEmailOtpValues] = useState(Array(6).fill(''));
-    const inputRefs = useRef([]);
+    const inputRefsPatient = useRef([]);
 
     const handleEmailChange = (index, value) => {
         const newOtpValues = [...emailOtpValues];
         newOtpValues[index] = value;
         if (value === '') {
             if (index > 0) {
-                inputRefs.current[index].value = '';
-                inputRefs.current[index - 1].focus();
+                inputRefsPatient.current[index].value = '';
+                inputRefsPatient.current[index - 1].focus();
             }
         } else if (index < emailOtpValues.length - 1 && value.length === 1) {
-            inputRefs.current[index + 1].focus();
+            inputRefsPatient.current[index + 1].focus();
         }
         setEmailOtpValues(newOtpValues);
     };
+    //endregion
 
-    // REGISTRATION - OTP functions
-    const [registrationOtpValues, setRegistrationOtpValues] = useState(Array(6).fill(''));
-    const inputRRefs = useRef([]);
+    //region EMAIL Hospital - OTP functions
+    const [emailOtpValuesHospital, setEmailOtpValuesHospital] = useState(Array(6).fill(''));
+    const inputHRefs = useRef([]);
+
+    const handleEmailChangeHospital = (index, value) => {
+        const newOtpValues = [...emailOtpValuesHospital];
+        newOtpValues[index] = value;
+        if (value === '') {
+            if (index > 0) {
+                inputHRefs.current[index].value = '';
+                inputHRefs.current[index - 1].focus();
+            }
+        } else if (index < emailOtpValuesHospital.length - 1 && value.length === 1) {
+            inputHRefs.current[index + 1].focus();
+        }
+        setEmailOtpValuesHospital(newOtpValues);
+    };
+    //endregion
+
+    //region REGISTRATION - OTP functions
+    const [phoneOtpValues, setPhoneOtpValues] = useState(Array(6).fill(''));
+    const inputPRefs = useRef([]);
 
     const handleRegistrationChange = (index, value) => {
-        const newerOtpValues = [...registrationOtpValues];
+        const newerOtpValues = [...phoneOtpValues];
         newerOtpValues[index] = value;
         if (value === '') {
             if (index > 0) {
-                inputRRefs.current[index].value = '';
-                inputRRefs.current[index - 1].focus();
+                inputPRefs.current[index].value = '';
+                inputPRefs.current[index - 1].focus();
             }
-        } else if (index < registrationOtpValues.length - 1 && value.length === 1) {
-            inputRRefs.current[index + 1].focus();
+        } else if (index < phoneOtpValues.length - 1 && value.length === 1) {
+            inputPRefs.current[index + 1].focus();
         }
-        setRegistrationOtpValues(newerOtpValues);
+        setPhoneOtpValues(newerOtpValues);
     };
+    //endregion
+
+    const verifyOtp = (id) => {
+        let verificationCode = '';
+        if(id === 0) { verificationCode = emailOtpValues.join(''); }
+        else if(id === 1) { verificationCode = phoneOtpValues.join(''); }
+        else { verificationCode = emailOtpValuesHospital.join(''); }
+        confResult.confirm(verificationCode).then((result) => {
+            console.log("Success");
+            if(id === 0) {
+                document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
+            }
+            else if(id === 1) {
+                document.getElementById("phone-otp-check-patient").className = "fg visually-hidden";
+                document.getElementById("phone-patient-send-otp").innerText = "Verified";
+                document.getElementById("phone-patient-send-otp").style.backgroundColor = "#39c239";
+            }
+            else {
+                document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
+            }
+        }).catch((error) => {
+            console.log("Error");
+        });
+    }
+
+    const sendOtp = () => {
+        const phoneNumber = document.getElementById("phone-number").value;
+        const appVerifier = window.recaptchaVerifier;
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                setConfResult(confirmationResult);
+            }).catch((error) => {
+            console.log("expire");
+        });
+    }
+
+    const onClickSendOtp = () => {
+        firebase.auth().useDeviceLanguage();
+        try {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    },
+                    'error-callback': (error) => {
+                        console.log(error);
+                    }
+                });
+                window.recaptchaVerifier.render().then(() =>{
+                    sendOtp();
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    }, []);
 
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
+            <div id='recaptcha-container'></div>
             <div className="title">
                 Registration Form
             </div>
@@ -118,17 +212,68 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange}
-                                   required/>
+                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
+                            <button className="ver" onClick={() => {
+                                const isHidden = document.getElementById("patient-email-otp-check");
+                                if (isHidden !== null) {
+                                    isHidden.className = "fg";
+                                }
+                                onClickSendOtp();
+                            }}>
+                                Send OTP
+                            </button>
                             <label>Email</label>
                         </div>
+                    </div>
+                    <div className="fg visually-hidden" id="patient-email-otp-check">
+                        <div className="container-otp">
+                            <div id="inputs" className="inputs">
+                                {emailOtpValues.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputRefsPatient.current[index] = ref)}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
+                                           onChange={(e) => handleEmailChange(index, e.target.value)}/>
+                                ))}
+                            </div>
+                            <div className="field">
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(0);}}/>
+                            </div>
+                            <div id="resend-otp">
+                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="fg">
                         <div className="field">
-                            <input type="text" name="phoneNumber" value={formData.phoneNumber}
-                                   onChange={handleInputChange} required/>
+                            <input type="text" name="phone" id="phone-number" onChange={handleInputChange} required/>
+                            <button className="ver" id="phone-patient-send-otp" onClick={() => {
+                                const isHidden = document.getElementById("phone-otp-check-patient");
+                                if (isHidden !== null) {
+                                    isHidden.className = "fg";
+                                }
+                                onClickSendOtp();
+                            }}>
+                                Send OTP
+                            </button>
                             <label>Phone Number</label>
                         </div>
                     </div>
-
+                    <div className="fg visually-hidden" id="phone-otp-check-patient">
+                        <div className="container-otp">
+                            <div id="inputs" className="inputs">
+                                {phoneOtpValues.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputPRefs.current[index] = ref)}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
+                                           onChange={(e) => handleRegistrationChange(index, e.target.value)}/>
+                                ))}
+                            </div>
+                            <div className="field">
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(1);}}/>
+                            </div>
+                            <div id="resend-otp">
+                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
+                            </div>
+                        </div>
+                    </div>
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="age" value={formData.age} onChange={handleInputChange}
@@ -218,32 +363,28 @@ const SignUpHelper = () => {
                         <div className="field">
                             <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
                             <button className="ver" onClick={() => {
-                                const isHidden = document.getElementById("email-otp-check");
+                                const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
                                 }
+                                onClickSendOtp();
                             }}>
                                 Send OTP
                             </button>
                             <label>Email</label>
                         </div>
                     </div>
-                    <div className="fg visually-hidden" id="email-otp-check">
+                    <div className="fg visually-hidden" id="email-otp-check-Hospital">
                         <div className="container-otp">
                             <div id="inputs" className="inputs">
-                                {emailOtpValues.map((value, index) => (
-                                    <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
+                                {emailOtpValuesHospital.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputHRefs.current[index] = ref)}
                                         className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
-                                        onChange={(e) => handleEmailChange(index, e.target.value)}/>
+                                        onChange={(e) => handleEmailChangeHospital(index, e.target.value)}/>
                                 ))}
                             </div>
                             <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {
-                                    const isHidden = document.getElementById("email-otp-check");
-                                    if (isHidden !== null) {
-                                        isHidden.className = "fg visually-hidden";
-                                    }
-                                }}/>
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(2);}}/>
                             </div>
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
@@ -253,37 +394,7 @@ const SignUpHelper = () => {
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="email" value={formData.regis} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
-                                const isHidden = document.getElementById("regis-otp-check");
-                                if (isHidden !== null) {
-                                    isHidden.className = "fg";
-                                }
-                            }}>
-                                Send OTP
-                            </button>
                             <label>Registration Number</label>
-                        </div>
-                    </div>
-                    <div className="fg visually-hidden" id="regis-otp-check">
-                        <div className="container-otp">
-                            <div id="inputs" className="inputs">
-                                {registrationOtpValues.map((value, index) => (
-                                    <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
-                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
-                                           onChange={(e) => handleRegistrationChange(index, e.target.value)}/>
-                                ))}
-                            </div>
-                            <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {
-                                    const isHidden = document.getElementById("regis-otp-check");
-                                    if (isHidden !== null) {
-                                        isHidden.className = "fg visually-hidden";
-                                    }
-                                }}/>
-                            </div>
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
                         </div>
                     </div>
                     <div className="fg">
