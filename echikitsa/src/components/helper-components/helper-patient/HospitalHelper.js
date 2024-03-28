@@ -131,9 +131,10 @@ function HospitalHelper (props) {
                                 <option value="senior">Senior Doctor</option>
                             </select>
                             <select onChange={handleSpecialityChange} className="filter-doctor doctor-speciality-filter">
-                                <option selected hidden>Select Specialisations</option>
-                                <option value="General Medicine">General Medicine</option>
-                                <option value="Pediatrics">Pediatrics</option>
+                                <option selected hidden>Select Specializations </option>
+                                {Array.from(new Set(doctors.map(doctor => doctor.specialization))).map((specialization, index) => (
+                                    <option key={index} value={specialization}>{specialization}</option>
+                                ))}
                             </select>
                             {selectedDoctors.length > 0 &&( <select onChange={handleNameChange} className="filter-doctor doctor-name-filter">
                                 <option selected hidden>Select Doctor</option>
@@ -153,35 +154,35 @@ function HospitalHelper (props) {
                                     <tbody>
                                         <tr>
                                             <td>Doctor Name</td>
-                                            <td>{selectedDoctor.name}</td>
+                                            <td>{selectedDoctor && selectedDoctor.name}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Gender</td>
-                                            <td>{selectedDoctor.gender}</td>
+                                            <td>{selectedDoctor && selectedDoctor.gender}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Age</td>
-                                            <td>{selectedDoctor.age}</td>
+                                            <td>{selectedDoctor  && selectedDoctor.age}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Specialization</td>
-                                            <td>{selectedDoctor.specialization}</td>
+                                            <td>{selectedDoctor && selectedDoctor.specialization}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Experience</td>
-                                            <td>{selectedDoctor.experience}</td>
+                                            <td>{selectedDoctor && selectedDoctor.experience}</td>
                                         </tr>
-                                        {/*<tr>*/}
-                                        {/*    <td>Doctor Qualifications</td>*/}
-                                        {/*    <td>{selectedDoctor.qualification}</td>*/}
-                                        {/*</tr>*/}
-                                        {/*<tr>*/}
-                                        {/*    <td>Languages Spoken</td>*/}
-                                        {/*    <td>English, Hindi</td>*/}
-                                        {/*</tr>*/}
+                                        <tr>
+                                            <td>Doctor Qualifications</td>
+                                            <td>{selectedDoctor && selectedDoctor.qualification}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Languages Spoken</td>
+                                            <td>English, Hindi</td>
+                                        </tr>
                                         <tr>
                                             <td>Doctor Rating</td>
-                                            <td>{selectedDoctor.rating}</td>
+                                            <td>{selectedDoctor && selectedDoctor.rating}</td>
                                         </tr>
                                     </tbody>
                                 </table>
