@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
 import {Link} from "react-router-dom";
 import Collapsible from "react-collapsible";
+import { firebaseConfig } from '../../firebase-config/firebaseConfigs';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 
@@ -29,7 +30,7 @@ function ConsultationPageHelper(effect, deps) {
     const [doctorLocalStream, setDoctorLocalStream] = useState(null);
     const [doctorRemoteStream, setDoctorRemoteStream] = useState(null);
     const [peerConnection, setPeerConnection] = useState(null);
-    const [isCaller, setIsCaller] = useState(true);
+    const [isCaller, setIsCaller] = useState(false);
     let oCount = 0;
     let aCount = 0;
 
@@ -146,17 +147,6 @@ function ConsultationPageHelper(effect, deps) {
             const stream = await playVideoFromCamera();
             setDoctorLocalStream(stream);
 
-            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-            const firebaseConfig = {
-                apiKey: "AIzaSyDwzwWNy1tobd0RTnrNUqjfVyVOU3-FqlE",
-                authDomain: "echikitsa-b4fc8.firebaseapp.com",
-                databaseURL: "https://echikitsa-b4fc8-default-rtdb.asia-southeast1.firebasedatabase.app",
-                projectId: "echikitsa-b4fc8",
-                storageBucket: "echikitsa-b4fc8.appspot.com",
-                messagingSenderId: "254572421559",
-                appId: "1:254572421559:web:f53a89bb97e76a1f038832",
-                measurementId: "G-0T5936KCPF"
-            };
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
