@@ -19,6 +19,7 @@ function ProfilePage() {
         "prevRecords": "previous.pdf"
     });
 
+
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
         email: '',
@@ -51,6 +52,7 @@ function ProfilePage() {
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
         }
+
     }
 
     const updateProfile = () => {
@@ -71,6 +73,9 @@ function ProfilePage() {
     const off = () => {
         document.getElementById("overlay-patient-profile").style.display = "none";
     }
+
+
+
 
     return (
         <div>
@@ -133,7 +138,7 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={"+91-" + profile.mobile} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" placeholder={"+91-" + profile.mobile} readOnly={true} />
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>

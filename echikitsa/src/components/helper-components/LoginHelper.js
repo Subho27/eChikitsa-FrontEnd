@@ -84,6 +84,7 @@ const LoginHelper = () => {
                 const response = await axios.post('http://localhost:9191/api/login', {email, password},{headers}).then((response) => {
 
                     if (response.data) {
+                        console.log(response.data)
                         saveJwtTokenToLocalStorage(response.data.token)
                         if(loginType == 'patient')
                         {

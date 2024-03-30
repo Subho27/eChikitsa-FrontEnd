@@ -14,6 +14,7 @@ const SignUpHelper = () => {
         firstName: '',
         lastName: '',
         email: '',
+        role:'PATIENT',
         phoneNumber: '',
         password: '',
         age:'',
@@ -112,8 +113,6 @@ const SignUpHelper = () => {
 
             }
 
-
-        } else if (signupType === 'doctor') {
 
         }
     };

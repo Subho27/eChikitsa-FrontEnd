@@ -15,6 +15,7 @@ import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
 import WelcomeAdmin from "./components/admin-components/WelcomeAdmin";
 
+
 function App() {
     return (
         <Routes>
@@ -39,6 +40,7 @@ function App() {
 
             {/*Admin Page Routes*/}
             <Route path='/admin' element={<WelcomeAdmin/>}/>
+
         </Routes>
     );
 }
