@@ -34,7 +34,7 @@ const SignUpHelper = () => {
 
     });
     const [formDataHospital, setFormDataHospital] = useState({
-        hospitalname: '',
+        name: '',
         category: '',
         email: '',
         role:'ADMIN',
@@ -214,13 +214,13 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
+                const response = await axios.post('http://localhost:9191/auth/registerPatient', formData).then((response) => {
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
 
                         let path = '/login'
-                        //navigate(path);
+                        navigate(path);
 
                     }
                     else {
@@ -238,6 +238,25 @@ const SignUpHelper = () => {
         else
         {
             console.log(formDataHospital);
+            try {
+
+                const response = await axios.post('http://localhost:9191/auth/registerHospital', formDataHospital).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
         }
     };
     //****************************************
@@ -419,7 +438,7 @@ const SignUpHelper = () => {
                 <form onSubmit={handleSignUp}>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="hospitalname" value={formDataHospital.hospitalname}
+                            <input type="text" name="name" value={formDataHospital.name}
                                    onChange={handleInputChangeHospital} required/>
                             <label>Hospital Name</label>
                         </div>
