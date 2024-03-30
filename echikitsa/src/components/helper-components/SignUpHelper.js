@@ -13,10 +13,14 @@ import {firebaseConfig} from "../firebase-config/firebaseConfigs";
 const SignUpHelper = () => {
 
     const [signupType, setSignUpType] = useState('patient');
+
+//******************************************************************************************************
+
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
+        role:'PATIENT',
         phoneNumber: '',
         password: '',
         age:'',
@@ -27,7 +31,6 @@ const SignUpHelper = () => {
         gender: '',
 
     });
-//******************************************************************************************************
     const [formDataHospital, setFormDataHospital] = useState({
         hospitalname: '',
         category: '',
