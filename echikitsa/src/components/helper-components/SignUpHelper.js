@@ -27,6 +27,32 @@ const SignUpHelper = () => {
         gender: '',
 
     });
+//******************************************************************************************************
+    const [formDataHospital, setFormDataHospital] = useState({
+        hospitalname: '',
+        category: '',
+        email: '',
+        role:'ADMIN',
+        phoneNumber: '',
+        password: '',
+        registrationNumber:'',
+        address:'',
+        confirmPassword: '',
+        website:'',
+        pincode:''
+
+
+    });
+
+    const handleInputChangeHospital = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setFormDataHospital((prevData) => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+    //***********************************************************************************************
 
     const [confResult, setConfResult] = useState({});
 
