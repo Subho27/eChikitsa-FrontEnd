@@ -202,6 +202,42 @@ const SignUpHelper = () => {
         }
     }, []);
 
+    ///*****************************************************************************************************
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        // Logic to handle login based on login method
+        if (signupType === 'patient') {
+
+            try {
+
+                const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+
+
+        }
+        else
+        {
+            console.log(formDataHospital);
+        }
+    };
+    //****************************************
+
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
             <div id='recaptcha-container'></div>
