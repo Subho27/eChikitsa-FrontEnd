@@ -3,14 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
 import {firebaseConfig} from "../firebase-config/firebaseConfigs";
+import axios from "axios";
 
 
 const SignUpHelper = () => {
+    const navigate = useNavigate();
 
     const [signupType, setSignUpType] = useState('patient');
 
@@ -77,6 +79,7 @@ const SignUpHelper = () => {
     };
 
     const handleGenderChange = (e) => {
+        formData.gender = e.target.value;
         setSelectedGender(e.target.value);
     };
 
@@ -207,6 +210,7 @@ const SignUpHelper = () => {
         e.preventDefault();
         // Logic to handle login based on login method
         if (signupType === 'patient') {
+            console.log(formData)
 
             try {
 
@@ -216,7 +220,7 @@ const SignUpHelper = () => {
                         alert("registered successfully !!")
 
                         let path = '/login'
-                        navigate(path);
+                        //navigate(path);
 
                     }
                     else {
@@ -261,7 +265,7 @@ const SignUpHelper = () => {
             </div>
 
             {signupType === 'patient' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
 
                         <div className="field">
@@ -309,7 +313,7 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="phone" id="phone-number" onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" id="phone-number" onChange={handleInputChange} required/>
                             <button className="ver" id="phone-patient-send-otp" onClick={() => {
                                 const isHidden = document.getElementById("phone-otp-check-patient");
                                 if (isHidden !== null) {
@@ -412,21 +416,21 @@ const SignUpHelper = () => {
             )}
 
             {signupType === 'hospital' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.hospitalname}
+                            <input type="text" name="hospitalname" value={formDataHospital.hospitalname}
                                    onChange={handleInputChange} required/>
                             <label>Hospital Name</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="lastName" value={formData.category} onChange={handleInputChange} required/>
+                            <input type="text" name="category" value={formDataHospital.category} onChange={handleInputChange} required/>
                             <label>Category</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
+                            <input type="text" name="email" value={formDataHospital.email} onChange={handleInputChange} required/>
                             <button className="ver" onClick={() => {
                                 const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
@@ -458,37 +462,37 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.regis} onChange={handleInputChange} required/>
+                            <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange} required/>
                             <label>Registration Number</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.contact} onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" value={formDataHospital.phoneNumber} onChange={handleInputChange} required/>
                             <label>Contact</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="text" name="website" value={formDataHospital.website} onChange={handleInputChange} required/>
                             <label>Website Link</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="state" value={formData.address} onChange={handleInputChange} required/>
+                            <input type="text" name="address" value={formDataHospital.address} onChange={handleInputChange} required/>
                             <label>Address</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="city" value={formData.pincode} onChange={handleInputChange} required/>
+                            <input type="text" name="pincode" value={formDataHospital.pincode} onChange={handleInputChange} required/>
                             <label>Pincode</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="password" name="password" value={formData.password} onChange={handleInputChange} required/>
+                            <input type="password" name="password" value={formDataHospital.password} onChange={handleInputChange} required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="password" name="confirmPassword" value={formDataHospital.confirmPassword} onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
                         </div>
                     </div>
