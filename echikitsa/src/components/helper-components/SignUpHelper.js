@@ -3,20 +3,31 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
 import {firebaseConfig} from "../firebase-config/firebaseConfigs";
+import axios from "axios";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 
 const SignUpHelper = () => {
+    const navigate = useNavigate();
 
     const [signupType, setSignUpType] = useState('patient');
+    const [imageUpload, setImageUpload] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]);
+    const imagesListRef = ref(storage, "images/");
+//******************************************************************************************************
+
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
+        role:'PATIENT',
         phoneNumber: '',
         password: '',
         age:'',
@@ -25,8 +36,35 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
+        img_url:''
 
     });
+    const [formDataHospital, setFormDataHospital] = useState({
+        name: '',
+        category: '',
+        email: '',
+        role:'ADMIN',
+        phoneNumber: '',
+        password: '',
+        registrationNumber:'',
+        address:'',
+        confirmPassword: '',
+        website:'',
+        pincode:'',
+        img_url:''
+
+
+    });
+
+    const handleInputChangeHospital = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setFormDataHospital((prevData) => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+    //***********************************************************************************************
 
     const [confResult, setConfResult] = useState({});
 
@@ -48,6 +86,7 @@ const SignUpHelper = () => {
     };
 
     const handleGenderChange = (e) => {
+        formData.gender = e.target.value;
         setSelectedGender(e.target.value);
     };
 
@@ -169,9 +208,96 @@ const SignUpHelper = () => {
 
     useEffect(() => {
         if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+           // firebase.initializeApp(firebaseConfig);
         }
     }, []);
+
+    const uploadFiles = () => {
+        console.log(imageUpload)
+        if (imageUpload == null) return Promise.reject("No image to upload");
+
+        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+
+        return uploadBytes(imageRef, imageUpload)
+            .then((snapshot) => {
+                return getDownloadURL(snapshot.ref);
+            })
+            .then((url) => {
+                // Optionally, you can also update state or perform other actions here
+                if(signupType === 'patient')
+                {
+                    formData.img_url = url;
+                }
+                else {
+                    formDataHospital.img_url = url;
+                }
+                console.log("Image uploaded successfully. Download URL:", url);
+                return url; // Return the download URL
+            })
+            .catch((error) => {
+                console.error("Error uploading image:", error);
+                throw error; // Propagate the error
+            });
+    };
+
+    ///*****************************************************************************************************
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        await uploadFiles()
+        // Logic to handle login based on login method
+        if (signupType === 'patient') {
+            console.log(formData)
+
+            try {
+
+                const response = await axios.post('http://localhost:9191/auth/registerPatient', formData).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+
+
+        }
+        else
+        {
+            console.log(formDataHospital);
+            try {
+
+                const response = await axios.post('http://localhost:9191/auth/registerHospital', formDataHospital).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+        }
+    };
+    //****************************************
 
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
@@ -196,7 +322,7 @@ const SignUpHelper = () => {
             </div>
 
             {signupType === 'patient' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
 
                         <div className="field">
@@ -244,7 +370,7 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="phone" id="phone-number" onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" id="phone-number" onChange={handleInputChange} required/>
                             <button className="ver" id="phone-patient-send-otp" onClick={() => {
                                 const isHidden = document.getElementById("phone-otp-check-patient");
                                 if (isHidden !== null) {
@@ -336,7 +462,10 @@ const SignUpHelper = () => {
                     <div className="fg form-group mt-3 upload-photo-section">
                         <span className="upload-photo-label">Upload your Photo</span>
                         <div className="upload-photo-button">
-                            <input type="file" name="file" className="file-input"/>
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
+
                         </div>
                     </div>
 
@@ -347,21 +476,21 @@ const SignUpHelper = () => {
             )}
 
             {signupType === 'hospital' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.hospitalname}
-                                   onChange={handleInputChange} required/>
+                            <input type="text" name="name" value={formDataHospital.name}
+                                   onChange={handleInputChangeHospital} required/>
                             <label>Hospital Name</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="lastName" value={formData.category} onChange={handleInputChange} required/>
+                            <input type="text" name="category" value={formDataHospital.category} onChange={handleInputChangeHospital} required/>
                             <label>Category</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
+                            <input type="text" name="email" value={formDataHospital.email} onChange={handleInputChangeHospital} required/>
                             <button className="ver" onClick={() => {
                                 const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
@@ -393,44 +522,53 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.regis} onChange={handleInputChange} required/>
+                            <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChangeHospital} required/>
                             <label>Registration Number</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.contact} onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" value={formDataHospital.phoneNumber} onChange={handleInputChangeHospital} required/>
                             <label>Contact</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="text" name="website" value={formDataHospital.website} onChange={handleInputChangeHospital} required/>
                             <label>Website Link</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="state" value={formData.address} onChange={handleInputChange} required/>
+                            <input type="text" name="address" value={formDataHospital.address} onChange={handleInputChangeHospital} required/>
                             <label>Address</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="city" value={formData.pincode} onChange={handleInputChange} required/>
+                            <input type="text" name="pincode" value={formDataHospital.pincode} onChange={handleInputChangeHospital} required/>
                             <label>Pincode</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="password" name="password" value={formData.password} onChange={handleInputChange} required/>
+                            <input type="password" name="password" value={formDataHospital.password} onChange={handleInputChangeHospital} required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="password" name="confirmPassword" value={formDataHospital.confirmPassword} onChange={handleInputChangeHospital} required/>
                             <label>Confirm Password</label>
                         </div>
                     </div>
                     <div className="fg form-group mt-3 upload-photo-section">
                         <span className="upload-photo-label">Upload Hospital Photo</span>
                         <div className="upload-photo-button">
-                            <input type="file" name="file" className="file-input"/>
+                            {/*<input*/}
+                            {/*    type="file"*/}
+                            {/*    onChange={(event) => {*/}
+                            {/*        setImageUpload(event.target.files[0]);*/}
+                            {/*    }}*/}
+                            {/*/>*/}
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
+                            {/*<button onClick={uploadFiles}> Upload Image</button>*/}
                         </div>
                     </div>
                     <div className="field">
