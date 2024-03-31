@@ -4,19 +4,20 @@ import '../../../css/helper-components/helper-patient/profile-style.css';
 
 function ProfilePage() {
     const [profile, setProfile] = useState({
-        "firstName": "John",
-        "lastName": "Doe",
-        "mobile": "8782788392",
-        "address": "123 Main Street, City, Country",
-        "email": "john.doe@example.com",
-        "age": 30,
-        "gender": "Male",
-        "aadhar": "1234 - 5678 - 9012",
-        "weight": "70",
-        "height": "180",
-        "bloodGroup": "O+",
+        "firstName": "Ajay",
+        "lastName": "Gidd",
+        "phoneNumber": "",
+        "address": "",
+        "email": "",
+        "age": "",
+        "gender": "M",
+        "aadhar": "123456",
+        "weight": "",
+        "height": "",
+        "bloodGroup": "",
         "profilePicture": "review_profile.jpeg",
-        "prevRecords": "previous.pdf"
+        "prevRecords": "previous.pdf",
+        "password":""
     });
 
     const [updatedProfile, setUpdatedProfile] = useState({
@@ -27,8 +28,8 @@ function ProfilePage() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUpdatedProfile({
-            ...updatedProfile,
+        setProfile({
+            ...profile,
             [name]: value
         });
     };
@@ -51,6 +52,7 @@ function ProfilePage() {
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
         }
+        console.log(profile)
     }
 
     const updateProfile = () => {
@@ -124,7 +126,7 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.email} readOnly={true}/>
+                                    <input className="user-data-value editable" name="email" value={profile.email} onChange={handleChange} type="text" placeholder={profile.email} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -133,14 +135,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={"+91-" + profile.mobile} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="phoneNumber" value={profile.phoneNumber} onChange={handleChange }placeholder={"+91-" + profile.mobile} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Age : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.age + " Years"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="age" value={profile.age} onChange={handleChange } placeholder={profile.age + " Years"} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -163,14 +165,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.address} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="address" value={profile.address} onChange={handleChange } placeholder={profile.address} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Password : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="XXXXXXXXXXXXXX" readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="password" value={profile.password} onChange={handleChange } placeholder="XXXXXXXXXXXXXX" readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -179,14 +181,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Weight : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.weight + " kg"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="weight" value={profile.weight} onChange={handleChange } placeholder={profile.weight + " kg"} readOnly={true}/>
                                     <i className="fa fa-pencil 5" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Height : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.height + " cm"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="height" value={profile.height} onChange={handleChange } placeholder={profile.height + " cm"} readOnly={true}/>
                                     <i className="fa fa-pencil 6" onClick={makeEditable}></i>
                                 </div>
                             </td>
