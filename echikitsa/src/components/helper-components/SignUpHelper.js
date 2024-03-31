@@ -1,18 +1,23 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {CitiesByState, States} from "../validation-component/CityDatabase";
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
-import 'bootstrap/dist/css/bootstrap.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {firebaseConfig} from "../firebase-config/firebaseConfigs";
+import {ValidateField} from "../validation-component/validation";
 import '../../css/helper-components/sign-up-style.css';
-import {Link} from "react-router-dom";
 import firebase from 'firebase/compat/app';
+import 'bootstrap/dist/css/bootstrap.css';
+import {Link} from "react-router-dom";
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
-import {firebaseConfig} from "../firebase-config/firebaseConfigs";
+import Popup from "reactjs-popup";
 
 
 const SignUpHelper = () => {
 
     const [signupType, setSignUpType] = useState('patient');
+    const [numberVerified, setNumberVerified] = useState(false);
+    const [emailVerified, setEmailVerified] = useState(false);
     const [formData, setFormData] = useState({
         firstname: '',
         lastname: '',
@@ -25,30 +30,67 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
-
     });
-
+    const [validationMessage, setValidationMessage] = useState({
+        firstNameMessage: '',
+        lastNameMessage: '',
+        emailMessage: '',
+        phoneNumberMessage: '',
+        passwordMessage: '',
+        ageMessage:'',
+        aadhaarMessage:'',
+        stateMessage:'',
+        cityMessage:'',
+        confirmPasswordMessage: '',
+        genderMessage: ''
+    });
     const [confResult, setConfResult] = useState({});
 
-    const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
         setSignUpType(type.toLowerCase());
     };
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type, checked  } = e.target;
 
         setFormData((prevData) => ({
             ...prevData,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: type === 'checkbox' ? checked  : value,
         }));
+
+        setValidationMessage(ValidateField(name, value, validationMessage));
     };
+
+    useEffect(() =>{
+        console.log(formData);
+        if(document.getElementById('patient-send-email') !== null) document.getElementById('patient-send-email').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+        if(document.getElementById('patient-send-phone') !== null) document.getElementById('patient-send-phone').disabled = formData.phoneNumber === '' || validationMessage.phoneNumberMessage !== '';
+        if(document.getElementById('hospital-send-email') !== null) document.getElementById('hospital-send-email').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+
+        if(Object.values(formData).every((value) => value !== '') && Object.values(validationMessage).every((message) => message === '')) {
+            if(document.getElementById('register') !== null) document.getElementById('register').disabled = false;
+            if(document.getElementById('register-patient') !== null && numberVerified && emailVerified) document.getElementById('register-patient').disabled = false;
+        } else {
+            if(document.getElementById('register') !== null) document.getElementById('register').disabled = true;
+            if(document.getElementById('register-patient') !== null) document.getElementById('register-patient').disabled = true;
+        }
+
+        if(formData.confirmPassword !== '' && formData.confirmPassword !== formData.password) {
+            setValidationMessage((prevMessages) => ({
+                ...prevMessages,
+                confirmPasswordMessage: "Does not match with Password."
+            }));
+        }
+    }, [formData])
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
     const handleGenderChange = (e) => {
-        setSelectedGender(e.target.value);
+        setFormData((prevData) => ({
+            ...prevData,
+            gender: e.target.value
+        }));
     };
 
     //region EMAIL Patient - OTP functions
@@ -108,6 +150,7 @@ const SignUpHelper = () => {
     };
     //endregion
 
+    //region OTP Verification
     const verifyOtp = (id) => {
         let verificationCode = '';
         if(id === 0) { verificationCode = emailOtpValues.join(''); }
@@ -116,12 +159,14 @@ const SignUpHelper = () => {
         confResult.confirm(verificationCode).then((result) => {
             console.log("Success");
             if(id === 0) {
+                setEmailVerified(true);
                 document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
             }
             else if(id === 1) {
-                document.getElementById("phone-otp-check-patient").className = "fg visually-hidden";
-                document.getElementById("phone-patient-send-otp").innerText = "Verified";
-                document.getElementById("phone-patient-send-otp").style.backgroundColor = "#39c239";
+                setNumberVerified(true);
+                document.getElementById("patient-send-phone").className = "fg visually-hidden";
+                document.getElementById("patient-send-phone").innerText = "Verified";
+                document.getElementById("patient-send-phone").style.backgroundColor = "#39c239";
             }
             else {
                 document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
@@ -132,7 +177,7 @@ const SignUpHelper = () => {
     }
 
     const sendOtp = () => {
-        const phoneNumber = document.getElementById("phone-number").value;
+        const phoneNumber = "+91" + document.getElementById("phone-number").value;
         const appVerifier = window.recaptchaVerifier;
         firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
             .then((confirmationResult) => {
@@ -172,6 +217,7 @@ const SignUpHelper = () => {
             firebase.initializeApp(firebaseConfig);
         }
     }, []);
+    //endregion
 
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
@@ -200,29 +246,37 @@ const SignUpHelper = () => {
                     <div className="fg">
 
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
+                            <input type="text" name="firstname" value={formData.firstname} onChange={handleInputChange}
                                    required/>
                             <label>First Name</label>
+                            {validationMessage.firstNameMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.firstNameMessage}</span>
+                            )}
                         </div>
                         <div className="field">
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
+                            <input type="text" name="lastname" value={formData.lastname} onChange={handleInputChange}
                                    required/>
                             <label>Last Name</label>
+                            {validationMessage.lastNameMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.lastNameMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
+                            <button className="ver" id="patient-send-email" onClick={() => {
                                 const isHidden = document.getElementById("patient-email-otp-check");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
                                 }
-                                onClickSendOtp();
-                            }}>
+                            }} >
                                 Send OTP
                             </button>
                             <label>Email</label>
+                            {validationMessage.emailMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.emailMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg visually-hidden" id="patient-email-otp-check">
@@ -244,8 +298,8 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="phone" id="phone-number" onChange={handleInputChange} required/>
-                            <button className="ver" id="phone-patient-send-otp" onClick={() => {
+                            <input type="text" name="phoneNumber" id="phone-number" onChange={handleInputChange} required/>
+                            <button className="ver" id="patient-send-phone" onClick={() => {
                                 const isHidden = document.getElementById("phone-otp-check-patient");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
@@ -255,6 +309,9 @@ const SignUpHelper = () => {
                                 Send OTP
                             </button>
                             <label>Phone Number</label>
+                            {validationMessage.phoneNumberMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.phoneNumberMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg visually-hidden" id="phone-otp-check-patient">
@@ -279,22 +336,42 @@ const SignUpHelper = () => {
                             <input type="text" name="age" value={formData.age} onChange={handleInputChange}
                                    required/>
                             <label>Age</label>
+                            {validationMessage.ageMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.ageMessage}</span>
+                            )}
                         </div>
                         <div className="field">
                             <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange} required/>
                             <label>Aadhaar</label>
+                            {validationMessage.aadhaarMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.aadhaarMessage}</span>
+                            )}
                         </div>
                     </div>
 
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="state" value={formData.state} onChange={handleInputChange}
-                                   required/>
+                                   list="states-list" required/>
                             <label>State</label>
+                            <datalist id="states-list">
+                                {States.map((state, index) => (
+                                    <option key={index} value={state} />
+                                ))}
+                            </datalist>
+                            {validationMessage.stateMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.stateMessage}</span>
+                            )}
                         </div>
                         <div className="field">
-                            <input type="text" name="city" value={formData.city} onChange={handleInputChange} required/>
+                            <input type="text" name="city" value={formData.city} onChange={handleInputChange}
+                                   list="cities-list" required/>
                             <label>City</label>
+                            <datalist id="cities-list">
+                                {(States.includes(formData.state)) && CitiesByState[formData.state].map((state, index) => (
+                                    <option key={index} value={state} />
+                                ))}
+                            </datalist>
                         </div>
                     </div>
 
@@ -303,11 +380,17 @@ const SignUpHelper = () => {
                             <input type="password" name="password" value={formData.password} onChange={handleInputChange}
                                    required/>
                             <label>Password</label>
+                            {validationMessage.passwordMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.passwordMessage}</span>
+                            )}
                         </div>
                         <div className="field">
                             <input type="password" name="confirmPassword" value={formData.confirmPassword}
                                    onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
+                            {validationMessage.confirmPasswordMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.confirmPasswordMessage}</span>
+                            )}
                         </div>
                     </div>
 
@@ -316,18 +399,17 @@ const SignUpHelper = () => {
                             <span className="gen">Gender</span>
                             <div className="radio">
                                 <input type="radio" id="male" name="gender" value="male"
-                                       checked={selectedGender === 'male'} onChange={handleGenderChange}/>
+                                       checked={formData.gender === 'male'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Male</span>
                             </div>
                             <div className="radio">
                                 <input type="radio" id="female" name="gender" value="female"
-                                       checked={selectedGender === 'female'} onChange={handleGenderChange}/>
+                                       checked={formData.gender === 'female'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Female</span>
                             </div>
-
                             <div className="radio">
                                 <input type="radio" id="others" name="gender" value="others"
-                                       checked={selectedGender === 'others'} onChange={handleGenderChange}/>
+                                       checked={formData.gender === 'others'} onChange={handleGenderChange}/>
                                 <span className="remember-text">Others</span>
                             </div>
                         </div>
@@ -336,12 +418,12 @@ const SignUpHelper = () => {
                     <div className="fg form-group mt-3 upload-photo-section">
                         <span className="upload-photo-label">Upload your Photo</span>
                         <div className="upload-photo-button">
-                            <input type="file" name="file" className="file-input"/>
+                            <input type="file" name="file" className="file-input" accept='image/*' required/>
                         </div>
                     </div>
 
                     <div className="field">
-                        <input type="submit" value={`Register`}/>
+                        <input type="submit" value={`Register`} id="register-patient"/>
                     </div>
                 </form>
             )}
@@ -362,12 +444,11 @@ const SignUpHelper = () => {
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
+                            <button className="ver" id="hospital-send-email" onClick={() => {
                                 const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
                                 }
-                                onClickSendOtp();
                             }}>
                                 Send OTP
                             </button>
@@ -434,7 +515,7 @@ const SignUpHelper = () => {
                         </div>
                     </div>
                     <div className="field">
-                        <input type="submit" value={`Register`}/>
+                        <input type="submit" value={`Register`} id="register"/>
                     </div>
                 </form>
             )}
