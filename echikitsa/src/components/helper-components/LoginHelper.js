@@ -83,7 +83,7 @@ const LoginHelper = () => {
 
                 }
 
-                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then((response) => {
+                const response = await axios.post('http://localhost:9191/auth/login', {email, password},{headers}).then((response) => {
 
                     if (response.data && response.data.role ==loginType.toUpperCase()) {
                         //console.log(response.data)
