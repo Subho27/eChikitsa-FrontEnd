@@ -6,6 +6,9 @@ import {useLocation} from "react-router-dom";
 
 function HospitalHelper (props) {
     const {state}=useLocation();
+
+
+
     const [selectedSpeciality, setSelectedSpeciality] = useState("");
     const [selectedType, setSelectedType] = useState("");
     const [hospitalName, setHospitalName] = useState({});
@@ -18,9 +21,12 @@ function HospitalHelper (props) {
             const fetchHospitalName = async () => {
                 try {
                     const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_ids}`);
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
                     setHospitalName(response.data);
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+
                     setDoctors(response2.data);
+                     console.log(response2.data);
+
                 } catch (error) {
                     console.error('Error fetching hospital name:', error);
                 }
@@ -31,6 +37,7 @@ function HospitalHelper (props) {
     }, [state.hospital_ids])
 
     useEffect(() => {
+        // Only set selectedDoctor if doctors array is not empty
         if (doctors.length > 0) {
             setSelectedDoctor(doctors[0]);
         }
@@ -68,14 +75,14 @@ function HospitalHelper (props) {
         <div>
             <div className="mainDiv">
                 <div className="hospital-name-details">
-                    <h1>{hospitalName.hospital_name}</h1>
+                    <h1>{hospitalName.hospital_name} Hospital</h1>
                 </div>
                 <div className="hospital-description">
                     <div className="hospital-details">
                         <div className="hospital-details-section">
                             <div className="hospital-detail-header">Hospital Details</div>
                             <div className="hospital-details-image-section">
-                                <img className="hospital-details-image" src={require("../../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} alt="Hospital"/>
+                                <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                             </div>
                             <table className="hospital-detail-table">
                                 <tbody>
@@ -193,6 +200,116 @@ function HospitalHelper (props) {
     );
 }
 
-
+// const doctors = [
+//     {
+//         "id": 3,
+//         "name": "Dr. Emily Smith",
+//         "gender": "Female",
+//         "age": 42,
+//         "specialization": "General Medicine",
+//         "experience": 18,
+//         "rating": 4.8,
+//         "image_path": "doctor8.jpg"
+//     },
+//     {
+//         "id": 4,
+//         "name": "Dr. Michael Johnson",
+//         "gender": "Male",
+//         "age": 48,
+//         "specialization": "Pediatrics",
+//         "experience": 15,
+//         "qualification": "MD, FAAP",
+//         "rating": 4.6,
+//         "image_path": "doctor9.jpg"
+//     },
+//     {
+//         "id": 5,
+//         "name": "Dr. Sarah Lee",
+//         "gender": "Female",
+//         "age": 37,
+//         "specialization": "General Medicine",
+//         "experience": 12,
+//         "qualification": "MD, FACP",
+//         "rating": 4.4,
+//         "image_path": "doctor8.jpg"
+//     },
+//     {
+//         "id": 6,
+//         "name": "Dr. Christopher Brown",
+//         "gender": "Male",
+//         "age": 45,
+//         "specialization": "Pediatrics",
+//         "experience": 17,
+//         "qualification": "MD, FAAP",
+//         "rating": 4.7,
+//         "image_path": "doctor9.jpg"
+//     },
+//     {
+//         "id": 7,
+//         "name": "Dr. Jessica Martinez",
+//         "gender": "Female",
+//         "age": 40,
+//         "specialization": "General Medicine",
+//         "experience": 14,
+//         "qualification": "MD, FACP",
+//         "rating": 4.5,
+//         "image_path": "doctor8.jpg"
+//     },
+//     {
+//         "id": 8,
+//         "name": "Dr. David Wilson",
+//         "gender": "Male",
+//         "age": 50,
+//         "specialization": "Pediatrics",
+//         "experience": 20,
+//         "qualification": "MD, FAAP",
+//         "rating": 4.9,
+//         "image_path": "doctor9.jpg"
+//     },
+//     {
+//         "id": 9,
+//         "name": "Dr. Olivia Taylor",
+//         "gender": "Female",
+//         "age": 38,
+//         "specialization": "General Medicine",
+//         "experience": 13,
+//         "qualification": "MD, FACP",
+//         "rating": 4.3,
+//         "image_path": "doctor9.jpg"
+//     },
+//     {
+//         "id": 10,
+//         "name": "Dr. James Anderson",
+//         "gender": "Male",
+//         "age": 47,
+//         "specialization": "Pediatrics",
+//         "experience": 18,
+//         "qualification": "MD, FAAP",
+//         "rating": 4.8,
+//         "image_path": "doctor8.jpg"
+//     },
+//     {
+//         "id": 11,
+//         "name": "Dr. Sophia Garcia",
+//         "gender": "Female",
+//         "age": 36,
+//         "specialization": "General Medicine",
+//         "experience": 11,
+//         "qualification": "MD, FACP",
+//         "rating": 4.2,
+//         "image_path": "doctor8.jpg"
+//     },
+//     {
+//         "id": 12,
+//         "name": "Dr. Ethan Rodriguez",
+//         "gender": "Male",
+//         "age": 49,
+//         "specialization": "Pediatrics",
+//         "experience": 19,
+//         "qualification": "MD, FAAP",
+//         "rating": 4.7,
+//         "image_path": "doctor9.jpg"
+//     }
+// ];
 
 export default HospitalHelper

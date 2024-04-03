@@ -36,8 +36,7 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
-        img_url:'',
-        active:'true'
+        imgUrl:''
 
     });
     const [formDataHospital, setFormDataHospital] = useState({
@@ -52,7 +51,7 @@ const SignUpHelper = () => {
         confirmPassword: '',
         website:'',
         pincode:'',
-        img_url:''
+        imgUrl:''
 
 
     });
@@ -106,6 +105,7 @@ const SignUpHelper = () => {
         } else if (index < emailOtpValues.length - 1 && value.length === 1) {
             inputRefsPatient.current[index + 1].focus();
         }
+        //console.log(newOtpValues)
         setEmailOtpValues(newOtpValues);
     };
     //endregion
@@ -125,6 +125,7 @@ const SignUpHelper = () => {
         } else if (index < emailOtpValuesHospital.length - 1 && value.length === 1) {
             inputHRefs.current[index + 1].focus();
         }
+        console.log(newOtpValues)
         setEmailOtpValuesHospital(newOtpValues);
     };
     //endregion
@@ -147,6 +148,90 @@ const SignUpHelper = () => {
         setPhoneOtpValues(newerOtpValues);
     };
     //endregion
+
+    const onClickSendOtp = async () => {
+        try {
+            if(signupType === 'patient')
+            {
+                const response = await axios.post('http://localhost:9192/email/sendEmail', {"email":formData.email}).then((response) => {
+                    if (response.data) {
+                        alert("OTP Sent Successfully on your email!!")
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }else {
+
+                const response = await axios.post('http://localhost:9192/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
+                    if (response.data) {
+                        alert("OTP Sent Successfully on your email!!")
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+    };
+
+    const verifyOtpEmail = async (id) => {
+        let verificationCode = '';
+
+        console.log(verificationCode)
+        try {
+            if (signupType === 'patient') {
+                verificationCode = emailOtpValues.join('');
+                const response = await axios.post('http://localhost:9192/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
+                    if (response.data) {
+                        alert("Verified")
+                        document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
+                        document.getElementById("email-patient-send-otp").innerText = "Verified";
+                        document.getElementById("email-patient-send-otp").style.backgroundColor = "#39c239";
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            } else {
+                verificationCode = emailOtpValuesHospital.join('');
+
+
+                const response = await axios.post('http://localhost:9192/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
+                    console.log(response.data)
+                    if (response.data) {
+                        alert("Verified")
+                        document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
+                        document.getElementById("email-hospital-send-otp").innerText = "Verified";
+                        document.getElementById("email-hospital-send-otp").style.backgroundColor = "#39c239";
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+
+
+    };
 
     const verifyOtp = (id) => {
         let verificationCode = '';
@@ -182,7 +267,9 @@ const SignUpHelper = () => {
         });
     }
 
-    const onClickSendOtp = () => {
+
+
+    const onClickSendOtpMobile = () => {
         firebase.auth().useDeviceLanguage();
         try {
             if (!window.recaptchaVerifier) {
@@ -227,10 +314,10 @@ const SignUpHelper = () => {
                 // Optionally, you can also update state or perform other actions here
                 if(signupType === 'patient')
                 {
-                    formData.img_url = url;
+                    formData.imgUrl = url;
                 }
                 else {
-                    formDataHospital.img_url = url;
+                    formDataHospital.imgUrl = url;
                 }
                 console.log("Image uploaded successfully. Download URL:", url);
                 return url; // Return the download URL
@@ -251,8 +338,8 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
-
+                const response = await axios.post('http://localhost:9192/auth/registerPatient', formData).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
@@ -278,7 +365,8 @@ const SignUpHelper = () => {
             console.log(formDataHospital);
             try {
 
-                const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
+                const response = await axios.post('http://localhost:9192/auth/registerHospital', formDataHospital).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
@@ -339,7 +427,7 @@ const SignUpHelper = () => {
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
+                            <button className="ver" id="email-patient-send-otp" onClick={() => {
                                 const isHidden = document.getElementById("patient-email-otp-check");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
@@ -361,7 +449,7 @@ const SignUpHelper = () => {
                                 ))}
                             </div>
                             <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(0);}}/>
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(0);}}/>
                             </div>
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
@@ -376,7 +464,7 @@ const SignUpHelper = () => {
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
                                 }
-                                onClickSendOtp();
+                                onClickSendOtpMobile();
                             }}>
                                 Send OTP
                             </button>
@@ -407,7 +495,7 @@ const SignUpHelper = () => {
                             <label>Age</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange} required/>
+                            <input type="text" name="aadhar" value={formData.aadhar} onChange={handleInputChange} required/>
                             <label>Aadhaar</label>
                         </div>
                     </div>
@@ -491,7 +579,7 @@ const SignUpHelper = () => {
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="email" value={formDataHospital.email} onChange={handleInputChangeHospital} required/>
-                            <button className="ver" onClick={() => {
+                            <button className="ver" id="email-hospital-send-otp" onClick={() => {
                                 const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
@@ -513,7 +601,7 @@ const SignUpHelper = () => {
                                 ))}
                             </div>
                             <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(2);}}/>
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(2);}}/>
                             </div>
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
