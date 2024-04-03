@@ -69,8 +69,21 @@ const LoginHelper = () => {
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
+                let role;
+                if(loginType == 'patient')
+                {
+                   role = "PATIENT"
+                }
+                if(loginType == 'doctor')
+                {
+                    role = "DOCTOR"
+                }
+                if(loginType == 'admin'){
+                    role = "ADMIN"
 
-                const response = await axios.post('http://localhost:9191/auth/login', {email, password},{headers}).then((response) => {
+                }
+
+                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then((response) => {
 
                     if (response.data && response.data.role ==loginType.toUpperCase()) {
                         //console.log(response.data)

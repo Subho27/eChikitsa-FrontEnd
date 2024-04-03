@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "../../../css/helper-components/helper-doctor/dashboard-style.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
+import axios from "axios";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
@@ -14,8 +15,42 @@ function DashboardHelper() {
     const [oneStar, setOneStar] = useState(totalOneStar/totalPatient)
     const [patientsInQueue, setPatientsInQueue] = useState([])
     const [lastPatient, setLastPatient] = useState({})
+    const [noOfPatient,setNoOfPatient] = useState("");
+    const [noOfPatientToday,setNoOfPatientToday] = useState("");
+    const [todayData ,setTodayDate] = useState("");
+     const [data, setData] = useState([]);
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
+    useEffect(() => {
+        const getNoOfPatient = async () => {
+            try {
+                const responses = await axios.get(
+                    "http://localhost:8081/ehr/get-history/2"
+
+                );
+                setData(responses.data);
+                const totalConsulted = await axios.get(
+                    "http://localhost:8081/ehr/get-no-patient/2"
+                );
+                setNoOfPatient(totalConsulted.data);
+                const totalConsulteds = await axios.get(
+                    "http://localhost:8081/ehr/get-no-patient-consulted-today/2"
+
+                );
+                setNoOfPatientToday(totalConsulteds.data);
+                const response = await axios.get(
+                    "http://localhost:8081/ehr/get-freq-patient/2"
+
+                );
+                setTodayDate(response.data);
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        getNoOfPatient();
+    }, []);
     useEffect(() => {
         //Set dummy values
         let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
@@ -211,7 +246,7 @@ function DashboardHelper() {
                         <img className="common-icon" src={require("../../../images/doctor-page-images/consultation-icon.png")} alt="consultation"/>
                         <div className="common-text">
                             <p>Total patients</p>
-                            <p className="number-text">2000+</p>
+                            <p className="number-text">{noOfPatient}+</p>
                             <p>till today</p>
                         </div>
                     </div>
@@ -226,7 +261,7 @@ function DashboardHelper() {
                         <img className="common-icon" src={require("../../../images/doctor-page-images/today-icon.png")} alt="queue"/>
                         <div className="common-text">
                             <p>Patients consulted today</p>
-                            <p className="number-text">5</p>
+                            <p className="number-text">{noOfPatientToday}</p>
                         </div>
                     </div>
                 </div>
@@ -328,33 +363,33 @@ function DashboardHelper() {
 
 }
 
-const data = [
-    {"date": "2024-02-01", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-02", "repeat": 15, "non_repeat": 7},
-    {"date": "2024-02-03", "repeat": 8, "non_repeat": 4},
-    {"date": "2024-02-04", "repeat": 12, "non_repeat": 6},
-    {"date": "2024-02-05", "repeat": 20, "non_repeat": 8},
-    {"date": "2024-02-06", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-07", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-08", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-09", "repeat": 16, "non_repeat": 8},
-    {"date": "2024-02-10", "repeat": 12, "non_repeat": 6},
-    {"date": "2024-02-11", "repeat": 22, "non_repeat": 11},
-    {"date": "2024-02-12", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-13", "repeat": 16, "non_repeat": 8},
-    {"date": "2024-02-14", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-15", "repeat": 20, "non_repeat": 10},
-    {"date": "2024-02-16", "repeat": 24, "non_repeat": 12},
-    {"date": "2024-02-17", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-18", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-19", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-20", "repeat": 16, "non_repeat": 8}
-];
+// const data = [
+//     {"date": "2024-02-01", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-02", "repeat": 15, "non_repeat": 7},
+//     {"date": "2024-02-03", "repeat": 8, "non_repeat": 4},
+//     {"date": "2024-02-04", "repeat": 12, "non_repeat": 6},
+//     {"date": "2024-02-05", "repeat": 20, "non_repeat": 8},
+//     {"date": "2024-02-06", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-07", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-08", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-09", "repeat": 16, "non_repeat": 8},
+//     {"date": "2024-02-10", "repeat": 12, "non_repeat": 6},
+//     {"date": "2024-02-11", "repeat": 22, "non_repeat": 11},
+//     {"date": "2024-02-12", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-13", "repeat": 16, "non_repeat": 8},
+//     {"date": "2024-02-14", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-15", "repeat": 20, "non_repeat": 10},
+//     {"date": "2024-02-16", "repeat": 24, "non_repeat": 12},
+//     {"date": "2024-02-17", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-18", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-19", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-20", "repeat": 16, "non_repeat": 8}
+// ];
 
-const todayData = {
-    "repeat": 10,
-    "non_repeat": 5
-};
+// const todayData = {
+//     "repeat": 10,
+//     "non_repeat": 5
+// };
 
 const ratingNumber = 4.3;
 const totalPatient = 42;
