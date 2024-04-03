@@ -36,7 +36,8 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
-        img_url:''
+        img_url:'',
+        active:'true'
 
     });
     const [formDataHospital, setFormDataHospital] = useState({
@@ -250,8 +251,8 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9191/auth/registerPatient', formData).then((response) => {
-                    //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
+                const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
+
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
@@ -277,8 +278,7 @@ const SignUpHelper = () => {
             console.log(formDataHospital);
             try {
 
-                const response = await axios.post('http://localhost:9191/auth/registerHospital', formDataHospital).then((response) => {
-                    //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
+                const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
                     console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
