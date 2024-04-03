@@ -21,10 +21,12 @@ function HospitalHelper (props) {
             const fetchHospitalName = async () => {
                 try {
                     const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_ids}`);
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
                     setHospitalName(response.data);
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+
                     setDoctors(response2.data);
                      console.log(response2.data);
+
                 } catch (error) {
                     console.error('Error fetching hospital name:', error);
                 }
@@ -73,14 +75,14 @@ function HospitalHelper (props) {
         <div>
             <div className="mainDiv">
                 <div className="hospital-name-details">
-                    <h1>{hospitalName.hospital_name}</h1>
+                    <h1>{hospitalName.hospital_name} Hospital</h1>
                 </div>
                 <div className="hospital-description">
                     <div className="hospital-details">
                         <div className="hospital-details-section">
                             <div className="hospital-detail-header">Hospital Details</div>
                             <div className="hospital-details-image-section">
-                                <img className="hospital-details-image" src={require("../../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} alt="Hospital"/>
+                                <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                             </div>
                             <table className="hospital-detail-table">
                                 <tbody>

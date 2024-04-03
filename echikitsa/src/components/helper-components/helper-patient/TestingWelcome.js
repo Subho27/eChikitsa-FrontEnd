@@ -46,7 +46,7 @@ function TestingWelcome() {
                     "http://localhost:8081/hospital/get-hospitals-landing"
                 );
                 setHospitalData(response.data);
-                // console.log(response.data);
+                 //console.log(response.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -274,7 +274,7 @@ function TestingWelcome() {
                         {currentPosts.map((hospital, index) => (
                             <div key={index} className="hospital-tab" onClick={()=>handleHospitalTabClick(hospital.hospital_id)}>
                                 <div className="image-container">
-                                    <img className="hospital-image" src={require("../../../images/landing_body_img/doctor7.jpg")} alt="Hospital"/>
+                                    <img className="hospital-image" src={hospital.image_path} alt="Hospital"/>
                                     <div className="rating-container">{hospital.rating.toFixed(1)}</div>
                                 </div>
                                 <div className="hospital-name">{hospital.hospital_name}</div>
