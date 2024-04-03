@@ -36,7 +36,8 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
-        imgUrl:''
+        img_url:'',
+        active:true
 
     });
     const [formDataHospital, setFormDataHospital] = useState({
@@ -153,7 +154,8 @@ const SignUpHelper = () => {
         try {
             if(signupType === 'patient')
             {
-                const response = await axios.post('http://localhost:9192/email/sendEmail', {"email":formData.email}).then((response) => {
+                const headers = { 'Content-Type' : 'application/json' }
+                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formData.email}).then((response) => {
                     if (response.data) {
                         alert("OTP Sent Successfully on your email!!")
 
@@ -165,7 +167,7 @@ const SignUpHelper = () => {
 
             }else {
 
-                const response = await axios.post('http://localhost:9192/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
+                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
                     if (response.data) {
                         alert("OTP Sent Successfully on your email!!")
 
@@ -191,7 +193,7 @@ const SignUpHelper = () => {
         try {
             if (signupType === 'patient') {
                 verificationCode = emailOtpValues.join('');
-                const response = await axios.post('http://localhost:9192/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
+                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
                     if (response.data) {
                         alert("Verified")
                         document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
@@ -208,7 +210,7 @@ const SignUpHelper = () => {
                 verificationCode = emailOtpValuesHospital.join('');
 
 
-                const response = await axios.post('http://localhost:9192/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
+                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
                     console.log(response.data)
                     if (response.data) {
                         alert("Verified")
@@ -314,7 +316,7 @@ const SignUpHelper = () => {
                 // Optionally, you can also update state or perform other actions here
                 if(signupType === 'patient')
                 {
-                    formData.imgUrl = url;
+                    formData.img_url = url;
                 }
                 else {
                     formDataHospital.imgUrl = url;
@@ -338,7 +340,7 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9192/auth/registerPatient', formData).then((response) => {
+                const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
                     //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
                     console.log(response.data);
                     if (response.data) {
@@ -365,7 +367,7 @@ const SignUpHelper = () => {
             console.log(formDataHospital);
             try {
 
-                const response = await axios.post('http://localhost:9192/auth/registerHospital', formDataHospital).then((response) => {
+                const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
                     //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
                     console.log(response.data);
                     if (response.data) {
@@ -495,7 +497,7 @@ const SignUpHelper = () => {
                             <label>Age</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="aadhar" value={formData.aadhar} onChange={handleInputChange} required/>
+                            <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange} required/>
                             <label>Aadhaar</label>
                         </div>
                     </div>
