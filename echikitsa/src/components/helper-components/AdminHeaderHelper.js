@@ -4,10 +4,11 @@ import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
 import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 
 function AdminHeaderHelper(props) {
+
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
