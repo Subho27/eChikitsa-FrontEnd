@@ -3,13 +3,19 @@ import Collapsible from 'react-collapsible';
 import '../../../css/helper-components/helper-admin/welcome-page-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {dummy} from "./dummy";
+import {useLocation, useParams} from 'react-router-dom';
+import axios from "axios";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
-function AdminWelcomeHelper() {
+function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
 
     const [adminActiveId, setAdminActiveId] = useState(null);
 
     const [query, setQuery] = useState("");
+    const {state}=useLocation();
+
+console.log(state.hospital_id);
 
 
     const toggleActivation = (id) => {
@@ -27,19 +33,109 @@ function AdminWelcomeHelper() {
         item.Email.toLowerCase().includes(query.toLowerCase())
     );
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phoneNumber: '',
-        password: '',
+        yearOfExp: '',
+        role:'DOCTOR',
         age:'',
         aadhaar:'',
         state:'',
         city:'',
-        confirmPassword: '',
+        degree: '',
         gender: '',
+        registrationNumber:'',
+        specialization:''
 
     });
+
+    const [hospitalData, setHospitalData] = useState({
+        name :'',
+        email :'',
+        phoneNumber :'',
+        address :'',
+        website :'',
+        departments :[{
+            department_id: '',
+            department_name: ''
+        }]
+
+
+    });
+
+    const handleInputChangeHospital = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setHospitalData((prevData) => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+        //console.log(hospitalData);
+    };
+
+    // Function to handle specialisation selection
+    const handleSpecialisationChange = (event) => {
+        const { options } = event.target;
+        const selectedSpecialisations = [];
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                selectedSpecialisations.push(options[i].value);
+            }
+        }
+        setHospitalData(prevState => ({
+            ...prevState,
+            specialisation: selectedSpecialisations
+        }));
+    };
+
+
+
+
+
+    const handleUpdateHospitalDetails = async (e) => {
+        e.preventDefault();
+        //console.log(hospitalData);
+        try {
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
+            const response = await axios.post(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, hospitalData,{headers}).then((response) => {
+                console.log(response.data);
+                if (response.data) {
+                    alert(response.data)
+
+                }
+                else {
+                    alert("Something went wrong !!")
+                }
+
+            });
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+
+
+
+    };
+
+    const handleAddDoctor = async (e) => {
+        e.preventDefault();
+        //console.log(formData)
+        try {
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = await axios.post(`http://localhost:9191/admin/addDoctor/?id=${state.hospital_id}`,formData,{headers}).then((response) => {
+
+            });
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+
+    }
+
     const [selectedValue, setSelectedValue] = useState('');
 
     const [selectedValues, setSelectedValues] = useState([]);
@@ -56,13 +152,19 @@ function AdminWelcomeHelper() {
         "Gastroenterology"
     ];
 
-    const handleCheckboxChange = (department) => {
-        if (selectedValues.includes(department)) {
-            setSelectedValues(selectedValues.filter(item => item !== department));
+    const handleCheckboxChange = (department_id,department_name) => {
+        if (selectedValues.includes(department_name)) {
+            setSelectedValues(selectedValues.filter(item => item !== department_name));
         } else {
-            setSelectedValues([...selectedValues, department]);
+            setSelectedValues([...selectedValues,department_name]);
         }
+        setHospitalData(prevState => ({
+            ...prevState,
+            departments: department_name
+        }));
     };
+
+
 
 
 
@@ -88,6 +190,8 @@ function AdminWelcomeHelper() {
     };
 
     const handleGenderChange = (e) => {
+        // setSelectedGender(e.target.value);
+        formData.gender = e.target.value;
         setSelectedGender(e.target.value);
     };
 
@@ -150,6 +254,8 @@ function AdminWelcomeHelper() {
             element[i].readOnly = true;
         }
     }
+
+
     return (
         <div className="admin-welcome">
             <div className="admin-welcome-action">
@@ -215,7 +321,7 @@ function AdminWelcomeHelper() {
                                 </div>
                             </div>
                             <div className="field">
-                                <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
+                                <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange}
                                        required/>
                                 <label>Registration Number</label>
                             </div>
@@ -248,12 +354,12 @@ function AdminWelcomeHelper() {
 
                         <div className="fg">
                             <div className="field">
-                                <input type="text" name="password" value={formData.password} onChange={handleInputChange}
+                                <input type="text" name="yearOfExp" value={formData.yearOfExp} onChange={handleInputChange}
                                        required/>
                                 <label>Years of Experience</label>
                             </div>
                             <div className="field">
-                                <input type="text" name="confirmPassword" value={formData.confirmPassword}
+                                <input type="text" name="degree" value={formData.degree}
                                        onChange={handleInputChange} required/>
                                 <label>Degree</label>
                             </div>
@@ -289,7 +395,8 @@ function AdminWelcomeHelper() {
                         </div>
 
                         <div className="field">
-                            <input type="submit" value={`APPOINT`} className="admin-appoint"/>
+                            <input type="submit" value={`APPOINT`} onClick={handleAddDoctor} className="admin-appoint"/>
+                            {/*<button type="submit" className="button-background"  >Login</button>*/}
                         </div>
                     </form>
                 </Collapsible>
@@ -380,14 +487,14 @@ function AdminWelcomeHelper() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Hospital Name : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="Sanjeevani Hospital" readOnly={true}/>
+                                    <input className="user-data-value editable" name="name" value={hospitalData.name} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.name} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="info@harmonymedicalcenter.com" readOnly={true}/>
+                                    <input className="user-data-value editable" name="email" value={hospitalData.email} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.email} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -396,14 +503,14 @@ function AdminWelcomeHelper() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="(555) 123-4567" readOnly={true}/>
+                                    <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.phone} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="Mumbai, Maharashtra, India" readOnly={true}/>
+                                    <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.address} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -412,14 +519,14 @@ function AdminWelcomeHelper() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Website : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="www.harmonymedicalcenter.com" readOnly={true}/>
+                                    <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.website} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Specialisation : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="Select specialisations to add" readOnly/>
+                                    <input className="user-data-value editable" name="specialisation" value={hospitalData.specialisation} onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
                                     <i className="fa fa-pencil 5" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -433,12 +540,12 @@ function AdminWelcomeHelper() {
                                 <div key={index}>
                                     <div
                                         className={selectedValues.includes(department) ? 'selected checkbox-item' : 'checkbox-item'}
-                                        onClick={() => handleCheckboxChange(department)}>
+                                        onClick={() => handleCheckboxChange(index,department)}>
                                         <input
                                             type="checkbox"
                                             value={department}
                                             checked={selectedValues.includes(department)}
-                                            onChange={() => handleCheckboxChange(department)}
+                                            onChange={() => handleCheckboxChange(index,department)}
                                         />
                                         <span>{department}</span>
                                     </div>
@@ -450,7 +557,7 @@ function AdminWelcomeHelper() {
                         )}
                     </div>
                     <div className="update-profile-button-section">
-                        <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={onProfileSave}>SAVE</button>
+                        <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={handleUpdateHospitalDetails}>SAVE</button>
                     </div>
                 </Collapsible>
             </div>
