@@ -54,8 +54,7 @@ const LoginHelper = () => {
     };
 
     const handleGenerateOtp = () => {
-        // Simulate OTP generation and sending logic
-        // You can replace this with actual OTP sending logic
+
         setIsOtpSent(true);
     };
 
@@ -63,9 +62,7 @@ const LoginHelper = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // Logic to handle login based on login method
         if (loginMethod === 'password') {
-            //console.log('Logging in with email and password:', email, password);
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
