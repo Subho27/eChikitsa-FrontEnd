@@ -88,21 +88,29 @@ const LoginHelper = () => {
                     if (response.data && response.data.role ==loginType.toUpperCase()) {
                         //console.log(response.data)
                         saveJwtTokenToLocalStorage(response.data.token)
-                        if(loginType == 'patient')
+                        if(loginType === 'patient')
                         {
                             let path = '/welcome'
                             navigate(path);
                         }
-                        if(loginType == 'doctor')
+                        if(loginType === 'doctor')
                         {
                             let path = '/dashboard'
                             navigate(path);
                         }
-                        if(loginType == 'admin'){
-                            let path = '/admin'
-                            navigate(path);
+                        if(loginType === 'admin'){
+                            // let path = '/admin'
+                            // navigate(path);
+                            // let path = `/admin/${response.data.id}`
+                            // navigate(path);
 
-                        }
+                            navigate("/admin",{state:{
+                                    hospital_id:response.data.id}
+                            });
+
+                        };
+
+
 
 
 
