@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-patient/testing-welcome.css"
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
 
 function TestingWelcome() {
@@ -26,6 +26,8 @@ function TestingWelcome() {
 
 
     const navigate = useNavigate();
+    const {state}=useLocation();
+   // console.log(state.user_id)
     const handleHospitalTabClick = (id) => {
 
          navigate("/hospital",{state:{
@@ -33,6 +35,7 @@ function TestingWelcome() {
          });
 
     };
+
     useEffect(() => {
         const getHospitalDetails = async () => {
             try {
