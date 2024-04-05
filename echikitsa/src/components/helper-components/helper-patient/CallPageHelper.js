@@ -6,9 +6,9 @@ import 'reactjs-popup/dist/index.css';
 import styled from 'styled-components';
 import Collapsible from "react-collapsible";
 import "../../../css/helper-components/helper-patient/call-page-style.css"
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
-import {firebaseConfig} from "../../firebase-config/firebaseConfigs";
+import {Device} from 'mediasoup-client'
+import io from 'socket.io-client'
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -18,43 +18,17 @@ function CallPageHelper(effect, deps) {
     const [medicines, setMedicines] = useState([]);
     const [prescription, setPrescription] = useState([]);
     const [isOpen, setIsOpen] = useState(true);
+    const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
+    let i = 0;
+
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    //region Call Handle
-    const [patientLocalStream, setPatientLocalStream] = useState(null);
-    const [patientRemoteStream, setPatientRemoteStream] = useState(null);
-    const [peerConnection, setPeerConnection] = useState(null);
-    const [isCaller, setIsCaller] = useState(true);
-    let oCount = 0;
-    let aCount = 0;
-
-    const constraints = {
-        'video': true,
-        'audio': true
-    }
-
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-            // console.log('Got MediaStream:', stream);
-        })
-        .catch(error => {
-            console.error('Error accessing media devices.', error);
-        });
-
-    async function playVideoFromCamera() {
-        try {
-            const constraints = {'video': true, 'audio': true};
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            const videoElement = document.querySelector('video#patientLocalStream');
-            videoElement.srcObject = stream;
-            return stream;
-        } catch(error) {
-            console.error('Error opening video camera.', error);
-            throw error;
-        }
-    }
+    //region Call constants
+    const [roomName, setRoomName] = useState("");
+    const [error, setError] = useState("");
+    const [socket, setSocket] = useState(null);
     //endregion
 
     const writePrescription = () => {
@@ -133,27 +107,413 @@ function CallPageHelper(effect, deps) {
         videoArray.item(1).id = remote;
     }
 
-    //region handle Call button
-    const handleCallButton = async () => {
-        try {
-            setIsOpen(false);
-            let offerSender = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offerSender);
-            offerSender = JSON.stringify(offerSender);
-            const offerMessage = {
-                offer: offerSender,
-                recipient: "callee"
-            };
-            firebase.database().ref("signalling").push(offerMessage)
-                .then((data) => {
-                })
-                .catch((error) => {
-                    console.error('Error pushing data to Firebase:', error);
-                });
-        } catch (error) {
-            console.error('Error initiating call:', error);
+    //region Call Methods
+    // https://mediasoup.org/documentation/v3/mediasoup-client/api/#ProducerOptions
+    // https://mediasoup.org/documentation/v3/mediasoup-client/api/#transport-produce
+    let params = {
+        // mediasoup params
+        encodings: [
+            {
+                rid: 'r0',
+                maxBitrate: 100000,
+                scalabilityMode: 'S1T3',
+            },
+            {
+                rid: 'r1',
+                maxBitrate: 300000,
+                scalabilityMode: 'S1T3',
+            },
+            {
+                rid: 'r2',
+                maxBitrate: 900000,
+                scalabilityMode: 'S1T3',
+            },
+        ],
+        // https://mediasoup.org/documentation/v3/mediasoup-client/api/#ProducerCodecOptions
+        codecOptions: {
+            videoGoogleStartBitrate: 1000
         }
-    };
+    }
+    let device;
+    let audioParams;
+    let audioProducer;
+    let videoProducer;
+    let rtpCapabilities;
+    let producerTransport;
+    let consumerTransports = [];
+    let videoParams = { params };
+    let consumingTransports = [];
+
+    const connectSendTransport = async () => {
+        // we now call produce() to instruct the producer transport
+        // to send media to the Router
+        // https://mediasoup.org/documentation/v3/mediasoup-client/api/#transport-produce
+        // this action will trigger the 'connect' and 'produce' events above
+
+        console.log('Connect SSend Transport');
+        audioProducer = await producerTransport.produce(audioParams);
+        videoProducer = await producerTransport.produce(videoParams);
+
+        audioProducer.on('trackended', () => {
+            console.log('audio track ended')
+
+            // close audio track
+        })
+
+        audioProducer.on('transportclose', () => {
+            console.log('audio transport ended')
+
+            // close audio track
+        })
+
+        videoProducer.on('trackended', () => {
+            console.log('video track ended')
+
+            // close video track
+        })
+
+        videoProducer.on('transportclose', () => {
+            console.log('video transport ended')
+
+            // close video track
+        })
+    }
+
+    const connectRecvTransport = async (consumerTransport, remoteProducerId, serverConsumerTransportId) => {
+        // for consumer, we need to tell the server first
+        // to create a consumer based on the rtpCapabilities and consume
+        // if the router can consume, it will send back a set of params as below
+        console.log('Emitting Consume');
+        await socket.emit('consume', {
+            rtpCapabilities: device.rtpCapabilities,
+            remoteProducerId,
+            serverConsumerTransportId,
+        }, async ({ params }) => {
+            if (params.error) {
+                console.log('Cannot Consume')
+                return
+            }
+
+            // console.log(`Consumer Params ${params}`)
+            // then consume with the local consumer transport
+            // which creates a consumer
+            const consumer = await consumerTransport.consume({
+                id: params.id,
+                producerId: params.producerId,
+                kind: params.kind,
+                rtpParameters: params.rtpParameters
+            })
+
+            consumerTransports = [
+                ...consumerTransports,
+                {
+                    consumerTransport,
+                    serverConsumerTransportId: params.id,
+                    producerId: remoteProducerId,
+                    consumer,
+                },
+            ]
+
+            // create a new div element for the new consumer media
+            console.log('Before');
+            const newElem = document.createElement('div')
+            newElem.setAttribute('id', `td-${remoteProducerId}`)
+
+            if (params.kind === 'audio') {
+                console.log('Middle');
+                //append to the audio container
+                newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>'
+            } else {
+                console.log('Middle');
+                //append to the video container
+                newElem.setAttribute('class', 'remoteVideo')
+                newElem.innerHTML = '<div class="tag">'+ videoArray[i] +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
+                i = i + 1;
+            }
+
+            console.log('After');
+            const videoContainer = document.getElementById('videoContainer');
+
+            if (videoContainer) {
+                videoContainer.appendChild(newElem);
+            } else {
+                console.error('videoContainer element not found');
+                return;
+            }
+
+            console.log('And After');
+            // destructure and retrieve the video track from the producer
+            const { track } = consumer
+
+            document.getElementById(remoteProducerId).srcObject = new MediaStream([track])
+
+            console.log('Long After');
+            // the server consumer started with media paused
+            // so we need to inform the server to resume
+            socket.emit('consumer-resume', { serverConsumerId: params.serverConsumerId })
+        })
+    }
+
+    const signalNewConsumerTransport = async (remoteProducerId) => {
+        //check if we are already consuming the remoteProducerId
+        if (consumingTransports.includes(remoteProducerId)) return;
+        consumingTransports.push(remoteProducerId);
+        console.log('Entering Signal New Consumer Transport');
+        console.log('Emitting Create web rtc transport');
+
+        await socket.emit('createWebRtcTransport', { consumer: true }, async ({ params }) => {
+            // The server sends back params needed
+            // to create Send Transport on the client side
+            console.log('Got Create web rtc transport');
+            if (params.error) {
+                console.log(params.error)
+                return
+            }
+            // console.log(`PARAMS... ${params}`)
+
+            let consumerTransport
+            try {
+                consumerTransport = device.createRecvTransport(params)
+            } catch (error) {
+                // exceptions:
+                // {InvalidStateError} if not loaded
+                // {TypeError} if wrong arguments.
+                console.log(error)
+                return
+            }
+
+            console.log('Consumer transport on connect');
+            consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+                try {
+                    // Signal local DTLS parameters to the server side transport
+                    // see server's socket.on('transport-recv-connect', ...)
+                    console.log('Emitting tranport recv connect');
+                    await socket.emit('transport-recv-connect', {
+                        dtlsParameters,
+                        serverConsumerTransportId: params.id,
+                    })
+
+                    // Tell the transport that parameters were transmitted.
+                    callback()
+                } catch (error) {
+                    // Tell the transport that something was wrong
+                    errback(error)
+                }
+            })
+
+            console.log('Calling Connect Recv transport');
+            connectRecvTransport(consumerTransport, remoteProducerId, params.id)
+        })
+    }
+
+    const getProducers = () => {
+        console.log('Emitting getproducers');
+        socket.emit('getProducers', producerIds => {
+            // console.log(producerIds)
+            // for each of the producer create a consumer
+            // producerIds.forEach(id => signalNewConsumerTransport(id))
+            console.log('Got getProducers');
+            producerIds.forEach(signalNewConsumerTransport)
+        })
+    }
+
+    const createSendTransport = () => {
+        // see server's socket.on('createWebRtcTransport', sender?, ...)
+        // this is a call from Producer, so sender = true
+        console.log('Emitting create webrtc transport');
+        socket.emit('createWebRtcTransport', { consumer: false }, ({ params }) => {
+            // The server sends back params needed
+            // to create Send Transport on the client side
+            if (params.error) {
+                console.log(params.error)
+                return
+            }
+
+            // console.log(params)
+
+            // creates a new WebRTC Transport to send media
+            // based on the server's producer transport params
+            // https://mediasoup.org/documentation/v3/mediasoup-client/api/#TransportOptions
+            producerTransport = device.createSendTransport(params)
+
+            // https://mediasoup.org/documentation/v3/communication-between-client-and-server/#producing-media
+            // this event is raised when a first call to transport.produce() is made
+            // see connectSendTransport() below
+            producerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+                try {
+                    console.log('producer transport on connect');
+                    // Signal local DTLS parameters to the server side transport
+                    // see server's socket.on('transport-connect', ...)
+                    await socket.emit('transport-connect', {
+                        dtlsParameters,
+                    })
+
+                    // Tell the transport that parameters were transmitted.
+                    callback()
+
+                } catch (error) {
+                    errback(error)
+                }
+            })
+
+            producerTransport.on('produce', async (parameters, callback, errback) => {
+                // console.log(parameters)
+
+                console.log('producer transport on produce');
+                try {
+                    // tell the server to create a Producer
+                    // with the following parameters and produce
+                    // and expect back a server side producer id
+                    // see server's socket.on('transport-produce', ...)
+
+                    console.log('Emitting transport produce');
+                    await socket.emit('transport-produce', {
+                        kind: parameters.kind,
+                        rtpParameters: parameters.rtpParameters,
+                        appData: parameters.appData,
+                    }, ({ id, producersExist }) => {
+                        // Tell the transport that parameters were transmitted and provide it with the
+                        // server side producer's id.
+                        callback({ id })
+
+                        // if producers exist, then join room
+                        console.log('Getting producers');
+                        if (producersExist) getProducers()
+                    })
+                } catch (error) {
+                    errback(error)
+                }
+            })
+
+            console.log('Connect send transport');
+            connectSendTransport()
+        })
+    }
+
+    // A device is an endpoint connecting to a Router on the
+    // server side to send/recive media
+    const createDevice = async () => {
+        try {
+            console.log('starting create device');
+            device = new Device()
+
+            // https://mediasoup.org/documentation/v3/mediasoup-client/api/#device-load
+            // Loads the device with RTP capabilities of the Router (server side)
+            await device.load({
+                // see getRtpCapabilities() below
+                routerRtpCapabilities: rtpCapabilities
+            })
+
+            // console.log('Device RTP Capabilities', device.rtpCapabilities)
+
+            // once the device loads, create transport
+            console.log('created device');
+            createSendTransport()
+
+        } catch (error) {
+            console.log(error)
+            if (error.name === 'UnsupportedError')
+                console.warn('browser not supported')
+        }
+    }
+
+    const joinRoom = () => {
+        // console.log(socket);
+        console.log('Emitting join room');
+        socket.emit('joinRoom', { roomName }, (data) => {
+            // console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
+            // we assign to local variable and will be used when
+            // loading the client Device (see createDevice above)
+            rtpCapabilities = data.rtpCapabilities
+
+            console.log('Got join room');
+            // once we have rtpCapabilities from the Router, create Device
+            createDevice()
+        })
+    }
+
+    const streamSuccess = (stream) => {
+        const localVideo = document.querySelector('video#patientLocalStream');
+        localVideo.srcObject = stream
+
+        audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
+        videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
+
+        console.log('Setting local stream success');
+        joinRoom()
+    }
+
+    const getLocalStream = () => {
+        navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: {
+                width: {
+                    min: 640,
+                    max: 1920,
+                },
+                height: {
+                    min: 400,
+                    max: 1080,
+                }
+            }
+        })
+            .then(streamSuccess)
+            .catch(error => {
+                console.log(error)
+            })
+    }
+    //endregion
+
+    //region Call Use Effects
+    useEffect(() => {
+        if (!socket) return; // Exit if socket is null
+
+        const handleProducerClosed = ({ remoteProducerId }) => {
+            // server notification is received when a producer is closed
+            // we need to close the client-side consumer and associated transport
+            const producerToClose = consumerTransports.find(transportData => transportData.producerId === remoteProducerId);
+            producerToClose.consumerTransport.close();
+            producerToClose.consumer.close();
+
+            // remove the consumer transport from the list
+            consumerTransports = consumerTransports.filter(transportData => transportData.producerId !== remoteProducerId);
+
+            // remove the video div element
+            const videoContainer = document.getElementById('videoContainer');
+            if (videoContainer) {
+                const videoElement = document.getElementById(`td-${remoteProducerId}`);
+                if (videoElement) {
+                    videoContainer.removeChild(videoElement);
+                }
+            }
+        };
+
+        // Register the event listener
+        socket.on('producer-closed', handleProducerClosed);
+
+        // Clean up the event listener when component unmounts or socket changes
+        return () => {
+            socket.off('producer-closed', handleProducerClosed);
+        };
+    }, [socket, consumerTransports]); // Dependencies include socket and consumerTransports
+
+    useEffect(() => {
+        if (socket) {
+            // server informs the client of a new producer just joined
+            socket.on('new-producer', ({ producerId }) => signalNewConsumerTransport(producerId))
+        }
+    }, [socket]);
+
+    // This useEffect hook will run every time socket changes
+    useEffect(() => {
+        if (socket) {
+            socket.on('connection-success', ({ socketId }) => {
+                // console.log(socketId);
+                console.log('socket connection success');
+                getLocalStream();
+            });
+        }
+    }, [socket]);
     //endregion
 
     useEffect(() => {
@@ -164,127 +524,20 @@ function CallPageHelper(effect, deps) {
         const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
         setToday(tomorrowFormatted);
 
-        //region Call Handle
-        let pc;
-
-        const initializePeerConnection = async () => {
-
-
-            const stream = await playVideoFromCamera();
-            setPatientLocalStream(stream);
-
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-
-            // Set up signaling channel with Firebase
-            const database = firebase.database();
-            const signalingChannel = database.ref('signalling');
-
-            if(stream) {
-
-                // Create peer connection
-                pc = new RTCPeerConnection({
-                    iceServers: [{
-                        url: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                        credential: 'webrtc',
-                        username: 'webrtc'
-                    }]
-                });
-
-                pc.addEventListener('icecandidate', event => {
-                    if (event.candidate) {
-                        const candidate = JSON.stringify(event.candidate);
-                        signalingChannel.push({ iceCandidate: candidate });
-                    }
-                });
-                pc.addEventListener('connectionstatechange', event => {
-                    if (pc.connectionState === 'connected') {
-                        console.log("Connected");
-                    }
-                });
-
-                stream.getTracks().forEach(track => {
-                    pc.addTrack(track, stream);
-                });
-
-                const remoteVideo = document.querySelector('video#patientRemoteStream');
-                pc.addEventListener('track', async (event) => {
-                    const [patientRemoteStream] = event.streams;
-                    remoteVideo.srcObject = patientRemoteStream;
-                });
-
-                setPeerConnection(pc);
-
-                return signalingChannel;
-            }
-            else{
-                console.log("Problem with stream");
-            }
-        };
-
-        initializePeerConnection().then((signalingChannel) => {
-            signalingChannel.on('child_added', async snapshot => {
-                let message = snapshot.val();
-                if (message.recipient === "callee" && !isCaller && message.offer) {
-                    oCount++;
-                    if(oCount === 2) return;
-                    let offer = JSON.parse(message.offer);
-                    await handleOffer(offer);
-                } else if (message.recipient === "caller" && isCaller && message.answer) {
-                    aCount++;
-                    if(aCount === 1) return;
-                    let answer = JSON.parse(message.answer);
-                    await handleAnswer(answer);
-                } else if (message.iceCandidate) {
-                    let answer = JSON.parse(message.iceCandidate);
-                    await handleIceCandidate(answer);
-                }
-            });
-        });
-
-        async function handleOffer(offer) {
-            console.log("Handle Offer");
-            console.log(pc);
-            if(pc) {
-                pc.setRemoteDescription(new RTCSessionDescription(offer))
-                    .then(async function () {
-                        let answerCallee = await pc.createAnswer();
-                        await pc.setLocalDescription(answerCallee);
-                        answerCallee = JSON.stringify(answerCallee);
-                        const answerMessage = {
-                            answer : answerCallee,
-                            recipient: "caller"
-                        }
-                        firebase.database().ref('signalling').push(answerMessage);
-                    })
-                    .then((data) => {
-                    })
-                    .catch((error) => {
-                        console.error('Error pushing data to Firebase:', error);
-                    });
-            }
-            else {
-                console.log("Peer connection not initialized");
-            }
+        //region Connection & Room
+        //Handle room name
+        const room = window.location.pathname.split('/')[2];
+        console.log(room)
+        if (room === "" || room === undefined) {
+            setError("Please add a room name to the URL.");
+            return;
         }
+        setRoomName(room);
 
-        async function handleAnswer(answer) {
-            console.log("Handle Answer");
-            console.log(pc);
-            if (pc.signalingState !== 'stable') {
-                pc.setRemoteDescription(new RTCSessionDescription(answer)).catch(error => {
-                    console.error('Error handling answer:', error);
-                });
-            } else {
-                console.log("Connection already in stable state, ignoring answer");
-            }
-        }
-
-        async function handleIceCandidate(iceCandidate) {
-            pc.addIceCandidate(iceCandidate).catch(error => {
-                console.error('Error adding ICE candidate:', error);
-            });
+        //Creating socket connection
+        if(socket === null) {
+            const sock = io("/mediasoup");
+            setSocket(sock);
         }
         //endregion
 
@@ -344,24 +597,26 @@ function CallPageHelper(effect, deps) {
             <div id="overlay" onClick={off}>
                 <div id="text">Waiting</div>
             </div>
-            <div>
-                {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
-                    <div className="confirmation-content">
-                        <h3>Confirmation!!!</h3>
-                        <p>Are you sure?<br/>
-                        You want to join video consultation.</p>
-                        <div className="Feedbutton">
-                            <button className="confirm-call" onClick={handleCallButton}>YES</button>
-                            <button className="confirm-call" onClick={returnWelcome}>NO</button>
-                        </div>
-                    </div>
-                </StyledPopup>}
-            </div>
+            {/*<div>*/}
+            {/*    {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>*/}
+            {/*        <div className="confirmation-content">*/}
+            {/*            <h3>Confirmation!!!</h3>*/}
+            {/*            <p>Are you sure?<br/>*/}
+            {/*            You want to join video consultation.</p>*/}
+            {/*            <div className="Feedbutton">*/}
+            {/*                <button className="confirm-call" onClick={}>YES</button>*/}
+            {/*                <button className="confirm-call" onClick={returnWelcome}>NO</button>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </StyledPopup>}*/}
+            {/*</div>*/}
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <video className="large-video-call-patient" id="patientRemoteStream" name="switch-call-patient" autoPlay playsInline controls={false}/>
-                        <video className="small-video-call" id="patientLocalStream" name="switch-call-patient" autoPlay playsInline controls={false} onClick={switchView}/>
+                        <p className="tag">Patient</p>
+                        <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
+                        <div id="videoContainer" className="small-video-call"></div>
+                        {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
                     </div>
                     <div className="control-button-section">
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>

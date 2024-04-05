@@ -1,86 +1,22 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
-import {Link} from "react-router-dom";
-import Collapsible from "react-collapsible";
+import "../../../css/helper-components/helper-patient/call-page-style.css"
+import "../../../css/helper-components/helper-doctor/monitor-call-style.css"
+import 'reactjs-popup/dist/index.css';
 import 'firebase/compat/database';
-import {Device} from "mediasoup-client";
-import io from "socket.io-client";
+import {Device} from 'mediasoup-client'
+import io from 'socket.io-client'
 
-function ConsultationPageHelper(effect, deps) {
-    const [prevRecords, setPrevRecords] = useState([])
-    const [today, setToday] = useState("")
-    const [suggestDate, setSuggestDate] = useState("");
-    const [diagnosisSummary, setDiagnosisSummary] = useState("");
-    const [medicines, setMedicines] = useState([]);
-    const [prescription, setPrescription] = useState([]);
-    const [videoArray, setVideoArray] = useState(["Patient", "Senior Doctor"]);
+function MonitorCallHelper(effect, deps) {
+
+    const [videoArray, setVideoArray] = useState(["Patient", "Doctor"]);
     let i = 0;
-
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
     //endregion
-
-    const writePrescription = () => {
-        const newPrescribe = document.getElementById("chat-field").value;
-        setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
-    }
-    const cancelPrescription =(id) => {
-        setPrescription(prevPrescription => {
-            const updatedPrescription = [...prevPrescription];
-            updatedPrescription.splice(id, 1);
-            return updatedPrescription;
-        });
-    }
-
-    const submittedMedicines = () => {
-        const medicineName = document.getElementById("medicine").value;
-        const afterBefore = document.getElementById("after-before").value;
-        const dosage1 = document.getElementById("dosage-1").value;
-        const dosage2 = document.getElementById("dosage-2").value;
-        const dosage3 = document.getElementById("dosage-3").value;
-        const prescribe = {
-            "name" : medicineName,
-            "food" : afterBefore,
-            "dos1" : dosage1,
-            "dos2" : dosage2,
-            "dos3" : dosage3
-        }
-        setMedicines(prevMedicines => [...prevMedicines, prescribe]);
-    };
-    const cancelMedicine = (id) => {
-        setMedicines(prevMedicines => {
-            const updatedMedicines = [...prevMedicines];
-            updatedMedicines.splice(id, 1);
-            return updatedMedicines;
-        });
-    }
-
-    const summaryDiagnosis = () => {
-        const diagnosis = document.getElementById("diagnosis-summary").value;
-        setDiagnosisSummary(diagnosis);
-        document.getElementById("diagnosis-submit").disabled = true;
-        document.getElementById("diagnosis-submit").style.cursor = "not-allowed";
-    };
-    const cancelDiagnosis = () => {
-        setDiagnosisSummary("");
-        document.getElementById("diagnosis-submit").disabled = false;
-        document.getElementById("diagnosis-submit").style.cursor = "pointer";
-    }
-
-    const suggestADate = () => {
-        const suggestedDate = document.getElementById("next-date").value;
-        setSuggestDate(suggestedDate);
-    };
-
-    const switchView = async() => {
-        let videoArray = document.getElementsByName("switch-call-doctor");
-        const remote = videoArray.item(0).id;
-        videoArray.item(0).id = videoArray.item(1).id;
-        videoArray.item(1).id = remote;
-    }
 
     //region Call Methods
     // https://mediasoup.org/documentation/v3/mediasoup-client/api/#ProducerOptions
@@ -193,7 +129,6 @@ function ConsultationPageHelper(effect, deps) {
             console.log('Before');
             const newElem = document.createElement('div')
             newElem.setAttribute('id', `td-${remoteProducerId}`)
-
             if (params.kind === 'audio') {
                 console.log('Middle');
                 //append to the audio container
@@ -408,7 +343,7 @@ function ConsultationPageHelper(effect, deps) {
     }
 
     const streamSuccess = (stream) => {
-        const localVideo = document.querySelector('video#doctorLocalStream');
+        const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
 
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
@@ -491,14 +426,7 @@ function ConsultationPageHelper(effect, deps) {
     }, [socket]);
     //endregion
 
-
     useEffect(() => {
-        setPrevRecords(askRecord);
-        const today = new Date();
-        const tomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1);
-        const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
-        setToday(tomorrowFormatted);
 
         //region Connection & Room
         //Handle room name
@@ -521,34 +449,13 @@ function ConsultationPageHelper(effect, deps) {
 
 
     return (
+
         <div className="consult-page-container">
-            <div className="upcoming-container">
-                <div className="in-queue-section">
-                    <span className="in-queue-text">IN-QUEUE : 18</span>
-                </div>
-                <div className="next-in-queue-section">
-                    <div>
-                        <span className="next-in-queue-text">NEXT IN QUEUE : <span className="next-value">SURAJ SUBEDI</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">AGE : <span className="next-value">25</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">GENDER : <span className="next-value">MALE</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">DIAGNOSIS : <span className="next-value">HEALTH CHECKUP</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">REVISIT : <span className="next-value">NO</span></span>
-                    </div>
-                </div>
-            </div>
             <div className="call-container">
-                <div className="video-call-section">
+                <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">Doctor</p>
-                        <video className="large-video-call-patient-doctor" id="doctorLocalStream" name="switch-call-patient" autoPlay muted />
+                        <p className="tag">Senior Doctor</p>
+                        <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
                     </div>
@@ -556,147 +463,109 @@ function ConsultationPageHelper(effect, deps) {
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>
                         <div className="button-section">
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
+                                <img className="button-icon"
+                                     src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>
+                                <img className="button-icon"
+                                     src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video"/>
+                                <img className="button-icon"
+                                     src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video"/>
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
+                                <img className="button-icon"
+                                     src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
-                            <Link to="/dashboard"><button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
-                            </button></Link>
                         </div>
                     </div>
                 </div>
-                <div className="activity-section">
-                    <div>
-                        <Collapsible trigger="Ask for previous record" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                            <div>
-                                <table className="ask-record-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Doctor</th>
-                                            <th>Records</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {prevRecords.map((record, index) => (
-                                            <tr key={index}>
-                                                <td>{new Date(record.date).toLocaleDateString()}</td>
-                                                <td>{record.doctor_name}</td>
-                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">Download Here</a></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Collapsible>
+                <div className="activity-section-patient monitor-activity">
+                    <div className="monitor-doctor-details">
+                        <div className="monitor-head">
+                            <p className="activity-tag">Doctor</p>
+                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                        </div>
+                        <table className="monitor-detail">
+                            <tbody>
+                                <tr>
+                                    <td>Doctor Name</td>
+                                    <td>Dr. Rishav Chandel</td>
+                                </tr>
+                                <tr>
+                                    <td>Specialization</td>
+                                    <td>Orthopaedics</td>
+                                </tr>
+                                <tr>
+                                    <td>Degree</td>
+                                    <td>MBBS(Kolkata), MD</td>
+                                </tr>
+                                <tr>
+                                    <td>Email ID</td>
+                                    <td>rishav.chandel@gmail.com</td>
+                                </tr>
+                                <tr>
+                                    <td>Experience</td>
+                                    <td>10 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td>30 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Rating</td>
+                                    <td>4.3/5</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <Collapsible trigger="Suggest next date" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                            <div className="next-date-section">
-                                <input className="next-date" type="date" id="next-date" name="next-date" min={today} />
-                                <button className="next-date-submit" onClick={suggestADate}>Suggest</button>
-                            </div>
-                            <div className="next-date-result"><span>Suggested next date : {suggestDate}</span></div>
-                        </Collapsible>
-                    </div>
-                    <div>
-                        <Collapsible trigger="Add single word diagnosis" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                            <div className="next-date-section">
-                                <input className="diagnosis-field" type="text" id="diagnosis-summary" name="diagnosis-summary" />
-                                <button className="next-date-submit" id="diagnosis-submit" onClick={summaryDiagnosis}>Submit</button>
-                            </div>
-                            <div className="next-date-result"><span>Diagnosis Summary : {diagnosisSummary}</span>
-                                <span className="cancel-summary" onClick={cancelDiagnosis}>{diagnosisSummary !== "" ? " X " : ""}</span></div>
-                        </Collapsible>
-                    </div>
-                    <div>
-                        <Collapsible trigger="Choose medicine and dosage" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                            <div className="next-date-section dosage-section">
-                                <select className="medicine" id="medicine" name="medicine" >
-                                    <option>Medicine 1</option>
-                                    <option>Medicine 2</option>
-                                    <option>Medicine 3</option>
-                                    <option>Medicine 4</option>
-                                    <option>Medicine 5</option>
-                                    <option>Medicine 6</option>
-                                </select>
-                                <select className="after-before" id="after-before" name="after-before" >
-                                    <option>After</option>
-                                    <option>Before</option>
-                                </select>
-                                <select className="dosage" id="dosage-1" name="dosage-1" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                                <span style={{ color:"black", fontWeight:"bolder" }}>-</span>
-                                <select className="dosage" id="dosage-2" name="dosage-2" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                                <span style={{ color:"black", fontWeight:"bolder" }}>-</span>
-                                <select className="dosage" id="dosage-3" name="dosage-3" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                            </div>
-                            <button className="next-date-submit" onClick={submittedMedicines}>Submit</button>
-                            <div className="dosage-result">
-                                {medicines.length === 0 ? "" :
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Medicine Name</th>
-                                            <th>After/Before food</th>
-                                            <th>Dosage</th>
-                                            <th>Cancel</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {medicines.map((medicine, index) => (
-                                            <tr key={index}>
-                                                <td>{medicine.name}</td>
-                                                <td>{medicine.food}</td>
-                                                <td>{medicine.dos1}-{medicine.dos2}-{medicine.dos3}</td>
-                                                <td className="cancel-summary" onClick={() => cancelMedicine(index)}>X</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table> }
-                            </div>
-                        </Collapsible>
-                    </div>
-                    <div>
-                        <Collapsible trigger="Write prescription" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                            <div className="chat-box">
-                                {prescription.map((prescription, index) => (
-                                    <p key={index}>
-                                        <span>{index + 1 + ". "}</span> {prescription}
-                                        <span className="cancel-summary" onClick={() => cancelPrescription(index)}>{"  X"}</span>
-                                    </p>
-                                ))}
-                            </div>
-                            <div className="chat-box-section">
-                                <input className="diagnosis-field" type="text" id="chat-field" name="chat-field" />
-                                <button className="chat-field-submit" onClick={writePrescription}>Submit</button>
-                            </div>
-                        </Collapsible>
+                    <div className="monitor-patient-style">
+                        <div className="monitor-head">
+                            <p className="activity-tag">Patient</p>
+                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                        </div>
+                        <table className="monitor-detail">
+                            <tbody>
+                                <tr>
+                                    <td>Patient Name</td>
+                                    <td>Suraj Subedi</td>
+                                </tr>
+                                <tr>
+                                    <td>Email ID</td>
+                                    <td>suraj.subedi@gmail.com</td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td>36 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnosis</td>
+                                    <td>Asthma</td>
+                                </tr>
+                                <tr>
+                                    <td>Repeat Patient</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td>Height</td>
+                                    <td>170 cm</td>
+                                </tr>
+                                <tr>
+                                    <td>Weight</td>
+                                    <td>68 kg</td>
+                                </tr>
+                                <tr>
+                                    <td>Blood Group</td>
+                                    <td>O+</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+
     );
 }
 
@@ -719,4 +588,4 @@ const askRecord = [
 ]
 
 
-export default ConsultationPageHelper;
+export default MonitorCallHelper;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../../../css/helper-components/helper-doctor/doc-monitor-style.css";
+import {Link} from "react-router-dom";
 
 const DocMonitorHelper = () => {
     const [seniorDoctorCallHistory, setSeniorDoctorCallHistory] = useState([
@@ -282,7 +283,7 @@ const DocMonitorHelper = () => {
                                     <div className="status">Ongoing</div> }</div>
                                 <div className="Ref">
                                     {callStatus === "ongoing" ? (
-                                        <div className="joinbutton" onClick={() => joinCall(doctor.id)}>Join Call</div>
+                                        <Link to="/monitor-call/subho"><div className="joinbutton" onClick={() => joinCall(doctor.id)}>Join Call</div></Link>
                                     ) : (
                                         <div className="join">{seniorDoctorCallStatus === "joined" ? "Call Joined" : "Not Joined"}</div>
                                     )}
