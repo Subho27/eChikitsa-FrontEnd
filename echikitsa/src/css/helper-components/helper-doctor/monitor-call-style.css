@@ -1,0 +1,64 @@
+.monitor-photo {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    margin-left: 12%;
+    margin-bottom: 5px;
+    border-width: 1px;
+    border-color: #1D2A4D;
+}
+
+.monitor-doctor-details {
+    padding: 10px;
+    border-style: solid;
+    border-color: #1D2A4D;
+    border-width: 0 0 2px 0
+}
+
+.monitor-patient-style {
+    margin: 10px;
+}
+
+.monitor-activity {
+    padding: 10px;
+}
+
+.monitor-detail {
+    width: 100%;
+}
+
+.monitor-detail td {
+    padding: 3px;
+    font-size: 12px;
+}
+
+.monitor-detail td:first-child {
+    width: 50%;
+    text-align: right;
+    font-weight: bold;
+}
+
+.monitor-detail td:last-child {
+    width: 50%;
+    text-align: left;
+    color: #FFFFFF;
+}
+
+.monitor-head {
+    display: flex;
+    flex-direction: row;
+    font-weight: bold;
+}
+
+.tag {
+    position: absolute;
+    color: #ffffff;
+    padding: 5px;
+    background-color: #13c5dd;
+    border-radius: 10px 0 10px 0;
+    font-size: 12px;
+}
+
+.activity-tag {
+    color: #FFFFFF;
+}

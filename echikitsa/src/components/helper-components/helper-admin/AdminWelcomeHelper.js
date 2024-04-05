@@ -6,6 +6,9 @@ import {dummy} from "./dummy";
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -13,6 +16,7 @@ function AdminWelcomeHelper(props) {
     const [adminActiveId, setAdminActiveId] = useState(null);
 
     const [query, setQuery] = useState("");
+    const [imageUpload, setImageUpload] = useState(null);
     const {state}=useLocation();
 
 console.log(state.hospital_id);
@@ -46,7 +50,8 @@ console.log(state.hospital_id);
         degree: '',
         gender: '',
         registrationNumber:'',
-        specialization:''
+        specialization:'',
+        img_url:''
 
     });
 
@@ -65,6 +70,30 @@ console.log(state.hospital_id);
 
 
     });
+    const uploadFiles = () => {
+        console.log(imageUpload)
+        if (imageUpload == null) return Promise.reject("No image to upload");
+
+        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+
+        return uploadBytes(imageRef, imageUpload)
+            .then((snapshot) => {
+                return getDownloadURL(snapshot.ref);
+            })
+            .then((url) => {
+                // Optionally, you can also update state or perform other actions here
+
+
+                formData.img_url = url;
+
+                console.log("Image uploaded successfully. Download URL:", url);
+                return url; // Return the download URL
+            })
+            .catch((error) => {
+                console.error("Error uploading image:", error);
+                throw error; // Propagate the error
+            });
+    };
 
     const handleInputChangeHospital = (e) => {
         const { name, value, type, checked } = e.target;
@@ -138,8 +167,10 @@ console.log(state.hospital_id);
     const handleAddDoctor = async (e) => {
         e.preventDefault();
         //console.log(formData)
+        await uploadFiles()
         try {
             const token = getJwtTokenFromLocalStorage();
+
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const response = await axios.post(`http://localhost:9191/admin/addDoctor/?id=${state.hospital_id}`,formData,{headers}).then((response) => {
 
@@ -396,7 +427,10 @@ console.log(state.hospital_id);
                             <div className="admin-cc">
                                 <span>Upload your Photo</span>
                             </div>
-                            <input type="file" name="file" className="file-input"/>
+                            {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
                         </div>
 
                         <div className="field">
