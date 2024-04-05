@@ -1,8 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import '../../../css/helper-components/helper-patient/profile-style.css';
+import axios from "axios";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {useLocation} from "react-router-dom";
 
 
-function ProfilePage() {
+function ProfilePage(props) {
     const [profile, setProfile] = useState({
         "firstName": "Ajay",
         "lastName": "Gidd",
@@ -19,7 +22,9 @@ function ProfilePage() {
         "prevRecords": "previous.pdf",
         "password":""
     });
-
+    const [userId, setUserId] = useState(0);
+    const {state}=useLocation();
+    console.log("kaefhqpowedfqedqkj", props.data)
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
         email: '',
@@ -73,15 +78,56 @@ function ProfilePage() {
     const off = () => {
         document.getElementById("overlay-patient-profile").style.display = "none";
     }
+    useEffect(() => {
+        const id = parseInt(window.location.pathname.split("/")[2]);
+        console.log(id);
+        setUserId(id);
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            const getUserData = async (e) => {
+                // e.preventDefault();
+                //console.log(hospitalData);
+                try {
+                    const token = getJwtTokenFromLocalStorage();
+                    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
+                    const response = await axios.get(`http://localhost:8081/user/get-user/?id=${userId}`,{headers}).then((response) => {
+                        console.log(response.data);
+                        if (response.data) {
+                            //alert(response.data)
+                            setProfile(response.data)
+
+                        }
+                        else {
+                            alert("Something went wrong !!")
+                        }
+
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+
+                }
+
+
+
+            };
+
+            getUserData();
+        }
+    }, [userId])
+
+
 
     return (
         <div>
             <div id="overlay-patient-profile" onClick={off}>
-                <img className="overlay-profile" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="profile"/>
+                <img className="overlay-profile" src={profile.img_url} alt="profile"/>
             </div>
             <div className="containerProfile">
                 <div className="leftSideContents">
-                    <img className="profile-picture" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="Profile"/>
+                    <img className="profile-picture" src={profile.img_url} alt="Profile"/>
                     <div>
                         <p className="profile-info">{profile.firstName + " " + profile.lastName}</p>
                         <p className="address-info">{profile.address}</p>
@@ -157,7 +203,7 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Aadhaar : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.aadhar} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={profile.aadhaar} readOnly/>
                                 </div>
                             </td>
                         </tr>
@@ -165,14 +211,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" name="address" value={profile.address} onChange={handleChange } placeholder={profile.address} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="address" value={profile.address} onChange={handleChange } placeholder={profile.city + " " + profile.state} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Password : </span>
-                                    <input className="user-data-value editable" type="text" name="password" value={profile.password} onChange={handleChange } placeholder="XXXXXXXXXXXXXX" readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="password" value={"XXXXXXXXXXXXXX"} onChange={handleChange } placeholder={"XXXXXXXXXXXXXX"} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>

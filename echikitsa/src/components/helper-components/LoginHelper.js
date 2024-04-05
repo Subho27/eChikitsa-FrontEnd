@@ -87,13 +87,21 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token)
                         if(loginType === 'patient')
                         {
-                            let path = '/welcome'
-                            navigate(path);
+                            // let path = '/welcome'
+                            // navigate(path);
+                            console.log(response.data.id)
+                            navigate("/welcome",{state:{
+                                    user_id:response.data.id}
+                            });
                         }
                         if(loginType === 'doctor')
                         {
-                            let path = '/dashboard'
-                            navigate(path);
+                            // let path = '/dashboard'
+                            // navigate(path);
+
+                            navigate("/dashboard",{state:{
+                                    user_id:response.data.id}
+                            });
                         }
                         if(loginType === 'admin'){
                             // let path = '/admin'
