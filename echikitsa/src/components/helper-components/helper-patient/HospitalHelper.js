@@ -186,7 +186,8 @@ function HospitalHelper (props) {
                                         </tr>
                                         <tr>
                                             <td>Doctor Rating</td>
-                                            <td>{selectedDoctor && selectedDoctor.rating}</td>
+                                            {/*<td>{selectedDoctor && selectedDoctor.rating}</td>*/}
+                                            <td>3</td>
                                         </tr>
                                     </tbody>
                                 </table>
