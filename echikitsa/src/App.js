@@ -14,6 +14,8 @@ import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
 import WelcomeAdmin from "./components/admin-components/WelcomeAdmin";
+import ForgotPassword from "./components/common-components/ForgotPassword";
+
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
             <Route path='/' element={ <Home/> } />
             <Route path='/signup' element={ <SignUp/> } />
             <Route path='/login' element={ <Login/> } />
+                <Route path='/forgot-password' element={ <ForgotPassword/> } />
+
 
             {/*Patient Page Routes*/}
             <Route path='/welcome' element={<WelcomePatient/>}/>

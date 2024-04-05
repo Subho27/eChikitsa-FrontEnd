@@ -59,6 +59,32 @@ const LoginHelper = () => {
         setIsOtpSent(true);
     };
 
+    const handleForgotPassword = async (e) => {
+
+        let role;
+        if(loginType === 'patient')
+        {
+            role = "PATIENT"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'doctor')
+        {
+            role = "DOCTOR"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'admin'){
+            role = "ADMIN"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+
+        }
+    }
+
 
 
     const handleLogin = async (e) => {
@@ -90,13 +116,19 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token)
                         if(loginType === 'patient')
                         {
-                            let path = '/welcome'
-                            navigate(path);
+                            // let path = '/welcome'
+                            // navigate(path);
+                            navigate("/welcome",{state:{
+                                    patient_id:response.data.id}
+                            });
                         }
                         if(loginType === 'doctor')
                         {
-                            let path = '/dashboard'
-                            navigate(path);
+                            // let path = '/dashboard'
+                            // navigate(path);
+                            navigate("/dashboard",{state:{
+                                    doctor_id:response.data.id}
+                            });
                         }
                         if(loginType === 'admin'){
                             // let path = '/admin'
@@ -210,7 +242,7 @@ const LoginHelper = () => {
                     <span className="remember-text">Remember me</span>
                 </div>
                 <div className="pass-link">
-                    <a href="#">Forgot password?</a>
+                    <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>
             </div>
 

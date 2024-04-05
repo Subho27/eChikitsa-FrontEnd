@@ -56,10 +56,12 @@ console.log(state.hospital_id);
         phoneNumber :'',
         address :'',
         website :'',
-        departments :[{
-            department_id: '',
-            department_name: ''
-        }]
+        departments :[
+            {department_id: '',
+            department_name:''
+            }
+
+        ]
 
 
     });
@@ -78,7 +80,7 @@ console.log(state.hospital_id);
     const handleSpecialisationChange = (event) => {
         const { options } = event.target;
         const selectedSpecialisations = [];
-        for (let i = 0; i < options.length; i++) {
+        for (let i = 0; i <= options.length; i++) {
             if (options[i].selected) {
                 selectedSpecialisations.push(options[i].value);
             }
@@ -88,6 +90,19 @@ console.log(state.hospital_id);
             specialisation: selectedSpecialisations
         }));
     };
+
+    const handleCheckboxChange = (department) => {
+        if (selectedValues.includes(department)) {
+            setSelectedValues(selectedValues.filter(item => item !== department));
+        } else {
+            setSelectedValues([...selectedValues, department]);
+        }
+        setHospitalData(prevState => ({
+            ...prevState,
+            departments: selectedValues
+        }));
+    };
+    
 
 
 
@@ -152,17 +167,7 @@ console.log(state.hospital_id);
         "Gastroenterology"
     ];
 
-    const handleCheckboxChange = (department_id,department_name) => {
-        if (selectedValues.includes(department_name)) {
-            setSelectedValues(selectedValues.filter(item => item !== department_name));
-        } else {
-            setSelectedValues([...selectedValues,department_name]);
-        }
-        setHospitalData(prevState => ({
-            ...prevState,
-            departments: department_name
-        }));
-    };
+
 
 
 
@@ -540,12 +545,12 @@ console.log(state.hospital_id);
                                 <div key={index}>
                                     <div
                                         className={selectedValues.includes(department) ? 'selected checkbox-item' : 'checkbox-item'}
-                                        onClick={() => handleCheckboxChange(index,department)}>
+                                        onClick={() => handleCheckboxChange(department)}>
                                         <input
                                             type="checkbox"
                                             value={department}
                                             checked={selectedValues.includes(department)}
-                                            onChange={() => handleCheckboxChange(index,department)}
+                                            onChange={() => handleCheckboxChange(department)}
                                         />
                                         <span>{department}</span>
                                     </div>
