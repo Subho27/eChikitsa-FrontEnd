@@ -22,9 +22,11 @@ function HospitalHelper (props) {
                 try {
                     const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_ids}`);
                     setHospitalName(response.data);
+                    console.log(response.data);
                     const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
 
                     setDoctors(response2.data);
+
                      console.log(response2.data);
 
                 } catch (error) {
@@ -149,7 +151,7 @@ function HospitalHelper (props) {
                         <div className="doctors-details">
                             <div className="doctor-image-section">
                                 <img className="doctors-image"
-                                      src={selectedDoctor && selectedDoctor.image_path && require("../../../images/landing_body_img/"+selectedDoctor.image_path)} alt="Doctor" />
+                                      src={selectedDoctor && selectedDoctor.image_path } alt="Doctor" />
                             </div>
                             <div className="doctors-details-1">
                                 <table className="hospital-detail-table custom-hdt">

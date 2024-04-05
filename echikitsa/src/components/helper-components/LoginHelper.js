@@ -54,8 +54,7 @@ const LoginHelper = () => {
     };
 
     const handleGenerateOtp = () => {
-        // Simulate OTP generation and sending logic
-        // You can replace this with actual OTP sending logic
+
         setIsOtpSent(true);
     };
 
@@ -63,9 +62,7 @@ const LoginHelper = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // Logic to handle login based on login method
         if (loginMethod === 'password') {
-            //console.log('Logging in with email and password:', email, password);
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
@@ -90,13 +87,21 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token)
                         if(loginType === 'patient')
                         {
-                            let path = '/welcome'
-                            navigate(path);
+                            // let path = '/welcome'
+                            // navigate(path);
+                            console.log(response.data.id)
+                            navigate("/welcome",{state:{
+                                    user_id:response.data.id}
+                            });
                         }
                         if(loginType === 'doctor')
                         {
-                            let path = '/dashboard'
-                            navigate(path);
+                            // let path = '/dashboard'
+                            // navigate(path);
+
+                            navigate("/dashboard",{state:{
+                                    user_id:response.data.id}
+                            });
                         }
                         if(loginType === 'admin'){
                             // let path = '/admin'
