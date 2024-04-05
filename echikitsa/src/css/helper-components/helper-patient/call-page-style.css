@@ -133,3 +133,14 @@
     border-color: #0B7CF3;
     color: black;
 }
+
+.remoteVideo {
+    margin: 5px;
+    background-color: #13c5dd;
+    padding: 2px;
+    border-radius: 10px;
+}
+
+video {
+    border-radius: 10px;
+}

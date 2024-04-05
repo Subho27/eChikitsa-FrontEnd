@@ -2,6 +2,7 @@
   "name": "echikitsa",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://127.0.0.1:3000",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
@@ -31,7 +32,9 @@
     "swiper": "^11.0.6",
     "tailwindcss": "^3.4.1",
     "uuid": "^9.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "mediasoup-client": "^3.6.37",
+    "socket.io-client": "^4.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
