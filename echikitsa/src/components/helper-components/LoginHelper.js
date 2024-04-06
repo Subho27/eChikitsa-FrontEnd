@@ -54,15 +54,44 @@ const LoginHelper = () => {
     };
 
     const handleGenerateOtp = () => {
-
+        // Simulate OTP generation and sending logic
+        // You can replace this with actual OTP sending logic
         setIsOtpSent(true);
     };
+
+    const handleForgotPassword = async (e) => {
+
+        let role;
+        if(loginType === 'patient')
+        {
+            role = "PATIENT"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'doctor')
+        {
+            role = "DOCTOR"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'admin'){
+            role = "ADMIN"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+
+        }
+    }
 
 
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        // Logic to handle login based on login method
         if (loginMethod === 'password') {
+            //console.log('Logging in with email and password:', email, password);
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
@@ -89,18 +118,16 @@ const LoginHelper = () => {
                         {
                             // let path = '/welcome'
                             // navigate(path);
-                            console.log(response.data.id)
                             navigate("/welcome",{state:{
-                                    user_id:response.data.id}
+                                    patient_id:response.data.id}
                             });
                         }
                         if(loginType === 'doctor')
                         {
                             // let path = '/dashboard'
                             // navigate(path);
-
                             navigate("/dashboard",{state:{
-                                    user_id:response.data.id}
+                                    doctor_id:response.data.id}
                             });
                         }
                         if(loginType === 'admin'){
@@ -215,7 +242,7 @@ const LoginHelper = () => {
                     <span className="remember-text">Remember me</span>
                 </div>
                 <div className="pass-link">
-                    <a href="#">Forgot password?</a>
+                    <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>
             </div>
 
