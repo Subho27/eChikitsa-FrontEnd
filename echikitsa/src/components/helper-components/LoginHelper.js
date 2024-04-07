@@ -8,6 +8,7 @@ import axios from 'axios';
 import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
 // import {authentication} from '../../firebase/firebaseConfig'
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
+import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -113,29 +114,21 @@ const LoginHelper = () => {
 
                     if (response.data && response.data.role ==loginType.toUpperCase()) {
                         //console.log(response.data)
-                        saveJwtTokenToLocalStorage(response.data.token)
+                        saveJwtTokenToLocalStorage(response.data.token);
+                        saveUserIdToLocalStorage(response.data.id);
                         if(loginType === 'patient')
                         {
-                            // let path = '/welcome'
-                            // navigate(path);
                             navigate("/welcome",{state:{
                                     patient_id:response.data.id}
                             });
                         }
                         if(loginType === 'doctor')
                         {
-                            // let path = '/dashboard'
-                            // navigate(path);
                             navigate("/dashboard",{state:{
                                     doctor_id:response.data.id}
                             });
                         }
                         if(loginType === 'admin'){
-                            // let path = '/admin'
-                            // navigate(path);
-                            // let path = `/admin/${response.data.id}`
-                            // navigate(path);
-
                             navigate("/admin",{state:{
                                     hospital_id:response.data.id}
                             });
