@@ -9,6 +9,10 @@ import "../../../css/helper-components/helper-patient/call-page-style.css"
 import 'firebase/compat/database';
 import {Device} from 'mediasoup-client'
 import io from 'socket.io-client'
+import axios from "axios";
+import SockJS from "sockjs-client";
+import {over} from "stompjs";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -19,11 +23,12 @@ function CallPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [isOpen, setIsOpen] = useState(true);
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
+    const [stompClient, setStompClient] = useState(null);
     let i = 0;
 
 
     const navigate = useNavigate();
-    const location = useLocation();
+    const {state} = useLocation();
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
@@ -464,6 +469,38 @@ function CallPageHelper(effect, deps) {
     }
     //endregion
 
+    const confirmJoin = () => {
+        const room = window.location.pathname.split("/")[2];
+        if (room === "" || room === undefined) {
+            setError("Please add a room name to the URL.");
+            return;
+        }
+        setIsOpen(false);
+        setRoomName(room);
+
+        //Creating socket connection
+        if(socket === null) {
+            const sock = io("/mediasoup");
+            setSocket(sock);
+        }
+    }
+
+    const handleCallEnd = async () => {
+        await socket.disconnect();
+        await axios.post("http://localhost:9193/local/remove", {
+            patientId: null,
+            doctorId: parseInt(roomName)
+        }).then((response) => {
+            const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+            stompClient.connect({}, () => {
+                setStompClient(stompClient);
+                stompClient.send(`/app/send-data/${parseInt(roomName)}`);
+                alert("call ended successfully");
+                navigate("/welcome");
+            });
+        })
+    }
+
     //region Call Use Effects
     useEffect(() => {
         if (!socket) return; // Exit if socket is null
@@ -526,19 +563,7 @@ function CallPageHelper(effect, deps) {
 
         //region Connection & Room
         //Handle room name
-        const room = window.location.pathname.split('/')[2];
-        console.log(room)
-        if (room === "" || room === undefined) {
-            setError("Please add a room name to the URL.");
-            return;
-        }
-        setRoomName(room);
 
-        //Creating socket connection
-        if(socket === null) {
-            const sock = io("/mediasoup");
-            setSocket(sock);
-        }
         //endregion
 
     }, [])
@@ -597,19 +622,19 @@ function CallPageHelper(effect, deps) {
             <div id="overlay" onClick={off}>
                 <div id="text">Waiting</div>
             </div>
-            {/*<div>*/}
-            {/*    {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>*/}
-            {/*        <div className="confirmation-content">*/}
-            {/*            <h3>Confirmation!!!</h3>*/}
-            {/*            <p>Are you sure?<br/>*/}
-            {/*            You want to join video consultation.</p>*/}
-            {/*            <div className="Feedbutton">*/}
-            {/*                <button className="confirm-call" onClick={}>YES</button>*/}
-            {/*                <button className="confirm-call" onClick={returnWelcome}>NO</button>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </StyledPopup>}*/}
-            {/*</div>*/}
+            <div>
+                {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
+                    <div className="confirmation-content">
+                        <h3>Confirmation!!!</h3>
+                        <p>Are you sure?<br/>
+                        You want to join video consultation.</p>
+                        <div className="Feedbutton">
+                            <button className="confirm-call" onClick={confirmJoin}>YES</button>
+                            <button className="confirm-call" onClick={returnWelcome}>NO</button>
+                        </div>
+                    </div>
+                </StyledPopup>}
+            </div>
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
@@ -651,7 +676,7 @@ function CallPageHelper(effect, deps) {
                                         <h1><StarRating className="stars" totalStars={5}/></h1>
                                     </div>
                                     <div className="Feedbutton">
-                                        <Link to="/welcome"><button className="submit-button">Submit</button></Link>
+                                        <Link to="/welcome"><button className="submit-button" onClick={handleCallEnd}>Submit</button></Link>
                                         <Link to="/welcome"><button className="cancel-button">Cancel</button></Link>
                                     </div>
                                 </div>
