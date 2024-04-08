@@ -10,7 +10,7 @@ function WelcomePatient() {
 
     return(
         <div>
-            <PatientHeaderHelper data="welcome" />
+            <PatientHeaderHelper data="welcome"/>
             <WelcomeHelper/>
             <FooterHelper/>
         </div>

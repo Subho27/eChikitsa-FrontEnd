@@ -4,6 +4,8 @@ import "../../../css/helper-components/helper-doctor/dashboard-style.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
 import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {useNavigate} from "react-router-dom";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
@@ -19,6 +21,7 @@ function DashboardHelper() {
     const [noOfPatientToday,setNoOfPatientToday] = useState("");
     const [todayData ,setTodayDate] = useState("");
      const [data, setData] = useState([]);
+
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
@@ -141,6 +144,8 @@ function DashboardHelper() {
                 }
             }
         })
+
+
 
         // Ratings
         // document.getElementById("progress-canvas5").style.width = fiveStar*100 +"%";

@@ -4,9 +4,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
 import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
+
+
+
 
 const DoctorHeaderHelper = (props) => {
+    const navigate = useNavigate();
+
+    const handleJoinCall = async () => {
+        navigate("/consult/"+ getUserIdFromLocalStorage() )
+
+    }
+
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -57,7 +68,8 @@ const DoctorHeaderHelper = (props) => {
                         </button>
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
-                                <Link to="/consult"><button className="join-call">JOIN CALL</button></Link>
+                                {/*<Link to="/consult"><button className="join-call">JOIN CALL</button></Link>*/}
+                                <button className="join-call" onClick={handleJoinCall}>JOIN CALL</button>
                                 <Link to="/dashboard" className={`nav-item nav-link ${props.data === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
                                 <Link to="/doctor-records" className={`nav-item nav-link ${props.data === 'records' ? 'active' : ''}`} >Records</Link>
                                 <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>
