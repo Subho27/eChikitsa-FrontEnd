@@ -10,7 +10,7 @@ function WelcomePatient() {
 
     return(
         <div>
-            <PatientHeaderHelper data="welcome" id = {state.user_id}/>
+            <PatientHeaderHelper data="welcome" />
             <WelcomeHelper/>
             <FooterHelper/>
         </div>
