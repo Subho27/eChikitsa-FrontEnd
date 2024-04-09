@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Collapsible from 'react-collapsible';
 import '../../../css/helper-components/helper-admin/welcome-page-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -12,14 +12,126 @@ import {v4} from "uuid";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
-
     const [adminActiveId, setAdminActiveId] = useState(null);
-
     const [query, setQuery] = useState("");
     const [imageUpload, setImageUpload] = useState(null);
+    const [departments, setDepartments] = useState([]);
+    const [selectedValues, setSelectedValues] = useState([]);
+    const [hospitalName, setHospitalName] = useState({});
+    const [doctors,setDoctors] = useState([]);
+    const [hospitalNameValue, setHospitalNameValue] = useState("");
+    const [hospitalEmailValue, setHospitalEmailValue] = useState("");
+    const [hospitalPhoneNumberValue, setHospitalPhoneNumberValue] = useState("");
+    const [hospitalAddressValue, setHospitalAddressValue] = useState("");
+    const [hospitalWebsiteValue, setHospitalWebsiteValue] = useState("");
+    const [departmentName, setDepartmentName] = useState([])
+
     const {state}=useLocation();
 
-console.log(state.hospital_id);
+
+    useEffect(() => {
+        if (state.hospital_id) {
+            const fetchHospitalName = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_id}`)
+                    setHospitalName(response.data);
+                    const { data } = response;
+                    setHospitalData(data);
+                    setHospitalNameValue(data.hospital_name);
+                    setHospitalEmailValue(data.email);
+                    setHospitalPhoneNumberValue(data.phoneNumber);
+                    setHospitalAddressValue(data.address);
+                    setHospitalWebsiteValue(data.website);
+
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_id}`);
+                    setDoctors(response2.data);
+
+                } catch (error) {
+                    console.error('Error fetching hospital name:', error);
+                }
+            };
+
+            const fetchAllDepartments = async () => {
+                try {
+                    const response = await axios.get('http://localhost:8081/department/get-all-departments');
+                        setDepartments(response.data);
+                    }
+                 catch (error) {
+                    console.error('Error fetching all departments:', error);
+                }
+            };
+            const fetchDoctorDetails = async () => {
+                try {
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+                    const doctorsData = response2.data.map(doctor => ({
+                        doctorName: doctor.name,
+                        specialization: doctor.specialization,
+                        email: doctor.email,
+                        isActive:doctor.active
+                    }));
+
+                    setDoctors(doctorsData);
+                }
+                catch (error) {
+                    console.error('Error fetching all doctors:', error);
+                }
+            };
+
+
+            const fetchDepartmentsByHospitalId = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8081/hospital/get-all-departments-by-hospitalId/${state.hospital_id}`);
+                    const departmentsByHospitalId = response.data.map(department => department.department_id);
+                    setSelectedValues(departmentsByHospitalId);
+                    const departmentsByHospitalIds = response.data.map(department => department.department_name);
+                    setDepartmentName(departmentsByHospitalIds)
+                    console.log(departmentName);
+                } catch (error) {
+                    console.error('Error fetching departments by hospital ID:', error);
+                }
+            };
+            console.log(departmentName);
+
+            fetchAllDepartments();
+            fetchDoctorDetails()
+            fetchDepartmentsByHospitalId();
+            fetchHospitalName();
+        }
+    }, [state.hospital_id]);
+
+    const [hospitalData, setHospitalData] = useState({
+        name :hospitalName.hospital_name,
+        email :hospitalName.email,
+        phoneNumber :hospitalName.phoneNumber,
+        address : hospitalName.address,
+        website :hospitalName.website,
+        departments :[]
+
+
+    });
+
+
+    const handleCheckboxChange = (departmentId, department_name) => {
+        // Toggle selection status of the department
+        const isSelected = selectedValues.includes(departmentId);
+        const updatedValues = isSelected
+            ? selectedValues.filter(value => value !== departmentId) // Remove department if already selected
+            : [...selectedValues, departmentId]; // Add department if not selected
+
+        // Update selectedValues state
+        setSelectedValues(updatedValues);
+
+        // Update hospitalData.departments based on the updated selectedValues
+        const updatedDepartments = updatedValues.map(id => ({
+            department_id: id,
+            department_name: departments.find(dep => dep.department_id === id).department_name
+        }));
+
+        setHospitalData(prevState => ({
+            ...prevState,
+            departments: updatedDepartments
+        }));
+    };
 
 
     const toggleActivation = (id) => {
@@ -27,14 +139,17 @@ console.log(state.hospital_id);
     };
 
 
+
     const handleSearch = (e) => {
         setQuery(e.target.value.toLowerCase());
 
     };
-    const filteredData = dummy.filter(item =>
-        item.DoctorName.toLowerCase().includes(query.toLowerCase()) ||
-        item.Specialization.toLowerCase().includes(query.toLowerCase()) ||
-        item.Email.toLowerCase().includes(query.toLowerCase())
+    const filteredData = doctors.filter(item =>
+        item.name.toLowerCase().includes(query.toLowerCase()) ||
+        item.specialization.toLowerCase().includes(query.toLowerCase()) ||
+        item.email.toLowerCase().includes(query.toLowerCase())||
+        item.isActive.toLowerCase().includes(query.toLowerCase())
+
     );
     const [formData, setFormData] = useState({
         firstName: '',
@@ -55,21 +170,8 @@ console.log(state.hospital_id);
 
     });
 
-    const [hospitalData, setHospitalData] = useState({
-        name :'',
-        email :'',
-        phoneNumber :'',
-        address :'',
-        website :'',
-        departments :[
-            {department_id: '',
-            department_name:''
-            }
-
-        ]
 
 
-    });
     const uploadFiles = () => {
         console.log(imageUpload)
         if (imageUpload == null) return Promise.reject("No image to upload");
@@ -81,11 +183,7 @@ console.log(state.hospital_id);
                 return getDownloadURL(snapshot.ref);
             })
             .then((url) => {
-                // Optionally, you can also update state or perform other actions here
-
-
                 formData.img_url = url;
-
                 console.log("Image uploaded successfully. Download URL:", url);
                 return url; // Return the download URL
             })
@@ -102,14 +200,13 @@ console.log(state.hospital_id);
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
-        //console.log(hospitalData);
     };
 
     // Function to handle specialisation selection
     const handleSpecialisationChange = (event) => {
         const { options } = event.target;
         const selectedSpecialisations = [];
-        for (let i = 0; i <= options.length; i++) {
+        for (let i = 0; i < options.length; i++) {
             if (options[i].selected) {
                 selectedSpecialisations.push(options[i].value);
             }
@@ -120,19 +217,6 @@ console.log(state.hospital_id);
         }));
     };
 
-    const handleCheckboxChange = (department) => {
-        if (selectedValues.includes(department)) {
-            setSelectedValues(selectedValues.filter(item => item !== department));
-        } else {
-            setSelectedValues([...selectedValues, department]);
-        }
-        setHospitalData(prevState => ({
-            ...prevState,
-            departments: selectedValues
-        }));
-    };
-    
-
 
 
 
@@ -142,9 +226,17 @@ console.log(state.hospital_id);
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
-            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const updatedData = {
+                name: hospitalNameValue,
+                email: hospitalEmailValue,
+                phoneNumber: hospitalPhoneNumberValue,
+                address: hospitalAddressValue,
+                website: hospitalWebsiteValue,
+                departments: hospitalData.departments // Preserve existing departments
+            };
 
-            const response = await axios.post(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, hospitalData,{headers}).then((response) => {
+            const response = await axios.put(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, updatedData,{headers}).then((response) => {
                 console.log(response.data);
                 if (response.data) {
                     alert(response.data)
@@ -183,27 +275,6 @@ console.log(state.hospital_id);
     }
 
     const [selectedValue, setSelectedValue] = useState('');
-
-    const [selectedValues, setSelectedValues] = useState([]);
-    const departmentOptions = [
-        "Cardiology",
-        "Orthopedics",
-        "Neurology",
-        "Dermatology",
-        "Pediatrics",
-        "Oncology",
-        "Ophthalmology",
-        "Psychiatry",
-        "Urology",
-        "Gastroenterology"
-    ];
-
-
-
-
-
-
-
     const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
         setSignUpType(type.toLowerCase());
@@ -330,34 +401,22 @@ console.log(state.hospital_id);
                                     <span>Specialization</span>
                                 </div>
                                 <div className="admin-specialsel">
-                                    <select name="specialization" value={formData.specialization} onChange={handleInputChange}
-                                            required>
+                                    <select
+                                        name="specialization"
+                                        value={formData.specialization}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
                                         <option value="">Select Specialization</option>
-                                        <option value="Cardiology">Cardiology</option>
-                                        <option value="Neurology">Neurology</option>
-                                        <option value="Orthopedics">Orthopedics</option>
-                                        <option value="Dermatology">Dermatology</option>
-                                        <option value="Ophthalmology">Ophthalmology</option>
-                                        <option value="Gastroenterology">Gastroenterology</option>
-                                        <option value="Oncology">Oncology</option>
-                                        <option value="Endocrinology">Endocrinology</option>
-                                        <option value="Pediatrics">Pediatrics</option>
-                                        <option value="Nephrology">Nephrology</option>
-                                        <option value="Pulmonology">Pulmonology</option>
-                                        <option value="Rheumatology">Rheumatology</option>
-                                        <option value="Urology">Urology</option>
-                                        <option value="Hematology">Hematology</option>
-                                        <option value="Psychiatry">Psychiatry</option>
-                                        <option value="Dentistry">Dentistry</option>
-                                        <option value="Emergency Medicine">Emergency Medicine</option>
-                                        <option value="Radiology">Radiology</option>
-                                        <option value="Anesthesiology">Anesthesiology</option>
-                                        <option value="Pathology">Pathology</option>
+                                        {departmentName.map((department, index) => (
+                                            <option key={index} value={department}>{department}</option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
                             <div className="field">
-                                <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange}
+                                <input type="text" name="registrationNumber" value={formData.registrationNumber}
+                                       onChange={handleInputChange}
                                        required/>
                                 <label>Registration Number</label>
                             </div>
@@ -463,9 +522,9 @@ console.log(state.hospital_id);
                                 </tr>
                                 {filteredData.map((item) => (<tr key={item.id}>
 
-                                        <td>{item.DoctorName}</td>
-                                        <td>{item.Specialization}</td>
-                                        <td>{item.Email}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.specialization}</td>
+                                        <td>{item.email}</td>
                                         {/*<td>{item.Active}</td>*/}
                                     </tr>
                                 ))}
@@ -497,16 +556,16 @@ console.log(state.hospital_id);
                                 </tr>
                                 {filteredData.map((item) => (
                                     <tr key={item.id}>
-                                        <td>{item.DoctorName}</td>
-                                        <td>{item.Email}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.email}</td>
                                         <td>
                                             <div className="ActiveDeactive">
                                                 <button
                                                     id="admin-activate-button"
                                                     onClick={() => toggleActivation(item.id)}
-                                                    className={adminActiveId === item.id ? 'adminActive' : 'adminInactive'}
+                                                    className={item.isActive ? 'adminActive' : 'adminInactive'}
                                                 >
-                                                    {adminActiveId === item.id ? 'Deactivate' : 'Activate'}
+                                                    {item.isActive ? 'Deactivate' : 'Activate'}
                                                 </button>
                                             </div>
                                         </td>
@@ -526,14 +585,14 @@ console.log(state.hospital_id);
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Hospital Name : </span>
-                                    <input className="user-data-value editable" name="name" value={hospitalData.name} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.name} readOnly={true}/>
+                                    <input className="user-data-value editable" name="name" value={hospitalData.name} onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" name="email" value={hospitalData.email} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.email} readOnly={true}/>
+                                    <input className="user-data-value editable" name="email" value={hospitalData.email}  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -542,14 +601,14 @@ console.log(state.hospital_id);
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.phone} readOnly={true}/>
+                                    <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.address} readOnly={true}/>
+                                    <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -558,7 +617,7 @@ console.log(state.hospital_id);
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Website : </span>
-                                    <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.website} readOnly={true}/>
+                                    <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -575,28 +634,30 @@ console.log(state.hospital_id);
                     <div className="department-selector visually-hidden" id="selector-specialisation">
                         <h2>Select Departments:</h2>
                         <div className="checkbox-container">
-                            {departmentOptions.map((department, index) => (
+                            {departments.map((department, index) => (
                                 <div key={index}>
                                     <div
-                                        className={selectedValues.includes(department) ? 'selected checkbox-item' : 'checkbox-item'}
-                                        onClick={() => handleCheckboxChange(department)}>
+                                        className={selectedValues.includes(department.department_id) ? 'selected checkbox-item' : 'checkbox-item'}>
                                         <input
                                             type="checkbox"
-                                            value={department}
-                                            checked={selectedValues.includes(department)}
-                                            onChange={() => handleCheckboxChange(department)}
+                                            value={department.department_id}
+                                            checked={selectedValues.includes(department.department_id)}
+                                            onChange={() => handleCheckboxChange(department.department_id, department.department_name)}
                                         />
-                                        <span>{department}</span>
+                                        <span>{department.department_name}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        {selectedValues.length > 0 && (
-                            <p>You selected: {selectedValues.join(', ')}</p>
-                        )}
+
+                        {/*{selectedValues.length > 0 && (*/}
+                        {/*    <p>You selected: {selectedValues.join(', ')}</p>*/}
+                        {/*)}*/}
                     </div>
                     <div className="update-profile-button-section">
-                        <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={handleUpdateHospitalDetails}>SAVE</button>
+                        <button className="update-profile-button visually-hidden" id="profile-update-button"
+                                onClick={handleUpdateHospitalDetails}>SAVE
+                        </button>
                     </div>
                 </Collapsible>
             </div>
@@ -604,49 +665,52 @@ console.log(state.hospital_id);
                 <div className="hospital-details-section">
                     <div className="hospital-detail-header">Hello, ADMIN</div>
                     <div className="hospital-details-image-section">
-                        <img className="hospital-details-image" src={require("../../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} alt="Hospital"/>
+                        <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                     </div>
                     <table className="admin-hospital-detail-table">
                         <tbody>
                         <tr>
                             <td>Hospital Name</td>
-                            <td>Sanjeevani Hospital</td>
+                            <td>{hospitalName.hospital_name} Hospital</td>
                         </tr>
                         <tr>
                             <td>Registration No.</td>
-                            <td>KAR789200HILL</td>
+                            <td>{hospitalName.registrationNumber}</td>
                         </tr>
                         <tr>
                             <td>Email</td>
-                            <td>info@harmonymedicalcenter.com</td>
+                            <td>{hospitalName.email} </td>
                         </tr>
                         <tr>
                             <td>Phone Number</td>
-                            <td>(555) 123-4567</td>
+                            <td>{hospitalName.phoneNumber}</td>
                         </tr>
                         <tr>
                             <td>Address</td>
-                            <td>Mumbai, Maharashtra, India</td>
+                            <td>{hospitalName.address}</td>
                         </tr>
                         <tr>
                             <td>Website</td>
-                            <td>www.harmonymedicalcenter.com</td>
+                            <td>{hospitalName.website}</td>
                         </tr>
                         <tr>
                             <td>No. of Doctors</td>
-                            <td>13</td>
+                            <td>{hospitalName.noOfDoctors}</td>
                         </tr>
                         <tr>
                             <td>No. of Senior Doctors</td>
-                            <td>5</td>
+                            <td>{hospitalName.noOFSeniorDoctors}</td>
                         </tr>
                         <tr>
                             <td>Specialisations Available</td>
-                            <td>General Medicine, Pediatrics</td>
+                            <td> {hospitalName.specializationss && hospitalName.specializationss.map((spc, index) => (
+                                <span
+                                    key={index}>{spc} {index !== hospitalName.specializationss.length - 1 && ", "} </span>
+                            ))}</td>
                         </tr>
                         <tr>
                             <td>Rating</td>
-                            <td>4.5</td>
+                            <td>{hospitalName.rating}</td>
                         </tr>
                         </tbody>
                     </table>

@@ -71,7 +71,7 @@ function ForgotPassword () {
     return (
         <div>
             <HeaderHelper/>
-            <div className="mainDiv">
+            <div className="mainDivFP">
                 <h3 className="titlePassword">Password Reset</h3>
                 <hr className="hor-line"/>
 

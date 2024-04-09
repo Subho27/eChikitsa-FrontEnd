@@ -4,6 +4,8 @@ import "../../../css/helper-components/helper-doctor/dashboard-style.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
 import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {useNavigate} from "react-router-dom";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
@@ -20,26 +22,27 @@ function DashboardHelper() {
     const [todayData ,setTodayDate] = useState("");
      const [data, setData] = useState([]);
 
+
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
         const getNoOfPatient = async () => {
             try {
                 const responses = await axios.get(
-                    "http://localhost:8081/ehr/get-history/2"
+                    "http://localhost:8081/ehr/get-history/10"
 
                 );
                 setData(responses.data);
                 const totalConsulted = await axios.get(
-                    "http://localhost:8081/ehr/get-no-patient/2"
+                    "http://localhost:8081/ehr/get-no-patient/10"
                 );
                 setNoOfPatient(totalConsulted.data);
                 const totalConsulteds = await axios.get(
-                    "http://localhost:8081/ehr/get-no-patient-consulted-today/2"
+                    "http://localhost:8081/ehr/get-no-patient-consulted-today/10"
 
                 );
                 setNoOfPatientToday(totalConsulteds.data);
                 const response = await axios.get(
-                    "http://localhost:8081/ehr/get-freq-patient/2"
+                    "http://localhost:8081/ehr/get-freq-patient/10"
 
                 );
                 setTodayDate(response.data);
@@ -141,6 +144,8 @@ function DashboardHelper() {
                 }
             }
         })
+
+
 
         // Ratings
         // document.getElementById("progress-canvas5").style.width = fiveStar*100 +"%";
