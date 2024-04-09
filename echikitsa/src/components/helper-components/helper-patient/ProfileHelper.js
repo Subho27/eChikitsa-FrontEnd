@@ -3,6 +3,7 @@ import '../../../css/helper-components/helper-patient/profile-style.css';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {useLocation} from "react-router-dom";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
 
 function ProfilePage(props) {
@@ -22,8 +23,9 @@ function ProfilePage(props) {
         "prevRecords": "previous.pdf",
         "password":""
     });
-    const [userId, setUserId] = useState(0);
-    const {state}=useLocation();
+    // const [userId, setUserId] = useState(0);
+    // const {state}=useLocation();
+    const userId =  getUserIdFromLocalStorage();
     console.log("kaefhqpowedfqedqkj", props.data)
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
@@ -81,7 +83,7 @@ function ProfilePage(props) {
     useEffect(() => {
         const id = parseInt(window.location.pathname.split("/")[2]);
         console.log(id);
-        setUserId(id);
+
     }, []);
 
     useEffect(() => {

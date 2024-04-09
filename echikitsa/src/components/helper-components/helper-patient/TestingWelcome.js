@@ -264,7 +264,10 @@ function TestingWelcome() {
                                 </div>
                                 <div className="hospital-name">{hospital.hospital_name}</div>
                                 <div className="location-of-hospital"><i className="fa fa-location-arrow"></i> {hospital.location}</div>
-                                <div className="specialisation-of-hospital"><i className="fa fa-medkit"></i> {hospital.specialisations.slice(0, 3).join(', ')}</div>
+                                <div className="specialisation-of-hospital"><i className="fa fa-medkit"></i> {hospital.specialisations.length > 3 ?
+                                    hospital.specialisations.slice(0, 3).join(', ') + ' ...' :
+                                    hospital.specialisations.join(', ')
+                                }</div>
                             </div>
                         ))}
                     </div>

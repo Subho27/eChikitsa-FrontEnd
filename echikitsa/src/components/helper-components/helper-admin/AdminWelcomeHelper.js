@@ -60,22 +60,22 @@ function AdminWelcomeHelper(props) {
                     console.error('Error fetching all departments:', error);
                 }
             };
-            const fetchDoctorDetails = async () => {
-                try {
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
-                    const doctorsData = response2.data.map(doctor => ({
-                        doctorName: doctor.name,
-                        specialization: doctor.specialization,
-                        email: doctor.email,
-                        isActive:doctor.active
-                    }));
-
-                    setDoctors(doctorsData);
-                }
-                catch (error) {
-                    console.error('Error fetching all doctors:', error);
-                }
-            };
+            // const fetchDoctorDetails = async () => {
+            //     try {
+            //         const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+            //         const doctorsData = response2.data.map(doctor => ({
+            //             doctorName: doctor.name,
+            //             specialization: doctor.specialization,
+            //             email: doctor.email,
+            //             isActive:doctor.active
+            //         }));
+            //
+            //         setDoctors(doctorsData);
+            //     }
+            //     catch (error) {
+            //         console.error('Error fetching all doctors:', error);
+            //     }
+            // };
 
 
             const fetchDepartmentsByHospitalId = async () => {
@@ -93,7 +93,7 @@ function AdminWelcomeHelper(props) {
             console.log(departmentName);
 
             fetchAllDepartments();
-            fetchDoctorDetails()
+            // fetchDoctorDetails()
             fetchDepartmentsByHospitalId();
             fetchHospitalName();
         }
@@ -585,14 +585,14 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Hospital Name : </span>
-                                    <input className="user-data-value editable" name="name" value={hospitalData.name} onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
+                                    <input className="user-data-value editable" name="name" onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" name="email" value={hospitalData.email}  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
+                                    <input className="user-data-value editable" name="email"  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -601,14 +601,14 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
+                                    <input className="user-data-value editable" name="phoneNumber"  onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
+                                    <input className="user-data-value editable"  name="address"  onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -617,14 +617,14 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Website : </span>
-                                    <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
+                                    <input className="user-data-value editable" name="website"  onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Specialisation : </span>
-                                    <input className="user-data-value editable" name="specialisation" value={hospitalData.specialisation} onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
+                                    <input className="user-data-value editable" name="specialisation" onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
                                     <i className="fa fa-pencil 5" onClick={makeEditable}></i>
                                 </div>
                             </td>
