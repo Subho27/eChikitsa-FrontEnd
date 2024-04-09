@@ -1,15 +1,21 @@
 import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../../../css/helper-components/helper-doctor/dashboard-style.css"
+import "../../../css/helper-components/helper-doctor/call-notification.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
 import axios from "axios";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {useNavigate} from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import SockJS from "sockjs-client";
+import {over} from "stompjs";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
     const [patient, setPatient] = useState(0)
+    const [stompClient, setStompClient] = useState(null);
     const [fiveStar, setFiveStar] = useState(totalFiveStar/totalPatient)
     const [fourStar, setFourStar] = useState(totalFourStar/totalPatient)
     const [threeStar, setThreeStar] = useState(totalThreeStar/totalPatient)
@@ -20,8 +26,10 @@ function DashboardHelper() {
     const [noOfPatient,setNoOfPatient] = useState("");
     const [noOfPatientToday,setNoOfPatientToday] = useState("");
     const [todayData ,setTodayDate] = useState("");
-     const [data, setData] = useState([]);
-
+    const [data, setData] = useState([]);
+    const [isJoinLater, setIsJoinLater] = useState(false);
+    const navigate = useNavigate();
+    let notifyCount = 0;
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
@@ -243,8 +251,82 @@ function DashboardHelper() {
     },
     [data, todayData]);
 
+    useEffect(() => {
+        const initializeWebSocket = () => {
+            let sock = new SockJS('http://localhost:9193/ws-endpoint');
+            const stompC = over(sock);
+            stompC.connect({}, () => {
+                setStompClient(stompC);
+                const topic = `/topic/call-incoming/${getUserIdFromLocalStorage()}`;
+                stompC.subscribe(topic, async (message) => {
+                    console.log(message);
+                    if(notifyCount === 0) {
+                        notify();
+                        notifyCount++;
+                    }
+                });
+            });
+        };
+        initializeWebSocket();
+
+        return () => {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+        };
+    }, []);
+
+    const toastId = React.useRef(null);
+
+    const notify = () => {
+        toastId.current = toast( <div className="call-notification">
+            <p>Incoming Call</p>
+            <table className="call-table">
+                <tbody>
+                <tr>
+                    <td>Patient Name : </td>
+                    <td>Rishav Chandel</td>
+                </tr>
+                <tr>
+                    <td>Gender : </td>
+                    <td>Male</td>
+                </tr>
+                <tr>
+                    <td>Age : </td>
+                    <td>21</td>
+                </tr>
+                <tr>
+                    <td>Repeat : </td>
+                    <td>No</td>
+                </tr>
+                </tbody>
+            </table>
+            <div className="call-handle-buttons">
+                <button className="accept-call-now" onClick={handleJoinCall}>Join Call</button>
+                <button className="accept-call-later" onClick={handleJoinLater}>Join Later</button>
+            </div>
+        </div>, {
+            position: "bottom-right"
+        });
+    };
+
+    const CloseButton = () => (
+        <i className="material-icons" onClick={handleJoinLater}>X</i>
+    );
+
+    const handleJoinCall = async () => {
+        navigate("/consult/"+ getUserIdFromLocalStorage() )
+    }
+
+    const handleJoinLater = async () => {
+        toast.dismiss(toastId.current);
+        setIsJoinLater(true);
+    }
+
     return (
         <div>
+            <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
+            {isJoinLater && <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>}
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
