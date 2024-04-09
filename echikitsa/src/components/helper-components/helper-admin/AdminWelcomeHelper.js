@@ -11,14 +11,6 @@ import 'react-tabs/style/react-tabs.css';
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
 import Select from "react-select";
-import Collapsible from "react-collapsible";
-
-const options = [
-    { value: "blues", label: "Blues" },
-    { value: "rock", label: "Rock" },
-    { value: "jazz", label: "Jazz" },
-    { value: "orchestra", label: "Orchestra" },
-];
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -94,14 +86,20 @@ function AdminWelcomeHelper(props) {
                     const response = await axios.get(`http://localhost:8081/hospital/get-all-departments-by-hospitalId/${state.hospital_id}`);
                     const departmentsByHospitalId = response.data.map(department => department.department_id);
                     setSelectedValues(departmentsByHospitalId);
+                    // console.log(departmentsByHospitalId);
                     const departmentsByHospitalIds = response.data.map(department => department.department_name);
-                    setDepartmentName(departmentsByHospitalIds)
-                    console.log(departmentName);
+                    // setDepartmentName(departmentsByHospitalIds)
+                    // console.log(departmentsByHospitalIds);
+                    const options = departmentsByHospitalIds.map(department => ({
+                        value: department,
+                        label: department
+                    }));
+                    setDepartmentName(options);
                 } catch (error) {
                     console.error('Error fetching departments by hospital ID:', error);
                 }
             };
-            console.log(departmentName);
+            // console.log(departmentName);
 
             fetchAllDepartments();
             // fetchDoctorDetails()
@@ -158,8 +156,8 @@ function AdminWelcomeHelper(props) {
     const filteredData = doctors.filter(item =>
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.specialization.toLowerCase().includes(query.toLowerCase()) ||
-        item.email.toLowerCase().includes(query.toLowerCase())||
-        item.isActive.toLowerCase().includes(query.toLowerCase())
+        item.email.toLowerCase().includes(query.toLowerCase())
+        // item.isActive.toLowerCase().includes(query.toLowerCase())
 
     );
     const [formData, setFormData] = useState({
@@ -269,7 +267,7 @@ function AdminWelcomeHelper(props) {
 
     const handleAddDoctor = async (e) => {
         e.preventDefault();
-        //console.log(formData)
+        console.log(formData)
         await uploadFiles()
         try {
             const token = getJwtTokenFromLocalStorage();
@@ -378,6 +376,15 @@ function AdminWelcomeHelper(props) {
         }
     }
 
+    useEffect(() => {
+        if(selectedOption !== null) {
+            setFormData((prevData) => ({
+                ...prevData,
+                'specialization': selectedOption.value,
+            }));
+        }
+    }, [selectedOption])
+
 
     return (
         <div className="admin-welcome">
@@ -424,9 +431,11 @@ function AdminWelcomeHelper(props) {
                                     </div>
                                     <div className="admin-specialsel">
                                         <Select
+                                            name="specialization"
                                             defaultValue={selectedOption}
                                             onChange={setSelectedOption}
                                             options={departmentName}
+                                            required
                                         />
                                         {/*<select*/}
                                         {/*    name="specialization"*/}
