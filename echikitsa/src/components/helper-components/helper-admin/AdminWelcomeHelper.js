@@ -1,36 +1,137 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import Collapsible from 'react-collapsible';
 import '../../../css/helper-components/helper-admin/welcome-page-style.css'
-import '../../../css/helper-components/helper-patient/profile-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {dummy} from "./dummy";
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
-import Select from "react-select";
-
-const options = [
-    { value: "blues", label: "Blues" },
-    { value: "rock", label: "Rock" },
-    { value: "jazz", label: "Jazz" },
-    { value: "orchestra", label: "Orchestra" },
-];
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
-
     const [adminActiveId, setAdminActiveId] = useState(null);
-
     const [query, setQuery] = useState("");
     const [imageUpload, setImageUpload] = useState(null);
-    const {state}=useLocation();
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [departments, setDepartments] = useState([]);
+    const [selectedValues, setSelectedValues] = useState([]);
+    const [hospitalName, setHospitalName] = useState({});
+    const [doctors,setDoctors] = useState([]);
+    const [hospitalNameValue, setHospitalNameValue] = useState("");
+    const [hospitalEmailValue, setHospitalEmailValue] = useState("");
+    const [hospitalPhoneNumberValue, setHospitalPhoneNumberValue] = useState("");
+    const [hospitalAddressValue, setHospitalAddressValue] = useState("");
+    const [hospitalWebsiteValue, setHospitalWebsiteValue] = useState("");
+    const [departmentName, setDepartmentName] = useState([])
 
-console.log(state.hospital_id);
+    const {state}=useLocation();
+
+
+    useEffect(() => {
+        if (state.hospital_id) {
+            const fetchHospitalName = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_id}`)
+                    setHospitalName(response.data);
+                    const { data } = response;
+                    setHospitalData(data);
+                    setHospitalNameValue(data.hospital_name);
+                    setHospitalEmailValue(data.email);
+                    setHospitalPhoneNumberValue(data.phoneNumber);
+                    setHospitalAddressValue(data.address);
+                    setHospitalWebsiteValue(data.website);
+
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_id}`);
+                    setDoctors(response2.data);
+
+                } catch (error) {
+                    console.error('Error fetching hospital name:', error);
+                }
+            };
+
+            const fetchAllDepartments = async () => {
+                try {
+                    const response = await axios.get('http://localhost:8081/department/get-all-departments');
+                    setDepartments(response.data);
+                }
+                catch (error) {
+                    console.error('Error fetching all departments:', error);
+                }
+            };
+            // const fetchDoctorDetails = async () => {
+            //     try {
+            //         const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+            //         const doctorsData = response2.data.map(doctor => ({
+            //             doctorName: doctor.name,
+            //             specialization: doctor.specialization,
+            //             email: doctor.email,
+            //             isActive:doctor.active
+            //         }));
+            //
+            //         setDoctors(doctorsData);
+            //     }
+            //     catch (error) {
+            //         console.error('Error fetching all doctors:', error);
+            //     }
+            // };
+
+
+            const fetchDepartmentsByHospitalId = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8081/hospital/get-all-departments-by-hospitalId/${state.hospital_id}`);
+                    const departmentsByHospitalId = response.data.map(department => department.department_id);
+                    setSelectedValues(departmentsByHospitalId);
+                    const departmentsByHospitalIds = response.data.map(department => department.department_name);
+                    setDepartmentName(departmentsByHospitalIds)
+                    console.log(departmentName);
+                } catch (error) {
+                    console.error('Error fetching departments by hospital ID:', error);
+                }
+            };
+            console.log(departmentName);
+
+            fetchAllDepartments();
+            // fetchDoctorDetails()
+            fetchDepartmentsByHospitalId();
+            fetchHospitalName();
+        }
+    }, [state.hospital_id]);
+
+    const [hospitalData, setHospitalData] = useState({
+        name :hospitalName.hospital_name,
+        email :hospitalName.email,
+        phoneNumber :hospitalName.phoneNumber,
+        address : hospitalName.address,
+        website :hospitalName.website,
+        departments :[]
+
+
+    });
+
+
+    const handleCheckboxChange = (departmentId, department_name) => {
+        // Toggle selection status of the department
+        const isSelected = selectedValues.includes(departmentId);
+        const updatedValues = isSelected
+            ? selectedValues.filter(value => value !== departmentId) // Remove department if already selected
+            : [...selectedValues, departmentId]; // Add department if not selected
+
+        // Update selectedValues state
+        setSelectedValues(updatedValues);
+
+        // Update hospitalData.departments based on the updated selectedValues
+        const updatedDepartments = updatedValues.map(id => ({
+            department_id: id,
+            department_name: departments.find(dep => dep.department_id === id).department_name
+        }));
+
+        setHospitalData(prevState => ({
+            ...prevState,
+            departments: updatedDepartments
+        }));
+    };
 
 
     const toggleActivation = (id) => {
@@ -38,14 +139,17 @@ console.log(state.hospital_id);
     };
 
 
+
     const handleSearch = (e) => {
         setQuery(e.target.value.toLowerCase());
 
     };
-    const filteredData = dummy.filter(item =>
-        item.DoctorName.toLowerCase().includes(query.toLowerCase()) ||
-        item.Specialization.toLowerCase().includes(query.toLowerCase()) ||
-        item.Email.toLowerCase().includes(query.toLowerCase())
+    const filteredData = doctors.filter(item =>
+        item.name.toLowerCase().includes(query.toLowerCase()) ||
+        item.specialization.toLowerCase().includes(query.toLowerCase()) ||
+        item.email.toLowerCase().includes(query.toLowerCase())||
+        item.isActive.toLowerCase().includes(query.toLowerCase())
+
     );
     const [formData, setFormData] = useState({
         firstName: '',
@@ -66,20 +170,8 @@ console.log(state.hospital_id);
 
     });
 
-    const [hospitalData, setHospitalData] = useState({
-        name :'',
-        email :'',
-        phoneNumber :'',
-        address :'',
-        website :'',
-        departments :[
-            {department_id: '',
-            department_name:''
-            }
-        ]
 
 
-    });
     const uploadFiles = () => {
         console.log(imageUpload)
         if (imageUpload == null) return Promise.reject("No image to upload");
@@ -91,11 +183,7 @@ console.log(state.hospital_id);
                 return getDownloadURL(snapshot.ref);
             })
             .then((url) => {
-                // Optionally, you can also update state or perform other actions here
-
-
                 formData.img_url = url;
-
                 console.log("Image uploaded successfully. Download URL:", url);
                 return url; // Return the download URL
             })
@@ -112,14 +200,13 @@ console.log(state.hospital_id);
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
-        //console.log(hospitalData);
     };
 
     // Function to handle specialisation selection
     const handleSpecialisationChange = (event) => {
         const { options } = event.target;
         const selectedSpecialisations = [];
-        for (let i = 0; i <= options.length; i++) {
+        for (let i = 0; i < options.length; i++) {
             if (options[i].selected) {
                 selectedSpecialisations.push(options[i].value);
             }
@@ -129,19 +216,6 @@ console.log(state.hospital_id);
             specialisation: selectedSpecialisations
         }));
     };
-
-    const handleCheckboxChange = (department) => {
-        if (selectedValues.includes(department)) {
-            setSelectedValues(selectedValues.filter(item => item !== department));
-        } else {
-            setSelectedValues([...selectedValues, department]);
-        }
-        setHospitalData(prevState => ({
-            ...prevState,
-            departments: selectedValues
-        }));
-    };
-    
 
 
 
@@ -153,8 +227,16 @@ console.log(state.hospital_id);
         try {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const updatedData = {
+                name: hospitalNameValue,
+                email: hospitalEmailValue,
+                phoneNumber: hospitalPhoneNumberValue,
+                address: hospitalAddressValue,
+                website: hospitalWebsiteValue,
+                departments: hospitalData.departments // Preserve existing departments
+            };
 
-            const response = await axios.post(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, hospitalData,{headers}).then((response) => {
+            const response = await axios.put(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, updatedData,{headers}).then((response) => {
                 console.log(response.data);
                 if (response.data) {
                     alert(response.data)
@@ -193,27 +275,6 @@ console.log(state.hospital_id);
     }
 
     const [selectedValue, setSelectedValue] = useState('');
-
-    const [selectedValues, setSelectedValues] = useState([]);
-    const departmentOptions = [
-        "Cardiology",
-        "Orthopedics",
-        "Neurology",
-        "Dermatology",
-        "Pediatrics",
-        "Oncology",
-        "Ophthalmology",
-        "Psychiatry",
-        "Urology",
-        "Gastroenterology"
-    ];
-
-
-
-
-
-
-
     const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
         setSignUpType(type.toLowerCase());
@@ -282,11 +343,6 @@ console.log(state.hospital_id);
         target = parseInt(target[target.length - 1]);
         let element = document.getElementsByClassName("user-data-value editable")[target];
         element.readOnly = false;
-        element.style.borderRadius = "5px"
-        element.style.border = "2px solid #1D2A4D"
-        element.focus();
-        element.select();
-
 
         let selector = document.getElementById("selector-specialisation");
         selector.className = "department-selector";
@@ -303,384 +359,358 @@ console.log(state.hospital_id);
         let element = document.getElementsByClassName("user-data-value editable");
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
-            element[i].style.border = "none"
         }
     }
+
 
     return (
         <div className="admin-welcome">
             <div className="admin-welcome-action">
-                <Tabs className="admin-tabs" selectedTabClassName="admin-selected-tab">
-                    <TabList className="admin-tab-header">
-                        <Tab className="admin-tab-header-items">Appoint a Doctor</Tab>
-                        <Tab className="admin-tab-header-items">Doctor's List</Tab>
-                        <Tab className="admin-tab-header-items">Terminate Contract</Tab>
-                        <Tab className="admin-tab-header-items">Update Hospital Details</Tab>
-                    </TabList>
-                    <TabPanel className="admin-tab-panel-items">
-                        <form action="#">
-                            <div className="fg">
-
-                                <div className="field">
-                                    <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
-                                           required/>
-                                    <label>First Name</label>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
-                                           required/>
-                                    <label>Last Name</label>
-                                </div>
-                            </div>
-                            <div className="fg">
-                                <div className="field">
-                                    <input type="text" name="email" value={formData.email} onChange={handleInputChange}
-                                           required/>
-                                    <label>Email</label>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="phoneNumber" value={formData.phoneNumber}
-                                           onChange={handleInputChange} required/>
-                                    <label>Phone Number</label>
-                                </div>
-                            </div>
-
-                            <div className="fg">
-                                <div className="admin-spec-field">
-                                    <div className="admin-specialization-label">
-                                        <span>Specialization</span>
-                                    </div>
-                                    <div className="admin-specialsel">
-                                        <Select
-                                            defaultValue={selectedOption}
-                                            onChange={setSelectedOption}
-                                            options={options}
-                                        />
-                                        {/*<Select id="dropdown-basic-button" title="Dropdown button" className="specialization-select" required>*/}
-                                        {/*    <Dropdown.Item value="">Select Specialization</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Cardiology">Cardiology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Neurology">Neurology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Orthopedics">Orthopedics</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Dermatology">Dermatology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Ophthalmology">Ophthalmology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Gastroenterology">Gastroenterology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Oncology">Oncology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Endocrinology">Endocrinology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Pediatrics">Pediatrics</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Nephrology">Nephrology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Pulmonology">Pulmonology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Rheumatology">Rheumatology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Urology">Urology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Hematology">Hematology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Psychiatry">Psychiatry</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Dentistry">Dentistry</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Emergency Medicine">Emergency Medicine</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Radiology">Radiology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Anesthesiology">Anesthesiology</Dropdown.Item>*/}
-                                        {/*    <Dropdown.Item value="Pathology">Pathology</Dropdown.Item>*/}
-                                        {/*</Select>*/}
-                                    </div>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange}
-                                           required/>
-                                    <label>Registration Number</label>
-                                </div>
-                            </div>
-
-                            <div className="fg">
-                                <div className="field">
-                                    <input type="text" name="age" value={formData.age} onChange={handleInputChange}
-                                           required/>
-                                    <label>Age</label>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
-                                           required/>
-                                    <label>Aadhaar</label>
-                                </div>
-                            </div>
-
-                            <div className="fg">
-                                <div className="field">
-                                    <input type="text" name="state" value={formData.state} onChange={handleInputChange}
-                                           required/>
-                                    <label>State</label>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="city" value={formData.city} onChange={handleInputChange} required/>
-                                    <label>City</label>
-                                </div>
-                            </div>
-
-                            <div className="fg">
-                                <div className="field">
-                                    <input type="text" name="yearOfExp" value={formData.yearOfExp} onChange={handleInputChange}
-                                           required/>
-                                    <label>Years of Experience</label>
-                                </div>
-                                <div className="field">
-                                    <input type="text" name="degree" value={formData.degree}
-                                           onChange={handleInputChange} required/>
-                                    <label>Degree</label>
-                                </div>
-                            </div>
-
-                            <div className="fg">
-                                <div className="content">
-                                    <span className="gen">Gender</span>
-                                    <div className="radio">
-                                        <input type="radio" id="male" name="gender" value="male"
-                                               checked={selectedGender === 'male'} onChange={handleGenderChange}/>
-                                        <span className="remember-text">Male</span>
-                                    </div>
-                                    <div className="radio">
-                                        <input type="radio" id="female" name="gender" value="female"
-                                               checked={selectedGender === 'female'} onChange={handleGenderChange}/>
-                                        <span className="remember-text">Female</span>
-                                    </div>
-
-                                    <div className="radio">
-                                        <input type="radio" id="others" name="gender" value="others"
-                                               checked={selectedGender === 'others'} onChange={handleGenderChange}/>
-                                        <span className="remember-text">Others</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="fg form-group mt-3">
-                                <div className="admin-cc">
-                                    <span>Upload your Photo</span>
-                                </div>
-                                {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
-                                <input type="file" name="file" className="file-input" onChange={(event) => {
-                                    setImageUpload(event.target.files[0]);
-                                }}/>
-                            </div>
+                <Collapsible trigger="Appoint a Doctor" className="admin-ask-record" openedClassName="admin-ask-record-open"
+                             triggerClassName="admin-ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                    <form action="#">
+                        <div className="fg">
 
                             <div className="field">
-                                <input type="submit" value={`APPOINT`} onClick={handleAddDoctor} className="admin-appoint"/>
-                                {/*<button type="submit" className="button-background"  >Login</button>*/}
+                                <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
+                                       required/>
+                                <label>First Name</label>
                             </div>
-                        </form>
-                    </TabPanel>
-                    <TabPanel className="admin-tab-panel-items">
-                        <div className="container-terminate">
-                            <div className="record-right-terminate">
-                                <div className="searchall">
-                                    <input
-                                        className="searchs"
-                                        placeholder="Search..."
-                                        onChange={(e) => setQuery(e.target.value.toLowerCase())}
-                                    />
-                                    <i className="fas fa-search"></i>
-                                </div>
-
-                                <table className="admin-record-table-terminate">
-                                    <tbody>
-                                    <tr>
-                                        <th>Doctor Name </th>
-                                        <th>Specialization </th>
-                                        <th>Email</th>
-                                        {/*<th>Active</th>*/}
-                                    </tr>
-                                    {filteredData.map((item) => (<tr key={item.id}>
-
-                                            <td>{item.DoctorName}</td>
-                                            <td>{item.Specialization}</td>
-                                            <td>{item.Email}</td>
-                                            {/*<td>{item.Active}</td>*/}
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                            <div className="field">
+                                <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
+                                       required/>
+                                <label>Last Name</label>
                             </div>
                         </div>
-                    </TabPanel>
-                    <TabPanel className="admin-tab-panel-items">
-                        <div className="container-terminate">
-                            <div className="record-right-terminate">
-                                <div className="searchall">
-                                    <input
-                                        className="searchs"
-                                        placeholder="Search..."
-                                        value={query}
-                                        onChange={handleSearch}
-                                    />
-                                    <i className="fas fa-search"></i>
-                                </div>
-
-                                <table className="admin-record-table-terminate">
-                                    <tbody>
-                                    <tr>
-                                        <th>Doctor Name</th>
-                                        <th>Email</th>
-                                        <th>Active/Deactive</th>
-                                    </tr>
-                                    {filteredData.map((item) => (
-                                        <tr key={item.id}>
-                                            <td>{item.DoctorName}</td>
-                                            <td>{item.Email}</td>
-                                            <td>
-                                                <div className="ActiveDeactive">
-                                                    <button
-                                                        id="admin-activate-button"
-                                                        onClick={() => toggleActivation(item.id)}
-                                                        className={adminActiveId === item.id ? 'adminActive' : 'adminInactive'}
-                                                    >
-                                                        {adminActiveId === item.id ? 'Deactivate' : 'Activate'}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                        <div className="fg">
+                            <div className="field">
+                                <input type="text" name="email" value={formData.email} onChange={handleInputChange}
+                                       required/>
+                                <label>Email</label>
+                            </div>
+                            <div className="field">
+                                <input type="text" name="phoneNumber" value={formData.phoneNumber}
+                                       onChange={handleInputChange} required/>
+                                <label>Phone Number</label>
                             </div>
                         </div>
-                    </TabPanel>
-                    <TabPanel className="admin-tab-panel-items">
-                        <table className="infoContent">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Hospital Name : </span>
-                                        <input className="user-data-value editable" name="name" onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.name} readOnly={true}/>
-                                        <i className="fa fa-pencil 0" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Email ID : </span>
-                                        <input className="user-data-value editable" name="email" value={hospitalData.email} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.email} readOnly={true}/>
-                                        <i className="fa fa-pencil 1" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Phone : </span>
-                                        <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.phone} readOnly={true}/>
-                                        <i className="fa fa-pencil 2" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Address : </span>
-                                        <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.address} readOnly={true}/>
-                                        <i className="fa fa-pencil 3" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Website : </span>
-                                        <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={handleInputChangeHospital} type="text" placeholder={hospitalData.website} readOnly={true}/>
-                                        <i className="fa fa-pencil 4" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="user-data">
-                                        <span className="user-data-label">Specialisation : </span>
-                                        <input className="user-data-value editable" name="specialisation" value={hospitalData.specialisation} onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
-                                        <i className="fa fa-pencil 5" onClick={makeEditable}></i>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <div className="department-selector visually-hidden" id="selector-specialisation">
-                            <h2>Select Departments:</h2>
-                            <div className="checkbox-container">
-                                {departmentOptions.map((department, index) => (
-                                    <div key={index}>
-                                        <div
-                                            className={selectedValues.includes(department) ? 'selected checkbox-item' : 'checkbox-item'}
-                                            onClick={() => handleCheckboxChange(department)}>
-                                            <input
-                                                type="checkbox"
-                                                value={department}
-                                                checked={selectedValues.includes(department)}
-                                                onChange={() => handleCheckboxChange(department)}
-                                            />
-                                            <span>{department}</span>
-                                        </div>
-                                    </div>
+
+                        <div className="fg">
+                            <div className="admin-spec-field">
+                                <div className="admin-specialization-label">
+                                    <span>Specialization</span>
+                                </div>
+                                <div className="admin-specialsel">
+                                    <select
+                                        name="specialization"
+                                        value={formData.specialization}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="">Select Specialization</option>
+                                        {departmentName.map((department, index) => (
+                                            <option key={index} value={department}>{department}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="field">
+                                <input type="text" name="registrationNumber" value={formData.registrationNumber}
+                                       onChange={handleInputChange}
+                                       required/>
+                                <label>Registration Number</label>
+                            </div>
+                        </div>
+
+                        <div className="fg">
+                            <div className="field">
+                                <input type="text" name="age" value={formData.age} onChange={handleInputChange}
+                                       required/>
+                                <label>Age</label>
+                            </div>
+                            <div className="field">
+                                <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
+                                       required/>
+                                <label>Aadhaar</label>
+                            </div>
+                        </div>
+
+                        <div className="fg">
+                            <div className="field">
+                                <input type="text" name="state" value={formData.state} onChange={handleInputChange}
+                                       required/>
+                                <label>State</label>
+                            </div>
+                            <div className="field">
+                                <input type="text" name="city" value={formData.city} onChange={handleInputChange} required/>
+                                <label>City</label>
+                            </div>
+                        </div>
+
+                        <div className="fg">
+                            <div className="field">
+                                <input type="text" name="yearOfExp" value={formData.yearOfExp} onChange={handleInputChange}
+                                       required/>
+                                <label>Years of Experience</label>
+                            </div>
+                            <div className="field">
+                                <input type="text" name="degree" value={formData.degree}
+                                       onChange={handleInputChange} required/>
+                                <label>Degree</label>
+                            </div>
+                        </div>
+
+                        <div className="fg">
+                            <div className="content">
+                                <span className="gen">Gender</span>
+                                <div className="radio">
+                                    <input type="radio" id="male" name="gender" value="male"
+                                           checked={selectedGender === 'male'} onChange={handleGenderChange}/>
+                                    <span className="remember-text">Male</span>
+                                </div>
+                                <div className="radio">
+                                    <input type="radio" id="female" name="gender" value="female"
+                                           checked={selectedGender === 'female'} onChange={handleGenderChange}/>
+                                    <span className="remember-text">Female</span>
+                                </div>
+
+                                <div className="radio">
+                                    <input type="radio" id="others" name="gender" value="others"
+                                           checked={selectedGender === 'others'} onChange={handleGenderChange}/>
+                                    <span className="remember-text">Others</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="fg form-group mt-3">
+                            <div className="admin-cc">
+                                <span>Upload your Photo</span>
+                            </div>
+                            {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
+                        </div>
+
+                        <div className="field">
+                            <input type="submit" value={`APPOINT`} onClick={handleAddDoctor} className="admin-appoint"/>
+                            {/*<button type="submit" className="button-background"  >Login</button>*/}
+                        </div>
+                    </form>
+                </Collapsible>
+                <Collapsible trigger="Doctor's List" className="admin-ask-record" openedClassName="admin-ask-record-open"
+                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+
+                    <div className="Container">
+                        <div className="recordRight">
+                            <div className="searchall">
+                                <input
+                                    className="searchs"
+                                    placeholder="Search..."
+                                    onChange={(e) => setQuery(e.target.value.toLowerCase())}
+                                />
+                                <i className="fas fa-search"></i>
+                            </div>
+
+                            <table className="adminRecordTable">
+                                <tbody>
+                                <tr>
+                                    <th>Doctor Name </th>
+                                    <th>Specialization </th>
+                                    <th>Email</th>
+                                    {/*<th>Active</th>*/}
+                                </tr>
+                                {filteredData.map((item) => (<tr key={item.id}>
+
+                                        <td>{item.name}</td>
+                                        <td>{item.specialization}</td>
+                                        <td>{item.email}</td>
+                                        {/*<td>{item.Active}</td>*/}
+                                    </tr>
                                 ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </Collapsible>
+                <Collapsible trigger="Terminate Doctor's Contract" className="admin-ask-record" openedClassName="admin-ask-record-open"
+                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                    <div className="Container">
+                        <div className="recordRight">
+                            <div className="searchall">
+                                <input
+                                    className="searchs"
+                                    placeholder="Search..."
+                                    value={query}
+                                    onChange={handleSearch}
+                                />
+                                <i className="fas fa-search"></i>
                             </div>
-                            {selectedValues.length > 0 && (
-                                <p>You selected: {selectedValues.join(', ')}</p>
-                            )}
+
+                            <table className="adminRecordTable">
+                                <tbody>
+                                <tr>
+                                    <th>Doctor Name</th>
+                                    <th>Email</th>
+                                    <th>Active/Deactive</th>
+                                </tr>
+                                {filteredData.map((item) => (
+                                    <tr key={item.id}>
+                                        <td>{item.name}</td>
+                                        <td>{item.email}</td>
+                                        <td>
+                                            <div className="ActiveDeactive">
+                                                <button
+                                                    id="admin-activate-button"
+                                                    onClick={() => toggleActivation(item.id)}
+                                                    className={item.isActive ? 'adminActive' : 'adminInactive'}
+                                                >
+                                                    {item.isActive ? 'Deactivate' : 'Activate'}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <div className="update-profile-button-section">
-                            <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={handleUpdateHospitalDetails}>SAVE</button>
+                    </div>
+
+                </Collapsible>
+                <Collapsible trigger="Update Hospital Details" className="admin-ask-record" openedClassName="admin-ask-record-open"
+                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                    <table className="infoContent">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Hospital Name : </span>
+                                    <input className="user-data-value editable" name="name" onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
+                                    <i className="fa fa-pencil 0" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Email ID : </span>
+                                    <input className="user-data-value editable" name="email"  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
+                                    <i className="fa fa-pencil 1" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Phone : </span>
+                                    <input className="user-data-value editable" name="phoneNumber"  onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
+                                    <i className="fa fa-pencil 2" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Address : </span>
+                                    <input className="user-data-value editable"  name="address"  onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
+                                    <i className="fa fa-pencil 3" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Website : </span>
+                                    <input className="user-data-value editable" name="website"  onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
+                                    <i className="fa fa-pencil 4" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div className="user-data">
+                                    <span className="user-data-label">Specialisation : </span>
+                                    <input className="user-data-value editable" name="specialisation" onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
+                                    <i className="fa fa-pencil 5" onClick={makeEditable}></i>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div className="department-selector visually-hidden" id="selector-specialisation">
+                        <h2>Select Departments:</h2>
+                        <div className="checkbox-container">
+                            {departments.map((department, index) => (
+                                <div key={index}>
+                                    <div
+                                        className={selectedValues.includes(department.department_id) ? 'selected checkbox-item' : 'checkbox-item'}>
+                                        <input
+                                            type="checkbox"
+                                            value={department.department_id}
+                                            checked={selectedValues.includes(department.department_id)}
+                                            onChange={() => handleCheckboxChange(department.department_id, department.department_name)}
+                                        />
+                                        <span>{department.department_name}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </TabPanel>
-                </Tabs>
+
+                        {/*{selectedValues.length > 0 && (*/}
+                        {/*    <p>You selected: {selectedValues.join(', ')}</p>*/}
+                        {/*)}*/}
+                    </div>
+                    <div className="update-profile-button-section">
+                        <button className="update-profile-button visually-hidden" id="profile-update-button"
+                                onClick={handleUpdateHospitalDetails}>SAVE
+                        </button>
+                    </div>
+                </Collapsible>
             </div>
-            {/*<div className="admin-welcome-action">*/}
-                {/*<Collapsible trigger="Appoint a Doctor" className="admin-ask-record" openedClassName="admin-ask-record-open"*/}
-                {/*             triggerClassName="admin-ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">*/}
-                {/*</Collapsible>*/}
-                {/*<Collapsible trigger="Doctor's List" className="admin-ask-record" openedClassName="admin-ask-record-open"*/}
-                {/*             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">*/}
-                {/*</Collapsible>*/}
-                {/*<Collapsible trigger="Terminate Doctor's Contract" className="admin-ask-record" openedClassName="admin-ask-record-open"*/}
-                {/*             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">*/}
-                {/*</Collapsible>*/}
-                {/*<Collapsible trigger="Update Hospital Details" className="admin-ask-record" openedClassName="admin-ask-record-open"*/}
-                {/*             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">*/}
-                {/*</Collapsible>*/}
-            {/*</div>*/}
             <div className="admin-welcome-hospital">
                 <div className="hospital-details-section">
+                    <div className="hospital-detail-header">Hello, ADMIN</div>
                     <div className="hospital-details-image-section">
-                        <img className="hospital-details-image" src={require("../../../images/patient_landing_page/Hospital_Img/hospital1.jpg")} alt="Hospital"/>
+                        <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                     </div>
                     <table className="admin-hospital-detail-table">
                         <tbody>
                         <tr>
                             <td>Hospital Name</td>
-                            <td>Sanjeevani Hospital</td>
+                            <td>{hospitalName.hospital_name} Hospital</td>
                         </tr>
                         <tr>
                             <td>Registration No.</td>
-                            <td>KAR789200HILL</td>
+                            <td>{hospitalName.registrationNumber}</td>
                         </tr>
                         <tr>
                             <td>Email</td>
-                            <td>info@harmonymedicalcenter.com</td>
+                            <td>{hospitalName.email} </td>
                         </tr>
                         <tr>
                             <td>Phone Number</td>
-                            <td>(555) 123-4567</td>
+                            <td>{hospitalName.phoneNumber}</td>
                         </tr>
                         <tr>
                             <td>Address</td>
-                            <td>Mumbai, Maharashtra, India</td>
+                            <td>{hospitalName.address}</td>
                         </tr>
                         <tr>
                             <td>Website</td>
-                            <td>www.harmonymedicalcenter.com</td>
+                            <td>{hospitalName.website}</td>
                         </tr>
                         <tr>
                             <td>No. of Doctors</td>
-                            <td>13</td>
+                            <td>{hospitalName.noOfDoctors}</td>
                         </tr>
                         <tr>
                             <td>No. of Senior Doctors</td>
-                            <td>5</td>
+                            <td>{hospitalName.noOFSeniorDoctors}</td>
                         </tr>
                         <tr>
                             <td>Specialisations Available</td>
-                            <td>General Medicine, Pediatrics</td>
+                            <td> {hospitalName.specializationss && hospitalName.specializationss.map((spc, index) => (
+                                <span
+                                    key={index}>{spc} {index !== hospitalName.specializationss.length - 1 && ", "} </span>
+                            ))}</td>
                         </tr>
                         <tr>
                             <td>Rating</td>
-                            <td>4.5</td>
+                            <td>{hospitalName.rating}</td>
                         </tr>
                         </tbody>
                     </table>
