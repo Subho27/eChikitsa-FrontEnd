@@ -3,6 +3,9 @@ import '../../../css/helper-components/helper-patient/profile-style.css';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {useLocation} from "react-router-dom";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 
 function ProfilePage(props) {
@@ -24,7 +27,7 @@ function ProfilePage(props) {
     });
     const [userId, setUserId] = useState(0);
     const {state}=useLocation();
-    //console.log("kaefhqpowedfqedqkj", props.data)
+    const [docUpload, setDocUpload] = useState(null);
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
         email: '',
@@ -60,7 +63,10 @@ function ProfilePage(props) {
         console.log(profile)
     }
 
+
+
     const updateProfile = () => {
+
 
         console.log('Updated profile:', updatedProfile);
         setProfile(updatedProfile);

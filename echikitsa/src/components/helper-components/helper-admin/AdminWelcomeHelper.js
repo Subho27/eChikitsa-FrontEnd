@@ -5,10 +5,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 import {dummy} from "./dummy";
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
-import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../../resources/storageManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import {saveUserIdToLocalStorage} from "../../../resources/userIdManagement";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -44,6 +45,7 @@ function AdminWelcomeHelper(props) {
                     setHospitalWebsiteValue(data.website);
 
                     const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_id}`);
+                    console.log("d ",response2.data)
                     setDoctors(response2.data);
 
                 } catch (error) {
@@ -60,22 +62,24 @@ function AdminWelcomeHelper(props) {
                     console.error('Error fetching all departments:', error);
                 }
             };
-            const fetchDoctorDetails = async () => {
-                try {
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
-                    const doctorsData = response2.data.map(doctor => ({
-                        doctorName: doctor.name,
-                        specialization: doctor.specialization,
-                        email: doctor.email,
-                        isActive:doctor.active
-                    }));
-
-                    setDoctors(doctorsData);
-                }
-                catch (error) {
-                    console.error('Error fetching all doctors:', error);
-                }
-            };
+            // const fetchDoctorDetails = async () => {
+            //     try {
+            //         const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+            //         console.log("d ",response2.data)
+            //         const doctorsData = response2.data.map(doctor => ({
+            //             doctorName: doctor.name,
+            //             specialization: doctor.specialization,
+            //             email: doctor.email,
+            //             isActive:doctor.active
+            //         }));
+            //
+            //         setDoctors(response2.data);
+            //
+            //     }
+            //     catch (error) {
+            //         console.error('Error fetching all doctors:', error);
+            //     }
+            // };
 
 
             const fetchDepartmentsByHospitalId = async () => {
@@ -93,7 +97,7 @@ function AdminWelcomeHelper(props) {
             console.log(departmentName);
 
             fetchAllDepartments();
-            fetchDoctorDetails()
+            // fetchDoctorDetails()
             fetchDepartmentsByHospitalId();
             fetchHospitalName();
         }
@@ -134,8 +138,28 @@ function AdminWelcomeHelper(props) {
     };
 
 
-    const toggleActivation = (id) => {
-        setAdminActiveId((prevId) => (prevId === id ? null : id));
+    const handleDoctorStatus = async (id) => {
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
+        const updatedDoctors = doctors.map((doctor) => {
+            if (doctor.id === id) {
+                return { ...doctor, active: !doctor.active};
+            }
+            return doctor;
+        });
+        setDoctors(updatedDoctors);
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        try {
+            const response = await axios.put("http://localhost:9191/admin/doctor-status-update",id,{headers}).then((response) => {
+
+
+            });
+
+        } catch (e) {
+            console.log(e)
+
+        }
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
     };
 
 
@@ -148,7 +172,7 @@ function AdminWelcomeHelper(props) {
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.specialization.toLowerCase().includes(query.toLowerCase()) ||
         item.email.toLowerCase().includes(query.toLowerCase())||
-        item.isActive.toLowerCase().includes(query.toLowerCase())
+        item.active.toLowerCase().includes(query.toLowerCase())
 
     );
     const [formData, setFormData] = useState({
@@ -562,11 +586,13 @@ function AdminWelcomeHelper(props) {
                                             <div className="ActiveDeactive">
                                                 <button
                                                     id="admin-activate-button"
-                                                    onClick={() => toggleActivation(item.id)}
-                                                    className={item.isActive ? 'adminActive' : 'adminInactive'}
+                                                    onClick={() => handleDoctorStatus(item.id)}
+                                                    className={item.active ? 'adminActive' : 'adminInactive'}
                                                 >
-                                                    {item.isActive ? 'Deactivate' : 'Activate'}
+                                                    {item.active ? 'Deactivate' : 'Activate'}
+
                                                 </button>
+
                                             </div>
                                         </td>
                                     </tr>
@@ -585,14 +611,14 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Hospital Name : </span>
-                                    <input className="user-data-value editable" name="name" value={hospitalData.name} onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
+                                    <input className="user-data-value editable" name="name" onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" name="email" value={hospitalData.email}  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
+                                    <input className="user-data-value editable" name="email"   onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -601,14 +627,14 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" name="phoneNumber" value={hospitalData.phoneNumber} onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
+                                    <input className="user-data-value editable" name="phoneNumber"  onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable"  name="address" value={hospitalData.address} onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
+                                    <input className="user-data-value editable"  name="address"  onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -617,7 +643,7 @@ function AdminWelcomeHelper(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Website : </span>
-                                    <input className="user-data-value editable" name="website" value={hospitalData.website} onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
+                                    <input className="user-data-value editable" name="website" onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
