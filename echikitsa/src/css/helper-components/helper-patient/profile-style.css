@@ -141,7 +141,7 @@ hr {
 .user-data-value {
     width: 70%;
     height: 35px;
-    border-radius: 5px;
+    border: none;
 }
 
 .user-data-value::placeholder {
@@ -151,9 +151,12 @@ hr {
 .fa.fa-pencil {
     position: absolute;
     top: 50%;
-    right: 10px;
+    right: 5px;
     transform: translateY(-50%);
     cursor: pointer;
+    background-color: #13c5dd;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .update-profile-button {
@@ -263,13 +266,13 @@ hr {
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.84);
-    z-index: 2;
+    z-index: 1021;
     cursor: pointer;
 }
 
 .overlay-profile {
     width: 500px;
     height: 600px;
-    margin-top: 10%;
+    margin-top: 5%;
     margin-left: 33%;
 }
