@@ -1,14 +1,24 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Collapsible from 'react-collapsible';
 import '../../../css/helper-components/helper-admin/welcome-page-style.css'
+import '../../../css/helper-components/helper-patient/profile-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
-import {dummy} from "./dummy";
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import Select from "react-select";
+import Collapsible from "react-collapsible";
+
+const options = [
+    { value: "blues", label: "Blues" },
+    { value: "rock", label: "Rock" },
+    { value: "jazz", label: "Jazz" },
+    { value: "orchestra", label: "Orchestra" },
+];
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -27,6 +37,7 @@ function AdminWelcomeHelper(props) {
     const [departmentName, setDepartmentName] = useState([])
 
     const {state}=useLocation();
+    const [selectedOption, setSelectedOption] = useState(null);
 
 
     useEffect(() => {
@@ -54,9 +65,9 @@ function AdminWelcomeHelper(props) {
             const fetchAllDepartments = async () => {
                 try {
                     const response = await axios.get('http://localhost:8081/department/get-all-departments');
-                        setDepartments(response.data);
-                    }
-                 catch (error) {
+                    setDepartments(response.data);
+                }
+                catch (error) {
                     console.error('Error fetching all departments:', error);
                 }
             };
@@ -226,7 +237,7 @@ function AdminWelcomeHelper(props) {
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
-             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const updatedData = {
                 name: hospitalNameValue,
                 email: hospitalEmailValue,
@@ -343,6 +354,10 @@ function AdminWelcomeHelper(props) {
         target = parseInt(target[target.length - 1]);
         let element = document.getElementsByClassName("user-data-value editable")[target];
         element.readOnly = false;
+        element.style.borderRadius = "5px"
+        element.style.border = "2px solid #1D2A4D"
+        element.focus();
+        element.select();
 
         let selector = document.getElementById("selector-specialisation");
         selector.className = "department-selector";
@@ -359,6 +374,7 @@ function AdminWelcomeHelper(props) {
         let element = document.getElementsByClassName("user-data-value editable");
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
+            element[i].style.border = "none"
         }
     }
 
@@ -366,304 +382,310 @@ function AdminWelcomeHelper(props) {
     return (
         <div className="admin-welcome">
             <div className="admin-welcome-action">
-                <Collapsible trigger="Appoint a Doctor" className="admin-ask-record" openedClassName="admin-ask-record-open"
-                             triggerClassName="admin-ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                    <form action="#">
-                        <div className="fg">
+                <Tabs className="admin-tabs" selectedTabClassName="admin-selected-tab">
+                    <TabList className="admin-tab-header">
+                        <Tab className="admin-tab-header-items">Appoint a Doctor</Tab>
+                        <Tab className="admin-tab-header-items">Doctor's List</Tab>
+                        <Tab className="admin-tab-header-items">Terminate Contract</Tab>
+                        <Tab className="admin-tab-header-items">Update Hospital Details</Tab>
+                    </TabList>
+                    <TabPanel className="admin-tab-panel-items">
+                        <form action="#">
+                            <div className="fg">
 
-                            <div className="field">
-                                <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
-                                       required/>
-                                <label>First Name</label>
-                            </div>
-                            <div className="field">
-                                <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
-                                       required/>
-                                <label>Last Name</label>
-                            </div>
-                        </div>
-                        <div className="fg">
-                            <div className="field">
-                                <input type="text" name="email" value={formData.email} onChange={handleInputChange}
-                                       required/>
-                                <label>Email</label>
-                            </div>
-                            <div className="field">
-                                <input type="text" name="phoneNumber" value={formData.phoneNumber}
-                                       onChange={handleInputChange} required/>
-                                <label>Phone Number</label>
-                            </div>
-                        </div>
-
-                        <div className="fg">
-                            <div className="admin-spec-field">
-                                <div className="admin-specialization-label">
-                                    <span>Specialization</span>
+                                <div className="field">
+                                    <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
+                                           required/>
+                                    <label>First Name</label>
                                 </div>
-                                <div className="admin-specialsel">
-                                    <select
-                                        name="specialization"
-                                        value={formData.specialization}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Select Specialization</option>
-                                        {departmentName.map((department, index) => (
-                                            <option key={index} value={department}>{department}</option>
-                                        ))}
-                                    </select>
+                                <div className="field">
+                                    <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
+                                           required/>
+                                    <label>Last Name</label>
                                 </div>
                             </div>
-                            <div className="field">
-                                <input type="text" name="registrationNumber" value={formData.registrationNumber}
-                                       onChange={handleInputChange}
-                                       required/>
-                                <label>Registration Number</label>
-                            </div>
-                        </div>
-
-                        <div className="fg">
-                            <div className="field">
-                                <input type="text" name="age" value={formData.age} onChange={handleInputChange}
-                                       required/>
-                                <label>Age</label>
-                            </div>
-                            <div className="field">
-                                <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
-                                       required/>
-                                <label>Aadhaar</label>
-                            </div>
-                        </div>
-
-                        <div className="fg">
-                            <div className="field">
-                                <input type="text" name="state" value={formData.state} onChange={handleInputChange}
-                                       required/>
-                                <label>State</label>
-                            </div>
-                            <div className="field">
-                                <input type="text" name="city" value={formData.city} onChange={handleInputChange} required/>
-                                <label>City</label>
-                            </div>
-                        </div>
-
-                        <div className="fg">
-                            <div className="field">
-                                <input type="text" name="yearOfExp" value={formData.yearOfExp} onChange={handleInputChange}
-                                       required/>
-                                <label>Years of Experience</label>
-                            </div>
-                            <div className="field">
-                                <input type="text" name="degree" value={formData.degree}
-                                       onChange={handleInputChange} required/>
-                                <label>Degree</label>
-                            </div>
-                        </div>
-
-                        <div className="fg">
-                            <div className="content">
-                                <span className="gen">Gender</span>
-                                <div className="radio">
-                                    <input type="radio" id="male" name="gender" value="male"
-                                           checked={selectedGender === 'male'} onChange={handleGenderChange}/>
-                                    <span className="remember-text">Male</span>
+                            <div className="fg">
+                                <div className="field">
+                                    <input type="text" name="email" value={formData.email} onChange={handleInputChange}
+                                           required/>
+                                    <label>Email</label>
                                 </div>
-                                <div className="radio">
-                                    <input type="radio" id="female" name="gender" value="female"
-                                           checked={selectedGender === 'female'} onChange={handleGenderChange}/>
-                                    <span className="remember-text">Female</span>
-                                </div>
-
-                                <div className="radio">
-                                    <input type="radio" id="others" name="gender" value="others"
-                                           checked={selectedGender === 'others'} onChange={handleGenderChange}/>
-                                    <span className="remember-text">Others</span>
+                                <div className="field">
+                                    <input type="text" name="phoneNumber" value={formData.phoneNumber}
+                                           onChange={handleInputChange} required/>
+                                    <label>Phone Number</label>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="fg form-group mt-3">
-                            <div className="admin-cc">
-                                <span>Upload your Photo</span>
-                            </div>
-                            {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
-                            <input type="file" name="file" className="file-input" onChange={(event) => {
-                                setImageUpload(event.target.files[0]);
-                            }}/>
-                        </div>
-
-                        <div className="field">
-                            <input type="submit" value={`APPOINT`} onClick={handleAddDoctor} className="admin-appoint"/>
-                            {/*<button type="submit" className="button-background"  >Login</button>*/}
-                        </div>
-                    </form>
-                </Collapsible>
-                <Collapsible trigger="Doctor's List" className="admin-ask-record" openedClassName="admin-ask-record-open"
-                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-
-                    <div className="Container">
-                        <div className="recordRight">
-                            <div className="searchall">
-                                <input
-                                    className="searchs"
-                                    placeholder="Search..."
-                                    onChange={(e) => setQuery(e.target.value.toLowerCase())}
-                                />
-                                <i className="fas fa-search"></i>
-                            </div>
-
-                            <table className="adminRecordTable">
-                                <tbody>
-                                <tr>
-                                    <th>Doctor Name </th>
-                                    <th>Specialization </th>
-                                    <th>Email</th>
-                                    {/*<th>Active</th>*/}
-                                </tr>
-                                {filteredData.map((item) => (<tr key={item.id}>
-
-                                        <td>{item.name}</td>
-                                        <td>{item.specialization}</td>
-                                        <td>{item.email}</td>
-                                        {/*<td>{item.Active}</td>*/}
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </Collapsible>
-                <Collapsible trigger="Terminate Doctor's Contract" className="admin-ask-record" openedClassName="admin-ask-record-open"
-                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                    <div className="Container">
-                        <div className="recordRight">
-                            <div className="searchall">
-                                <input
-                                    className="searchs"
-                                    placeholder="Search..."
-                                    value={query}
-                                    onChange={handleSearch}
-                                />
-                                <i className="fas fa-search"></i>
-                            </div>
-
-                            <table className="adminRecordTable">
-                                <tbody>
-                                <tr>
-                                    <th>Doctor Name</th>
-                                    <th>Email</th>
-                                    <th>Active/Deactive</th>
-                                </tr>
-                                {filteredData.map((item) => (
-                                    <tr key={item.id}>
-                                        <td>{item.name}</td>
-                                        <td>{item.email}</td>
-                                        <td>
-                                            <div className="ActiveDeactive">
-                                                <button
-                                                    id="admin-activate-button"
-                                                    onClick={() => toggleActivation(item.id)}
-                                                    className={item.isActive ? 'adminActive' : 'adminInactive'}
-                                                >
-                                                    {item.isActive ? 'Deactivate' : 'Activate'}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </Collapsible>
-                <Collapsible trigger="Update Hospital Details" className="admin-ask-record" openedClassName="admin-ask-record-open"
-                             triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
-                    <table className="infoContent">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Hospital Name : </span>
-                                    <input className="user-data-value editable" name="name" onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
-                                    <i className="fa fa-pencil 0" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" name="email"  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
-                                    <i className="fa fa-pencil 1" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" name="phoneNumber"  onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
-                                    <i className="fa fa-pencil 2" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable"  name="address"  onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
-                                    <i className="fa fa-pencil 3" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Website : </span>
-                                    <input className="user-data-value editable" name="website"  onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
-                                    <i className="fa fa-pencil 4" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                            <td>
-                                <div className="user-data">
-                                    <span className="user-data-label">Specialisation : </span>
-                                    <input className="user-data-value editable" name="specialisation" onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
-                                    <i className="fa fa-pencil 5" onClick={makeEditable}></i>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div className="department-selector visually-hidden" id="selector-specialisation">
-                        <h2>Select Departments:</h2>
-                        <div className="checkbox-container">
-                            {departments.map((department, index) => (
-                                <div key={index}>
-                                    <div
-                                        className={selectedValues.includes(department.department_id) ? 'selected checkbox-item' : 'checkbox-item'}>
-                                        <input
-                                            type="checkbox"
-                                            value={department.department_id}
-                                            checked={selectedValues.includes(department.department_id)}
-                                            onChange={() => handleCheckboxChange(department.department_id, department.department_name)}
+                            <div className="fg">
+                                <div className="admin-spec-field">
+                                    <div className="admin-specialization-label">
+                                        <span>Specialization</span>
+                                    </div>
+                                    <div className="admin-specialsel">
+                                        <Select
+                                            defaultValue={selectedOption}
+                                            onChange={setSelectedOption}
+                                            options={departmentName}
                                         />
-                                        <span>{department.department_name}</span>
+                                        {/*<select*/}
+                                        {/*    name="specialization"*/}
+                                        {/*    value={formData.specialization}*/}
+                                        {/*    onChange={handleInputChange}*/}
+                                        {/*    required*/}
+                                        {/*>*/}
+                                        {/*    <option value="">Select Specialization</option>*/}
+                                        {/*    {departmentName.map((department, index) => (*/}
+                                        {/*        <option key={index} value={department}>{department}</option>*/}
+                                        {/*    ))}*/}
+                                        {/*</select>*/}
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="field">
+                                    <input type="text" name="registrationNumber" value={formData.registrationNumber}
+                                           onChange={handleInputChange}
+                                           required/>
+                                    <label>Registration Number</label>
+                                </div>
+                            </div>
 
-                        {/*{selectedValues.length > 0 && (*/}
-                        {/*    <p>You selected: {selectedValues.join(', ')}</p>*/}
-                        {/*)}*/}
-                    </div>
-                    <div className="update-profile-button-section">
-                        <button className="update-profile-button visually-hidden" id="profile-update-button"
-                                onClick={handleUpdateHospitalDetails}>SAVE
-                        </button>
-                    </div>
-                </Collapsible>
+                            <div className="fg">
+                                <div className="field">
+                                    <input type="text" name="age" value={formData.age} onChange={handleInputChange}
+                                           required/>
+                                    <label>Age</label>
+                                </div>
+                                <div className="field">
+                                    <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange}
+                                           required/>
+                                    <label>Aadhaar</label>
+                                </div>
+                            </div>
+
+                            <div className="fg">
+                                <div className="field">
+                                    <input type="text" name="state" value={formData.state} onChange={handleInputChange}
+                                           required/>
+                                    <label>State</label>
+                                </div>
+                                <div className="field">
+                                    <input type="text" name="city" value={formData.city} onChange={handleInputChange} required/>
+                                    <label>City</label>
+                                </div>
+                            </div>
+
+                            <div className="fg">
+                                <div className="field">
+                                    <input type="text" name="yearOfExp" value={formData.yearOfExp} onChange={handleInputChange}
+                                           required/>
+                                    <label>Years of Experience</label>
+                                </div>
+                                <div className="field">
+                                    <input type="text" name="degree" value={formData.degree}
+                                           onChange={handleInputChange} required/>
+                                    <label>Degree</label>
+                                </div>
+                            </div>
+
+                            <div className="fg">
+                                <div className="content">
+                                    <span className="gen">Gender</span>
+                                    <div className="radio">
+                                        <input type="radio" id="male" name="gender" value="male"
+                                               checked={selectedGender === 'male'} onChange={handleGenderChange}/>
+                                        <span className="remember-text">Male</span>
+                                    </div>
+                                    <div className="radio">
+                                        <input type="radio" id="female" name="gender" value="female"
+                                               checked={selectedGender === 'female'} onChange={handleGenderChange}/>
+                                        <span className="remember-text">Female</span>
+                                    </div>
+
+                                    <div className="radio">
+                                        <input type="radio" id="others" name="gender" value="others"
+                                               checked={selectedGender === 'others'} onChange={handleGenderChange}/>
+                                        <span className="remember-text">Others</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="fg form-group mt-3">
+                                <div className="admin-cc">
+                                    <span>Upload your Photo</span>
+                                </div>
+                                {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
+                                <input type="file" name="file" className="file-input" onChange={(event) => {
+                                    setImageUpload(event.target.files[0]);
+                                }}/>
+                            </div>
+
+                            <div className="field">
+                                <input type="submit" value={`APPOINT`} onClick={handleAddDoctor} className="admin-appoint"/>
+                                {/*<button type="submit" className="button-background"  >Login</button>*/}
+                            </div>
+                        </form>
+                    </TabPanel>
+                    <TabPanel className="admin-tab-panel-items">
+                        <div className="container-terminate">
+                            <div className="record-right-terminate">
+                                <div className="searchall">
+                                    <input
+                                        className="searchs"
+                                        placeholder="Search..."
+                                        onChange={(e) => setQuery(e.target.value.toLowerCase())}
+                                    />
+                                    <i className="fas fa-search"></i>
+                                </div>
+
+                                <table className="admin-record-table-terminate">
+                                    <tbody>
+                                    <tr>
+                                        <th>Doctor Name </th>
+                                        <th>Specialization </th>
+                                        <th>Email</th>
+                                        {/*<th>Active</th>*/}
+                                    </tr>
+                                    {filteredData.map((item) => (<tr key={item.id}>
+
+                                            <td>{item.name}</td>
+                                            <td>{item.specialization}</td>
+                                            <td>{item.email}</td>
+                                            {/*<td>{item.Active}</td>*/}
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </TabPanel>
+                    <TabPanel className="admin-tab-panel-items">
+                        <div className="container-terminate">
+                            <div className="record-right-terminate">
+                                <div className="searchall">
+                                    <input
+                                        className="searchs"
+                                        placeholder="Search..."
+                                        value={query}
+                                        onChange={handleSearch}
+                                    />
+                                    <i className="fas fa-search"></i>
+                                </div>
+
+                                <table className="admin-record-table-terminate">
+                                    <tbody>
+                                    <tr>
+                                        <th>Doctor Name</th>
+                                        <th>Email</th>
+                                        <th>Active/Deactive</th>
+                                    </tr>
+                                    {filteredData.map((item) => (
+                                        <tr key={item.id}>
+                                            <td>{item.name}</td>
+                                            <td>{item.email}</td>
+                                            <td>
+                                                <div className="ActiveDeactive">
+                                                    <button
+                                                        id="admin-activate-button"
+                                                        onClick={() => toggleActivation(item.id)}
+                                                        className={item.isActive ? 'adminActive' : 'adminInactive'}
+                                                    >
+                                                        {item.isActive ? 'Deactivate' : 'Activate'}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </TabPanel>
+                    <TabPanel className="admin-tab-panel-items">
+                        <table className="infoContent">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Hospital Name : </span>
+                                        <input className="user-data-value editable" name="name" onChange={(e) => setHospitalNameValue(e.target.value)} type="text" placeholder={hospitalName.hospital_name} readOnly={true}/>
+                                        <i className="fa fa-pencil 0" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Email ID : </span>
+                                        <input className="user-data-value editable" name="email"  onChange={(e) => setHospitalEmailValue(e.target.value)} type="text" placeholder={hospitalName.email} readOnly={true}/>
+                                        <i className="fa fa-pencil 1" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Phone : </span>
+                                        <input className="user-data-value editable" name="phoneNumber"  onChange={(e) => setHospitalPhoneNumberValue(e.target.value)} type="text" placeholder={hospitalName.phoneNumber} readOnly={true}/>
+                                        <i className="fa fa-pencil 2" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Address : </span>
+                                        <input className="user-data-value editable"  name="address"  onChange={(e) => setHospitalAddressValue(e.target.value)} type="text" placeholder={hospitalName.address} readOnly={true}/>
+                                        <i className="fa fa-pencil 3" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Website : </span>
+                                        <input className="user-data-value editable" name="website"  onChange={(e) => setHospitalWebsiteValue(e.target.value)} type="text" placeholder={hospitalName.website} readOnly={true}/>
+                                        <i className="fa fa-pencil 4" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="user-data">
+                                        <span className="user-data-label">Specialisation : </span>
+                                        <input className="user-data-value editable" name="specialisation" onChange={handleSpecialisationChange} type="text" placeholder="Select specialisations to add" readOnly/>
+                                        <i className="fa fa-pencil 5" onClick={makeEditable}></i>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div className="department-selector visually-hidden" id="selector-specialisation">
+                            <h2>Select Departments:</h2>
+                            <div className="checkbox-container">
+                                {departments.map((department, index) => (
+                                    <div key={index}>
+                                        <div
+                                            className={selectedValues.includes(department.department_id) ? 'selected checkbox-item' : 'checkbox-item'}>
+                                            <input
+                                                type="checkbox"
+                                                value={department.department_id}
+                                                checked={selectedValues.includes(department.department_id)}
+                                                onChange={() => handleCheckboxChange(department.department_id, department.department_name)}
+                                            />
+                                            <span>{department.department_name}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/*{selectedValues.length > 0 && (*/}
+                            {/*    <p>You selected: {selectedValues.join(', ')}</p>*/}
+                            {/*)}*/}
+                        </div>
+                        <div className="update-profile-button-section">
+                            <button className="update-profile-button visually-hidden" id="profile-update-button"
+                                    onClick={handleUpdateHospitalDetails}>SAVE
+                            </button>
+                        </div>
+                    </TabPanel>
+                </Tabs>
             </div>
             <div className="admin-welcome-hospital">
                 <div className="hospital-details-section">
-                    <div className="hospital-detail-header">Hello, ADMIN</div>
                     <div className="hospital-details-image-section">
                         <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                     </div>

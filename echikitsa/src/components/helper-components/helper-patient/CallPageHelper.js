@@ -23,7 +23,6 @@ function CallPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [isOpen, setIsOpen] = useState(true);
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
-    const [stompClient, setStompClient] = useState(null);
     let i = 0;
 
 
@@ -34,6 +33,7 @@ function CallPageHelper(effect, deps) {
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
+    const [localStream, setLocalStream] = useState(null);
     //endregion
 
     const writePrescription = () => {
@@ -440,7 +440,7 @@ function CallPageHelper(effect, deps) {
     const streamSuccess = (stream) => {
         const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
-
+        setLocalStream(stream);
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -486,16 +486,26 @@ function CallPageHelper(effect, deps) {
     }
 
     const handleCallEnd = async () => {
-        await socket.disconnect();
+        let room;
+        if(roomName === "") room = parseInt(window.location.pathname.split("/")[2]);
+        else room = parseInt(roomName);
+        if(socket !== null) {
+            await socket.disconnect();
+            await localStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
-            doctorId: parseInt(roomName)
-        }).then((response) => {
+            doctorId: room
+        }).then(async (response) => {
             const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
-            stompClient.connect({}, () => {
-                setStompClient(stompClient);
-                stompClient.send(`/app/send-data/${parseInt(roomName)}`);
-                alert("call ended successfully");
+            stompClient.connect({}, async () => {
+                await stompClient.send("/app/reload-position");
+                await stompClient.send(`/app/send-data/${room}`);
+                if(socket !== null) {
+                    alert("call ended successfully");
+                }
                 navigate("/welcome");
             });
         })
@@ -614,14 +624,9 @@ function CallPageHelper(effect, deps) {
         navigate('/welcome');
     }
 
-    const handleClose = () => setIsOpen(false);
-
     return (
 
         <div className="consult-page-container">
-            <div id="overlay" onClick={off}>
-                <div id="text">Waiting</div>
-            </div>
             <div>
                 {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
                     <div className="confirmation-content">
@@ -630,7 +635,7 @@ function CallPageHelper(effect, deps) {
                         You want to join video consultation.</p>
                         <div className="Feedbutton">
                             <button className="confirm-call" onClick={confirmJoin}>YES</button>
-                            <button className="confirm-call" onClick={returnWelcome}>NO</button>
+                            <button className="confirm-call" onClick={handleCallEnd}>NO</button>
                         </div>
                     </div>
                 </StyledPopup>}
@@ -677,7 +682,7 @@ function CallPageHelper(effect, deps) {
                                     </div>
                                     <div className="Feedbutton">
                                         <Link to="/welcome"><button className="submit-button" onClick={handleCallEnd}>Submit</button></Link>
-                                        <Link to="/welcome"><button className="cancel-button">Cancel</button></Link>
+                                        <Link to="/welcome"><button className="cancel-button" onClick={handleCallEnd}>Cancel</button></Link>
                                     </div>
                                 </div>
                             </StyledPopup>

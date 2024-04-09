@@ -349,6 +349,12 @@ form .input-box span.details{
 
 }
 
+.container-terminate {
+    height: 100%;
+    width: 100%;
+    background-color: #FFFFFF;
+}
+
 .RecordContainer{
     height: 50%;
     width: 100%;
@@ -358,6 +364,12 @@ form .input-box span.details{
     border-radius: 10px;
 }
 
+.record-right-terminate {
+    width: 100%;
+    height: 840px;
+    overflow-y: auto;
+    padding-top: 5px;
+}
 
 .recordRight{
     width: 100%;
@@ -388,6 +400,15 @@ form .input-box span.details{
     text-align: center;
 }
 
+.admin-record-table-terminate {
+    width: 100%;
+    border: none;
+    margin-top: 10px;
+    border-spacing: 15px;
+    color: black;
+    text-align: center;
+}
+
 .adminRecordTable th, .adminRecordTable td {
     padding: 10px;
     border-collapse: collapse;
@@ -402,6 +423,19 @@ form .input-box span.details{
 .adminRecordTable td {
     color: #ffffff;
 }
+
+.admin-record-table-terminate th, .admin-record-table-terminate td {
+    padding: 10px;
+    border-collapse: collapse;
+}
+
+.admin-record-table-terminate th {
+    background-color: #13c5dd;
+    font-weight: bold;
+    border-collapse: collapse;
+    color: #FFFFFF;
+}
+
 /*.adminRecordTable  {*/
 /*    background-color: #848E9F;*/
 /*}*/
@@ -493,7 +527,8 @@ th i:hover {
 .admin-welcome-action {
     margin: 10px;
     width: 70%;
-    border-radius: 10px;
+    height: 900px;
+    border-radius: 25px 25px 10px 10px;
     box-shadow: 0 0 5px 0 #ababab;
 }
 
@@ -543,6 +578,7 @@ th i:hover {
 
 .admin-specialization-label {
     width: 40%;
+    padding-left: 2px;
     float: left;
 }
 .admin-spec-field {
@@ -598,4 +634,45 @@ th i:hover {
 
 .checkbox-item span {
     width: 60%;
+}
+
+.admin-tab-header {
+    display: flex;
+    flex-direction: row;
+    height: 38px;
+    padding-left: 0;
+    margin-bottom: 0;
+    background-color: #1D2A4D;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.admin-tab-panel-items {
+    padding-top: 0;
+}
+
+.admin-tab-header-items {
+    width: 25%;
+    margin: 2px;
+    text-align: center;
+    font-size: 16px;
+    padding-top: 3px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.admin-selected-tab {
+    margin: 2px;
+    border-radius: 50px;
+    padding-top: 3px;
+    background-color: #FFFFFF;
+    color: #1D2A4D;
+}
+
+.specialization-select {
+    box-shadow: none;
+}
+
+.specialization-select {
+    box-shadow: none;
 }

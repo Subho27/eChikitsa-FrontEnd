@@ -97,16 +97,18 @@
 }
 
 .logo-container {
-    height: 60px;
-    width: 60px;
-    background-color: #13C5DD;
+    height: 80px;
+    width: 80px;
+    /*background-color: #1D2A4D;*/
     text-align: center;
     border-radius: 50%;
+    margin-right: 10px;
 }
 .logo-photo {
-    height: 40px;
-    width: 40px;
-    margin: auto;
+    height: 65px;
+    width: 65px;
+    margin-top: 10%;
+    float: right;
 }
 .full-logo-container {
     display: flex;
@@ -114,9 +116,9 @@
 }
 .logo-name {
     margin: auto;
-    padding-left: 20px;
     font-family: 'Roboto Condensed', sans-serif;
-    color: #13C5DD;
+    color: #13c5dd;
+    padding-left: 10px;
 }
 .contact-text-body {
     font-family: 'Roboto', sans-serif;
@@ -125,13 +127,19 @@
 .join-call {
     background-color: red;
     color: #FFFFFF;
-    padding: 10px 20px 10px 20px;
-    margin-top: 21%;
+    padding: 8px 20px 10px 20px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 20px;
     font-weight: bolder;
+    border-radius: 5px;
 }
 
-.custom-navbar {
-    margin: 10px;
+.join-call:hover {
+    border-width: 1px;
+    border-color: red;
+    background-color: #FFFFFF;
+    color: red;
 }
 
 .custom-nav-item {

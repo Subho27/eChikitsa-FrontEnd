@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
+import axios from "axios";
+import {over} from "stompjs";
+import SockJS from "sockjs-client";
 
 function ConsultationPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -16,11 +19,13 @@ function ConsultationPageHelper(effect, deps) {
     const [videoArray, setVideoArray] = useState(["Patient", "Senior Doctor"]);
     let i = 0;
 
+    const navigate = useNavigate();
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
+    const [localStream, setLocalStream] = useState(null);
     //endregion
 
     const writePrescription = () => {
@@ -410,7 +415,7 @@ function ConsultationPageHelper(effect, deps) {
     const streamSuccess = (stream) => {
         const localVideo = document.querySelector('video#doctorLocalStream');
         localVideo.srcObject = stream
-
+        setLocalStream(stream);
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -447,8 +452,10 @@ function ConsultationPageHelper(effect, deps) {
             // server notification is received when a producer is closed
             // we need to close the client-side consumer and associated transport
             const producerToClose = consumerTransports.find(transportData => transportData.producerId === remoteProducerId);
-            producerToClose.consumerTransport.close();
-            producerToClose.consumer.close();
+            if(producerToClose != null) {
+                producerToClose.consumerTransport.close();
+                producerToClose.consumer.close();
+            }
 
             // remove the consumer transport from the list
             consumerTransports = consumerTransports.filter(transportData => transportData.producerId !== remoteProducerId);
@@ -491,6 +498,13 @@ function ConsultationPageHelper(effect, deps) {
     }, [socket]);
     //endregion
 
+    const handleCallEnd = async () => {
+        await socket.disconnect();
+        await localStream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+        navigate("/dashboard");
+    }
 
     useEffect(() => {
         setPrevRecords(askRecord);
@@ -567,7 +581,7 @@ function ConsultationPageHelper(effect, deps) {
                             <button className="call-buttons">
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
-                            <Link to="/dashboard"><button className="call-buttons">
+                            <Link to="/dashboard"><button className="call-buttons" onClick={handleCallEnd}>
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
                             </button></Link>
                         </div>

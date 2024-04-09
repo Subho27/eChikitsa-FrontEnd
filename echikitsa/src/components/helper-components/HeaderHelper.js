@@ -47,11 +47,11 @@ function HeaderHelper () {
                 <div className="container custom-navbar">
                     <nav className="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
                         <Link to="/" className="navbar-brand">
-                            <h1 className="m-0 text-uppercase text-primary full-logo-container">
+                            <h1 className="m-0 text-primary full-logo-container">
                                 <div className="logo-container">
-                                    <img className="logo-photo" src={require("./../../images/Logo/logo-nobg.png")} alt="Logo" />
+                                    <img className="logo-photo" src={require("./../../images/Logo/logo-circular.png")} alt="Logo" />
                                 </div>
-                                <div className="logo-name">{Constant.APP_NAME_STRING}</div>
+                                <div className="logo-name">eChikitsa</div>
                             </h1>
                         </Link>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">

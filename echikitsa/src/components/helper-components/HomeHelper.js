@@ -46,7 +46,7 @@ function homeHelper() {
                 <div className="container py-5">
                     <div className="row justify-content-start">
                         <div className="col-lg-8 text-center text-lg-start">
-                            <h5 className="d-inline-block text-primary text-uppercase text-white border-style">Welcome to eChikitsa</h5>
+                            <h5 className="d-inline-block text-primary text-white border-style">Welcome to eChikitsa</h5>
                             <h1 className="display-3 text-white mb-md-4">Best Consultation Solution</h1>
                             <div className="pt-2">
                                 <Link to="/login" className="btn btn-light rounded-pill py-md-3 px-md-5 mx-2">LOGIN</Link>
