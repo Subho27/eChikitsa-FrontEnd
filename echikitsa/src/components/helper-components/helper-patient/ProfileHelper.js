@@ -24,7 +24,7 @@ function ProfilePage(props) {
     });
     const [userId, setUserId] = useState(0);
     const {state}=useLocation();
-    console.log("kaefhqpowedfqedqkj", props.data)
+    //console.log("kaefhqpowedfqedqkj", props.data)
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
         email: '',

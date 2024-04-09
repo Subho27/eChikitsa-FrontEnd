@@ -9,6 +9,8 @@ import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
 // import {authentication} from '../../firebase/firebaseConfig'
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
 
+
+
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
     const [loginMethod, setLoginMethod] = useState('password'); // Default login method
@@ -19,6 +21,7 @@ const LoginHelper = () => {
     const [isOtpSent, setIsOtpSent] = useState(false);
     const inputRefs = useRef([]);
     const navigate = useNavigate();
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -114,43 +117,32 @@ const LoginHelper = () => {
                     if (response.data && response.data.role ==loginType.toUpperCase()) {
                         //console.log(response.data)
                         saveJwtTokenToLocalStorage(response.data.token)
+                        alert("Login Successfully")
                         if(loginType === 'patient')
                         {
-                            // let path = '/welcome'
-                            // navigate(path);
                             navigate("/welcome",{state:{
                                     patient_id:response.data.id}
                             });
                         }
                         if(loginType === 'doctor')
                         {
-                            // let path = '/dashboard'
-                            // navigate(path);
                             navigate("/dashboard",{state:{
                                     doctor_id:response.data.id}
                             });
                         }
                         if(loginType === 'admin'){
-                            // let path = '/admin'
-                            // navigate(path);
-                            // let path = `/admin/${response.data.id}`
-                            // navigate(path);
 
                             navigate("/admin",{state:{
                                     hospital_id:response.data.id}
                             });
 
-                        };
-
-
-
-
+                        }
 
                     }
                     else {
                         alert("email and password are incorrect")
                     }
-                    //console.log('Response:', response);
+
                 });
             } catch (error) {
                 console.error('Error:', error);
@@ -233,6 +225,8 @@ const LoginHelper = () => {
                         </div>
                     </div>
                     <button type="submit" className="button-background">Login</button>
+
+
                 </div>
             </form>
 
