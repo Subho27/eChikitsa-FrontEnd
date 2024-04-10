@@ -158,8 +158,8 @@ function AdminWelcomeHelper(props) {
     const filteredData = doctors.filter(item =>
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.specialization.toLowerCase().includes(query.toLowerCase()) ||
-        item.email.toLowerCase().includes(query.toLowerCase())||
-        item.isActive.toLowerCase().includes(query.toLowerCase())
+        item.email.toLowerCase().includes(query.toLowerCase())
+        // item.isActive.toLowerCase().includes(query.toLowerCase())
 
     );
     const [formData, setFormData] = useState({
@@ -426,7 +426,7 @@ function AdminWelcomeHelper(props) {
                                         <Select
                                             defaultValue={selectedOption}
                                             onChange={setSelectedOption}
-                                            options={departmentName}
+                                            options={options}
                                         />
                                         {/*<select*/}
                                         {/*    name="specialization"*/}
