@@ -615,10 +615,11 @@ function AdminWelcomeHelper(props) {
                                                 <div className="ActiveDeactive">
                                                     <button
                                                         id="admin-activate-button"
-                                                        onClick={() => toggleActivation(item.id)}
-                                                        className={item.isActive ? 'adminActive' : 'adminInactive'}
+                                                        onClick={() => handleDoctorStatus(item.id)}
+                                                        className={item.active ? 'adminActive' : 'adminInactive'}
                                                     >
-                                                        {item.isActive ? 'Deactivate' : 'Activate'}
+                                                        {item.active ? 'Deactivate' : 'Activate'}
+
                                                     </button>
                                                 </div>
                                             </td>
