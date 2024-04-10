@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -6,17 +6,30 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import axios from "axios";
 
 
 
 
 const DoctorHeaderHelper = (props) => {
+    const [name, setName] = useState("");
     const navigate = useNavigate();
 
     const handleJoinCall = async () => {
         navigate("/consult/"+ getUserIdFromLocalStorage() )
 
     }
+
+
+    const fetchUserName = async () => {
+        const response = axios.get(`http://localhost:8081/user/get-user-name/${getUserIdFromLocalStorage()}`).then((response) => {
+            //console.log(response)
+            setName(response.data)
+
+        });
+
+    }
+    fetchUserName()
 
     return (
         <div>
@@ -76,7 +89,7 @@ const DoctorHeaderHelper = (props) => {
                                 <div className="nav-item dropdown">
                                     <Link to="/" className={`nav-link dropdown-toggle ${props.data === 'profile' ? 'active' : ''}`} data-bs-toggle="dropdown" id="more">More</Link>
                                     <div className="dropdown-menu m-0">
-                                        <Link to="/doctor-profile" className="dropdown-item">Profile</Link>
+                                        <Link to="/doctor-profile" className="dropdown-item">{name}</Link>
                                         <Link to="/dashboard" className="dropdown-item">Settings</Link>
                                         <Link to="/" className="dropdown-item">Logout</Link>
                                     </div>

@@ -62,25 +62,6 @@ function AdminWelcomeHelper(props) {
                     console.error('Error fetching all departments:', error);
                 }
             };
-            // const fetchDoctorDetails = async () => {
-            //     try {
-            //         const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
-            //         console.log("d ",response2.data)
-            //         const doctorsData = response2.data.map(doctor => ({
-            //             doctorName: doctor.name,
-            //             specialization: doctor.specialization,
-            //             email: doctor.email,
-            //             isActive:doctor.active
-            //         }));
-            //
-            //         setDoctors(response2.data);
-            //
-            //     }
-            //     catch (error) {
-            //         console.error('Error fetching all doctors:', error);
-            //     }
-            // };
-
 
             const fetchDepartmentsByHospitalId = async () => {
                 try {
