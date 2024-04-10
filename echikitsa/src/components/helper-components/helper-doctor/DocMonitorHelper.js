@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/doc-monitor-style.css";
 import {Link} from "react-router-dom";
 
@@ -40,6 +40,7 @@ const DocMonitorHelper = () => {
                 age: 40,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -58,6 +59,7 @@ const DocMonitorHelper = () => {
                 age: 25,
                 repeatPatient: "r"
             },
+            reason: "Allergy",
             callStatus: "call ended"
         },
         {
@@ -76,6 +78,7 @@ const DocMonitorHelper = () => {
                 age: 30,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -94,6 +97,7 @@ const DocMonitorHelper = () => {
                 age: 35,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "call ended"
         },
         {
@@ -112,6 +116,7 @@ const DocMonitorHelper = () => {
                 age: 45,
                 repeatPatient: "r"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -130,6 +135,7 @@ const DocMonitorHelper = () => {
                 age: 50,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -148,6 +154,7 @@ const DocMonitorHelper = () => {
                 age: 32,
                 repeatPatient: "r"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -166,6 +173,7 @@ const DocMonitorHelper = () => {
                 age: 55,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "call ended"
         },
         {
@@ -184,6 +192,7 @@ const DocMonitorHelper = () => {
                 age: 25,
                 repeatPatient: "r"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         },
         {
@@ -202,6 +211,7 @@ const DocMonitorHelper = () => {
                 age: 38,
                 repeatPatient: "n"
             },
+            reason: "Allergy",
             callStatus: "ongoing"
         }
     ];
@@ -220,78 +230,96 @@ const DocMonitorHelper = () => {
         setFilteredData(filtered);
     };
 
+    //region Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hospitalsPerPage, setHospitalsPerPage] = useState(7);
+    const [currentPosts, setCurrentPosts] = useState([]);
+    const totalPosts = filteredData.length;
+    const paginate = pageNumber => setCurrentPage(pageNumber);
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalPosts / hospitalsPerPage); i++) {
+        pageNumbers.push(i);
+    }
+    //endregion
+
+    useEffect(() => {
+        const indexOfLastPost = currentPage * hospitalsPerPage;
+        const indexOfFirstPost = indexOfLastPost - hospitalsPerPage;
+        const updatedCurrentPosts = filteredData.slice(indexOfFirstPost, indexOfLastPost);
+        setCurrentPosts(updatedCurrentPosts);
+    }, [filteredData, currentPage, hospitalsPerPage])
+
     return (
         <div className="MonitorContainer">
-            <div className="MonitorTitle">
-                <span>Doctor Call Monitoring</span>
-            </div>
-            <div className="DateFilter">
-                <div className="dateFilter">Filter by Date:</div>
-                <input type="date" id="dateFilter" className="date" onChange={handleDateFilter} />
-            </div>
-            <div className="MonitorTable">
-                <div className="TableHead">
-                    <div className="DoctorDetail">Doctor Detail</div>
-                    <div className="PatientDetail" id="PatientTitle">Patient Detail</div>
-                    <div className="CallDetail">Call Status</div>
-                </div>
-                <div className="MonitorTableRow">
-                    <div className="DoctorDetail">
-                        <div className="DocRef">
-                            <div className="Ref">ID</div>
-                            <div className="Ref">Name</div>
-                            <div className="Ref">Specialisation</div>
+            <div className="Recordright">
+                <div className="whole-table-section">
+                    <div className="table-header-section">
+                        <div className="table-title">
+                            Senior Doctor Call Monitoring
                         </div>
                     </div>
-                    <div className="PatientDetail">
-                        <div className="PatRef">
-                            <div className="Ref">ID</div>
-                            <div className="Ref">Name</div>
-                            <div className="Ref">Gender</div>
-                            <div className="Ref">Age</div>
-                            <div className="Ref">Repeat</div>
+                    <div className="table-body-section">
+                        <div className="column-super-header-section">
+                            <div className="column-super-doctor super-head">Doctor Detail</div>
+                            <div className="column-super-patient super-head">Patient Detail</div>
+                            <div className="column-super-call super-head">Call Detail</div>
                         </div>
-                    </div>
-                    <div className="CallDetail">
-                        <div className="CallRef">
-                            <div className="Ref">Status</div>
-                            <div className="Ref">Action</div>
-                        </div>
-                    </div>
-                </div>
-                {filteredData.map(({ doctor, patient, callStatus }) => (
-                    <div key={doctor.id} className="MonitorTableRow">
-                        <div className="DoctorDetail">
-                            <div className="DocRef">
-                                <div className="Ref">{doctor.id}</div>
-                                <div className="Ref">{doctor.firstName} {doctor.lastName}</div>
-                                <div className="Ref">{doctor.specialization}</div>
+                        <hr className="table-row-divider"/>
+                        <div className="column-sub-header-section">
+                            <div className="column-super-doctor">
+                                <div className="table-cell-doctor">Doctor Name</div>
+                                <div className="table-cell-doctor">Specialization</div>
+                            </div>
+                            <div className="column-super-patient">
+                                <div className="table-cell-patient">Patient Name</div>
+                                <div className="table-cell-patient">Gender</div>
+                                <div className="table-cell-patient">Age</div>
+                                <div className="table-cell-patient">Repeat</div>
+                            </div>
+                            <div className="column-super-call">
+                                <div className="table-cell-call">Reason</div>
+                                <div className="table-cell-call">Call Status</div>
+                                <div className="table-cell-call">Action</div>
                             </div>
                         </div>
-                        <div className="PatientDetail">
-                            <div className="PatRef">
-                                <div className="Ref">{patient.id}</div>
-                                <div className="Ref">{patient.firstName} {patient.lastName}</div>
-                                <div className="Ref">{patient.gender}</div>
-                                <div className="Ref">{patient.age}</div>
-                                <div className="Ref">{patient.repeatPatient}</div>
-                            </div>
-                        </div>
-                        <div className="CallDetail">
-                            <div className="CallRef">
-                                <div className="Ref">{callStatus === "call ended"?<div className="join">Call Ended</div>:
-                                    <div className="status">Ongoing</div> }</div>
-                                <div className="Ref">
-                                    {callStatus === "ongoing" ? (
-                                        <Link to="/monitor-call/subho"><div className="joinbutton" onClick={() => joinCall(doctor.id)}>Join Call</div></Link>
-                                    ) : (
-                                        <div className="join">{seniorDoctorCallStatus === "joined" ? "Call Joined" : "Not Joined"}</div>
-                                    )}
+                        <hr className="table-row-divider"/>
+                        <div className="table-data-section">
+                            {currentPosts.map((item) => (
+                                <div key={item.id}>
+                                    <div className="table-row-section">
+                                        <div className="column-super-doctor">
+                                            <div className="table-cell-doctor">{"Dr. " + item.doctor.firstName + " " + item.doctor.lastName}</div>
+                                            <div className="table-cell-doctor">{item.doctor.specialization}</div>
+                                        </div>
+                                        <div className="column-super-patient">
+                                            <div className="table-cell-patient">{item.patient.firstName + " " + item.patient.lastName}</div>
+                                            <div className="table-cell-patient">{item.patient.gender}</div>
+                                            <div className="table-cell-patient">{item.patient.age}</div>
+                                            <div className="table-cell-patient">{item.patient.repeatPatient.toUpperCase()}</div>
+                                        </div>
+                                        <div className="column-super-call">
+                                            <div className="table-cell-call">{item.reason}</div>
+                                            <div className={`table-cell-call ${(item.callStatus==="ongoing")?`present`:`past`}`}>{item.callStatus.toUpperCase()}</div>
+                                            <div className="table-cell-call">{item.callStatus === "ongoing" && <button className="monitor-call-now">JOIN CALL</button>}</div>
+                                        </div>
+                                    </div>
+                                    <hr className="monitor-table-row-divider"/>
                                 </div>
-                            </div>
+                            ))}
                         </div>
+                        <nav>
+                            <ul className='pagination custom-pagination'>
+                                {pageNumbers.map(number => (
+                                    <li key={number} className='page-item'>
+                                <span onClick={() => paginate(number)} className={`page-link ${currentPage === number ? 'active' : ''}`}>
+                                    {number}
+                                </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     );

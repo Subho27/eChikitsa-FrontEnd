@@ -1,8 +1,9 @@
 .MonitorContainer{
-    margin: 2%;
-    padding: 5px;
-    border: 1px solid grey;
-    border-radius: 10px;
+    margin-top: 50px;
+    width: 98%;
+    height: 1050px;
+    margin-left: auto;
+    margin-right: auto;
     /*background: #13c5dd;*/
 }
 
@@ -126,4 +127,116 @@
     width: 200px;
 
     padding: 5px;
+}
+
+.column-super-doctor {
+    width: 25%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid black;
+}
+
+.column-super-patient {
+    width: 40%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid black;
+}
+
+.column-super-call {
+    width: 35%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.column-super-header-section {
+    margin-top: -35px;
+    padding-top: 60px;
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: row;
+    font-weight: bold;
+    text-align: center;
+}
+
+.table-cell-doctor {
+    width: 50%;
+    text-align: center;
+}
+
+.table-cell-patient {
+    width: 25%;
+    text-align: center;
+}
+
+.table-cell-call {
+    width: 33.33%;
+    text-align: center;
+}
+
+.column-sub-header-section {
+    display: flex;
+    flex-direction: row;
+    font-weight: bold;
+}
+
+.present {
+    color: #30dc30;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+}
+
+.past {
+    color: #bb2727;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+}
+
+.monitor-join-button {
+    height: 40px;
+    border-radius: 10px;
+    background-color: #007bff;
+}
+
+.super-head {
+    font-size: 18px;
+}
+
+.monitor-call-now {
+    height: 40px;
+    width: 120px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #5cb85c;
+    color: #FFFFFF;
+}
+
+.monitor-call-now:hover {
+    height: 40px;
+    width: 120px;
+    font-size: 16px;
+    border-width: 2px;
+    border-color: #5cb85c;
+    background-color: #FFFFFF;
+    color: #5cb85c;
+}
+
+.monitor-table-row-divider {
+    margin: 0 auto;
+    width: 98%;
+}
+
+.custom-pagination {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
 }

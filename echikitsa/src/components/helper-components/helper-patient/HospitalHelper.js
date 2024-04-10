@@ -82,8 +82,7 @@ function HospitalHelper (props) {
                 <div className="hospital-description">
                     <div className="hospital-details">
                         <div className="hospital-details-section">
-                            <div className="hospital-detail-header">Hospital Details</div>
-                            <div className="hospital-details-image-section">
+                            <div className="hospital-details-image-section-page">
                                 <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                             </div>
                             <table className="hospital-detail-table">
