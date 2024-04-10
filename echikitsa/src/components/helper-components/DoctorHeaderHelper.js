@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -6,6 +6,7 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import axios from "axios";
 
 
 
@@ -85,7 +86,7 @@ const DoctorHeaderHelper = (props) => {
                                 <Link to="/dashboard" className={`nav-item nav-link ${props.data === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
                                 <Link to="/doctor-records" className={`nav-item nav-link ${props.data === 'records' ? 'active' : ''}`} >Records</Link>
                                 <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>
-                                <Link to="/doctor-profile" className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >Profile</Link>
+                                <Link to="/doctor-profile" style={{ color: 'black' }} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
                                 <Link to="/" className={`nav-item nav-link ${props.data === 'logout' ? 'active' : ''}`} >Logout</Link>
                                 {/*<div className="nav-item dropdown">*/}
                                 {/*    <Link to="/" className={`nav-link dropdown-toggle ${props.data === 'profile' ? 'active' : ''}`} data-bs-toggle="dropdown" id="more">More</Link>*/}
