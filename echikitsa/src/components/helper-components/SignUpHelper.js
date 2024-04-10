@@ -1,9 +1,12 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
 import {Link} from "react-router-dom";
+import Validation from "../validation/validation";
+import {isDisabled} from "bootstrap/js/src/util";
+import button from "bootstrap/js/src/button";
 
 
 const SignUpHelper = () => {
@@ -23,6 +26,10 @@ const SignUpHelper = () => {
 
     });
 
+
+    const [formIsValid, setFormIsValid] = useState(false);
+
+
     const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
         setSignUpType(type.toLowerCase());
@@ -34,7 +41,103 @@ const SignUpHelper = () => {
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
+
+        // Consider using a separate validation function
+        validateField(name, value);
+
     };
+
+    // useEffect(() => {
+    //     setEmailValid(Validation.validate(formData.email));
+    //
+    // }, [formData]);
+
+    let isValid = true;
+    const [firstNameValid, setFirstNameValid] = useState("");
+    const [lastNameValid, setLastNameValid] = useState("");
+    const [emailValid, setEmailValid] = useState("");
+    const validateField = (fieldName, fieldValue) => {
+
+        if (fieldName === 'firstName') {
+            if (!fieldValue.match(/^[a-zA-Z]/)) {
+                setFirstNameValid('First Name is invalid - ONLY LETTERS');
+                console.log(firstNameValid);
+                isValid = false;
+            }
+            else {
+                setFirstNameValid('');
+                isValid = true;
+            }
+        }
+        if(fieldName === 'lastName'){
+            if(!fieldValue.match(/^[a-zA-Z]/)){
+                setLastNameValid('Last Name is invalid - ONLY LETTERS');
+                isValid = false;
+            }
+            else{
+                setLastNameValid('');
+                isValid = true;
+            }
+        }
+        if(fieldName === 'email'){
+            if (!fieldValue.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+                setEmailValid('Not valid.');
+                isValid = false;
+            } else {
+                setEmailValid('');
+                isValid = true;
+            }
+        }
+        // else if (fieldName === 'email') {
+        //     isValid = Validation.validateEmail(fieldValue); // Assuming Validation component
+        // } else if (fieldName === 'password'){
+        //     // Add password strength validation logic \(e\.g\., minimum length, lowercase, uppercase, numbers, symbols\)
+        //     const passwordRegex = /^\(?\=\.\*\\d\)\(?\=\.\*\[a\-z\]\)\(?\=\.\*\[A\-Z\]\)\[^\\s\]\{8,\}<span>;
+        //     isValid = passwordRegex.test(fieldValue);
+        //     if (!isValid) {
+        //         setFirstNameValid('Password must be at least 8 characters and include lowercase, uppercase, numbers, and symbols');
+        //     } else {
+        //         setFirstNameValid('');
+        //     }
+        // } else if (fieldName === 'confirmPassword') {
+        //     // Check if confirm password matches password
+        //     isValid = fieldValue === formData.password;
+        //     if (!isValid) {
+        //         setFirstNameValid('Confirm Password does not match Password');
+        //     } else {
+        //         setFirstNameValid('');
+        //     }
+        // }
+        // Add validation logic for other fields (e.g., phone number format, age range)
+
+        // Update overall form validity based on individual field validations
+        setFormIsValid(isValid && checkAllFieldsValid()); // Check all fields are filled
+    };
+
+    const checkAllFieldsValid = () => {
+        // Define required fields using a dedicated object or array
+        const requiredFields = {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phoneNumber: true,
+            password: true,
+            confirmPassword: true,
+            // Add other required fields here
+        };
+
+        // Loop through formData and check for missing values in required fields
+        for (const fieldName in formData) {
+            if (requiredFields[fieldName] && !formData[fieldName]) {
+                return false; // Early return if a required field is empty
+            }
+        }
+
+        return true; // All required fields have values
+    };
+
+
+
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -47,6 +150,7 @@ const SignUpHelper = () => {
     // EMAIL - OTP functions
     const [emailOtpValues, setEmailOtpValues] = useState(Array(6).fill(''));
     const inputRefs = useRef([]);
+
 
     const handleEmailChange = (index, value) => {
         const newOtpValues = [...emailOtpValues];
@@ -108,11 +212,13 @@ const SignUpHelper = () => {
                         <div className="field">
                             <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
                                    required/>
+                            <p>{firstNameValid}</p>
                             <label>First Name</label>
                         </div>
                         <div className="field">
                             <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
                                    required/>
+                            <p>{lastNameValid}</p>
                             <label>Last Name</label>
                         </div>
                     </div>
@@ -120,6 +226,7 @@ const SignUpHelper = () => {
                         <div className="field">
                             <input type="text" name="email" value={formData.email} onChange={handleInputChange}
                                    required/>
+                            <p>{emailValid}</p>
                             <label>Email</label>
                         </div>
                         <div className="field">
@@ -323,7 +430,11 @@ const SignUpHelper = () => {
                         </div>
                     </div>
                     <div className="field">
-                        <input type="submit" value={`Register`}/>
+                        <input
+                            type="submit"
+                            value={`Register`}
+                            disabled={!formIsValid}
+                        />
                     </div>
                 </form>
             )}

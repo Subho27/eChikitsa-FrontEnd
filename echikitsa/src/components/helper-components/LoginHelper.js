@@ -3,6 +3,7 @@ import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
+import Validation from "../validation/validation";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -13,6 +14,12 @@ const LoginHelper = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const inputRefs = useRef([]);
+
+    const [loginValue, SetLoginValue] = useState( {
+        emailId: '',
+        password:''
+    })
+
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());

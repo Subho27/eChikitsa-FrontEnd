@@ -4,14 +4,70 @@ import {Link} from "react-router-dom";
 import Collapsible from "react-collapsible";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
+import 'firebase/compat/auth';
+import {firebaseConfig} from "../../firbaseConfiguration/config";
+import axios from 'axios';
+import { storage } from "../../firbaseConfiguration/config";
+import { ref, uploadBytes } from "firebase/storage";
 
+// Initialize Firebase if it's not already initialized
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 function ConsultationPageHelper(effect, deps) {
-    const [prevRecords, setPrevRecords] = useState([])
-    const [today, setToday] = useState("")
+    const [prevRecords, setPrevRecords] = useState([]);
+    const [today, setToday] = useState("");
     const [suggestDate, setSuggestDate] = useState("");
     const [diagnosisSummary, setDiagnosisSummary] = useState("");
     const [medicines, setMedicines] = useState([]);
     const [prescription, setPrescription] = useState([]);
+    const [addMedicines, setAddMedicines] = useState([]);
+    const [prescriptionUpload, setPrescriptionUpload] = useState(null);
+
+    // Function to upload PDF file to Firebase Storage
+    const generatePDF = async () => {
+        try {
+            const response = await axios.post('http://localhost:9090/prescription/generate_pdf', {
+                patient_id:2,
+                doctor_id:1,
+                instructions:prescription,
+                medication:addMedicines,
+                diagnosis:diagnosisSummary,
+                nextdate:suggestDate
+            }, {
+                responseType: 'blob' // Set response type to blob
+            });
+
+            // Create a blob URL for the PDF data
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const prescriptionRef = ref(storage, `echikitsa/Patient/2/${"2"+Date.now().toLocaleString()}`);
+            await uploadBytes(prescriptionRef, blob).then(() => {
+                alert("Prescription Uploaded");
+            });
+            const pdfUrl = URL.createObjectURL(blob);
+
+            // Open the PDF in a new window/tab
+            window.open(pdfUrl);
+
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            throw error;
+        }
+    };
+
+    const handleClick = async () => {
+        try {
+            // Call the generatePDF function
+            await generatePDF();
+
+            // Handle successful response (if needed)
+            console.log("PDF generated, uploaded, and data added successfully.");
+        } catch (error) {
+            // Handle error
+            console.error("Error generating, uploading PDF, and adding data:", error);
+        }
+    };
+
 
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
@@ -73,6 +129,8 @@ function ConsultationPageHelper(effect, deps) {
             "dos2" : dosage2,
             "dos3" : dosage3
         }
+        const addMedicine = [medicineName, afterBefore, dosage1, dosage2, dosage3]
+        setAddMedicines(prevAddMedicines => [...prevAddMedicines, addMedicine]);
         setMedicines(prevMedicines => [...prevMedicines, prescribe]);
     };
     const cancelMedicine = (id) => {
@@ -321,7 +379,7 @@ function ConsultationPageHelper(effect, deps) {
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
                             <Link to="/dashboard"><button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
+                                <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End" onClick={handleClick}/>
                             </button></Link>
                         </div>
                     </div>
