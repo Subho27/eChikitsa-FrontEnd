@@ -42,6 +42,10 @@ function DocProfilePage() {
         target = parseInt(target[target.length - 1]);
         let element = document.getElementsByClassName("user-data-value editable")[target];
         element.readOnly = false;
+        element.style.borderRadius = "5px"
+        element.style.border = "2px solid #1D2A4D"
+        element.focus();
+        element.select();
 
         let saveButton = document.getElementById("profile-update-button");
         saveButton.className = "update-profile-button";
@@ -54,6 +58,7 @@ function DocProfilePage() {
         let element = document.getElementsByClassName("user-data-value editable");
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
+            element[i].style.border = "none"
         }
     }
 
