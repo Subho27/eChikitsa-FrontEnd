@@ -4,6 +4,9 @@ import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {useLocation} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 
 function ProfilePage(props) {
@@ -23,6 +26,9 @@ function ProfilePage(props) {
         "prevRecords": "previous.pdf",
         "password":""
     });
+    const [userId, setUserId] = useState(0);
+    const {state}=useLocation();
+    const [docUpload, setDocUpload] = useState(null);
     // const [userId, setUserId] = useState(0);
     // const {state}=useLocation();
     const userId =  getUserIdFromLocalStorage();

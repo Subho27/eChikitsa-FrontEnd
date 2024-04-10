@@ -20,6 +20,7 @@ const LoginHelper = () => {
     const [isOtpSent, setIsOtpSent] = useState(false);
     const inputRefs = useRef([]);
     const navigate = useNavigate();
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -116,19 +117,30 @@ const LoginHelper = () => {
                         //console.log(response.data)
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id);
+                        saveJwtTokenToLocalStorage(response.data.token)
+                        alert("Login Successfully")
                         if(loginType === 'patient')
                         {
+                            // let path = '/welcome'
+                            // navigate(path);
                             navigate("/welcome",{state:{
                                     patient_id:response.data.id}
                             });
                         }
                         if(loginType === 'doctor')
                         {
+                            // let path = '/dashboard'
+                            // navigate(path);
                             navigate("/dashboard",{state:{
                                     doctor_id:response.data.id}
                             });
                         }
                         if(loginType === 'admin'){
+                            // let path = '/admin'
+                            // navigate(path);
+                            // let path = `/admin/${response.data.id}`
+                            // navigate(path);
+
                             navigate("/admin",{state:{
                                     hospital_id:response.data.id}
                             });
