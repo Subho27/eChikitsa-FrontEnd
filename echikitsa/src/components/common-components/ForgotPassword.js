@@ -7,7 +7,6 @@ import {useLocation} from "react-router-dom";
 function ForgotPassword () {
     const [email, setEmail] = useState('');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-    const [touched, setTouched] = useState(false);
     const [responseMessage, setResponseMessage] = useState('');
     const [otp, setOTP] = useState('');
     const [password, setPassword] = useState('');
@@ -41,6 +40,20 @@ function ForgotPassword () {
         );
     };
 
+    const [touched, setTouched] = useState({
+        email: false,
+        otp: false,
+        newpassword: false,
+        confirmpassword: false
+    });
+
+    const handleInputBlur = (fieldName) => {
+        setTouched({
+            ...touched,
+            [fieldName]: true
+        });
+    };
+
     const sendOtp = async (event) => {
 
         try {
@@ -71,43 +84,47 @@ function ForgotPassword () {
     return (
         <div>
             <HeaderHelper/>
-            <div className="mainDivFP">
-                <h3 className="titlePassword">Password Reset</h3>
-                <hr className="hor-line"/>
+            <div className="mainDivFP-xx">
+                <h3 className="titlePassword-xx">Password Reset</h3>
+                <hr className="hor-line-xx"/>
 
-                <div className="text-content">
-                    <p className="text">Forgotten your password? Enter your e-mail address below, and we'll send you an OTP.</p>
+                <div className="text-content-xx">
+                    <p className="text-xx">Forgotten your password? Enter your e-mail address below, and we'll send you an OTP.</p>
                 </div>
-                <div className= "inputDiv">
-                    <input className="input" placeholder={"E-mail address"} value={email} name="email"
-                           onChange={handleChange}/>
-                    <button className="send-otp-button" onClick={sendOtp}>Sent OTP</button>
-
-                </div>
-                {touched && !email.trim() && <div className="alert-box">Required</div>}
-                <div className= "inputDiv">
-                    <input className="input-n" placeholder={"Enter OTP"} value={otp} name="otp"
-                           onChange={handleChange}/>
-
+                <div className= "inputDiv-xx">
+                    <input className="input-xx" placeholder={"E-mail address"} value={email} name="email"
+                           onChange={handleChange}
+                           onBlur={() => handleInputBlur('email')}/>
+                    <button className="send-otp-button-xx" onClick={sendOtp}>Sent OTP</button>
 
                 </div>
-                {touched && !otp.trim() && <div className="alert-box">Required</div>}
-                <div className= "inputDiv">
-                    <input className="input-n" placeholder={"New Password"} value={password} name="password"
-                           onChange={handleChange}/>
+                {touched.email && !email.trim() && <div className="alert-box-xx">Required</div>}
+                <div className= "inputDiv-xx">
+                    <input className="input-n-xx" placeholder={"Enter OTP"} value={otp} name="otp"
+                           onChange={handleChange}
+                           onBlur={() => handleInputBlur('otp')}/>
 
 
                 </div>
-                {touched && !password.trim() && <div className="alert-box">Required</div>}
-                <div className= "inputDiv">
-                    <input className="input-n" placeholder={"Confirm Password"} value={repassword} name="repassword"
-                           onChange={handleChange}/>
+                {touched.otp && !otp.trim() && <div className="alert-box-xx">Required</div>}
+                <div className= "inputDiv-xx">
+                    <input className="input-n-xx" placeholder={"New Password"} value={password} name="password" type="password"
+                           onChange={handleChange}
+                           onBlur={() => handleInputBlur('newpassword')}/>
 
 
                 </div>
-                {touched && !repassword.trim() && <div className="alert-box">Required</div>}
+                {touched.newpassword && !password.trim() && <div className="alert-box-xx">Required</div>}
+                <div className= "inputDiv-xx">
+                    <input className="input-n-xx" placeholder={"Confirm Password"} value={repassword} name="repassword" type="password"
+                           onChange={handleChange}
+                           onBlur={() => handleInputBlur('confirmpassword')}/>
+
+
+                </div>
+                {touched.confirmpassword && !repassword.trim() && <div className="alert-box-xx">Required</div>}
                 <div>
-                    <button name="password_reset_btn" type="submit" className="btn btn-success reset-button" disabled={isSubmitDisabled} onClick={handleSubmit}>Reset My Password</button>
+                    <button name="password_reset_btn-xx" type="submit" className="btn btn-success reset-button-xx" disabled={isSubmitDisabled} onClick={handleSubmit}>Reset My Password</button>
 
                 </div>
 

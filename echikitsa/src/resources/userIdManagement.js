@@ -1,14 +1,14 @@
-// Save JWT token to localStorage
+// Save UserId to localStorage
 const saveUserIdToLocalStorage = (token) => {
     localStorage.setItem('userid', token);
 };
 
-// Retrieve JWT token from localStorage
+// Retrieve UserId from localStorage
 const getUserIdFromLocalStorage = () => {
     return localStorage.getItem('userid');
 };
 
-// Remove JWT token from localStorage (logout)
+// Remove UserId from localStorage (logout)
 const removeUserIdFromLocalStorage = () => {
     localStorage.removeItem('userid');
 };
