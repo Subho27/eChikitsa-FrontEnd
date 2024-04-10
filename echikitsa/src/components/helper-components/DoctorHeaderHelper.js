@@ -11,6 +11,24 @@ import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
 
 
 const DoctorHeaderHelper = (props) => {
+    const [name, setName] = useState("");
+    const navigate = useNavigate();
+
+    const handleJoinCall = async () => {
+        navigate("/consult/"+ getUserIdFromLocalStorage() )
+
+    }
+
+
+    const fetchUserName = async () => {
+        const response = axios.get(`http://localhost:8081/user/get-user-name/${getUserIdFromLocalStorage()}`).then((response) => {
+            //console.log(response)
+            setName(response.data)
+
+        });
+
+    }
+    fetchUserName()
 
     return (
         <div>

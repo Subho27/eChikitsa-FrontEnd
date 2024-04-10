@@ -605,12 +605,12 @@ th i:hover {
 }
 
 .adminInactive {
-    background-color: #39c239;
+    background-color: #5cb85c ;
     color: #FFFFFF;
 }
 
 .adminActive {
-    background-color: #b95050;
+    background-color: #d9534f ;
     color: #FFFFFF;
 }
 

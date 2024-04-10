@@ -4,7 +4,7 @@ import '../../../css/helper-components/helper-patient/profile-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
-import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../../resources/storageManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
@@ -63,22 +63,22 @@ function AdminWelcomeHelper(props) {
                     console.error('Error fetching all departments:', error);
                 }
             };
-            // const fetchDoctorDetails = async () => {
-            //     try {
-            //         const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
-            //         const doctorsData = response2.data.map(doctor => ({
-            //             doctorName: doctor.name,
-            //             specialization: doctor.specialization,
-            //             email: doctor.email,
-            //             isActive:doctor.active
-            //         }));
-            //
-            //         setDoctors(doctorsData);
-            //     }
-            //     catch (error) {
-            //         console.error('Error fetching all doctors:', error);
-            //     }
-            // };
+            const fetchDoctorDetails = async () => {
+                try {
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+                    const doctorsData = response2.data.map(doctor => ({
+                        doctorName: doctor.name,
+                        specialization: doctor.specialization,
+                        email: doctor.email,
+                        isActive:doctor.active
+                    }));
+
+                    setDoctors(doctorsData);
+                }
+                catch (error) {
+                    console.error('Error fetching all doctors:', error);
+                }
+            };
 
 
             const fetchDepartmentsByHospitalId = async () => {
@@ -99,7 +99,7 @@ function AdminWelcomeHelper(props) {
                     console.error('Error fetching departments by hospital ID:', error);
                 }
             };
-            // console.log(departmentName);
+            console.log(departmentName);
 
             fetchAllDepartments();
             // fetchDoctorDetails()
@@ -143,8 +143,28 @@ function AdminWelcomeHelper(props) {
     };
 
 
-    const toggleActivation = (id) => {
-        setAdminActiveId((prevId) => (prevId === id ? null : id));
+    const handleDoctorStatus = async (id) => {
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
+        const updatedDoctors = doctors.map((doctor) => {
+            if (doctor.id === id) {
+                return { ...doctor, active: !doctor.active};
+            }
+            return doctor;
+        });
+        setDoctors(updatedDoctors);
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        try {
+            const response = await axios.put("http://localhost:9191/admin/doctor-status-update",id,{headers}).then((response) => {
+
+
+            });
+
+        } catch (e) {
+            console.log(e)
+
+        }
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
     };
 
 
@@ -235,7 +255,7 @@ function AdminWelcomeHelper(props) {
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
-            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const updatedData = {
                 name: hospitalNameValue,
                 email: hospitalEmailValue,
@@ -267,7 +287,7 @@ function AdminWelcomeHelper(props) {
 
     const handleAddDoctor = async (e) => {
         e.preventDefault();
-        console.log(formData)
+        //console.log(formData)
         await uploadFiles()
         try {
             const token = getJwtTokenFromLocalStorage();
@@ -695,6 +715,7 @@ function AdminWelcomeHelper(props) {
             </div>
             <div className="admin-welcome-hospital">
                 <div className="hospital-details-section">
+                    <div className="hospital-detail-header">Hello, ADMIN</div>
                     <div className="hospital-details-image-section">
                         <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                     </div>
