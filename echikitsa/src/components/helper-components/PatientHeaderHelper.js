@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -6,8 +6,40 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
+import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
 
 function PatientHeaderHelper(props) {
+    const [name, setName] = useState("");
+    // useEffect(() => {
+    //     let userid = getUserIdFromLocalStorage();
+    //     if (userid !== null)
+    //     {
+    //         const fetchUserName = async () => {
+    //             const response = axios.get(`http://localhost:8081/user/get-user-name/${userid}`).then((response) => {
+    //                 console.log(response)
+    //
+    //             });
+    //
+    //         }
+    //         fetchUserName()
+    //     }
+    //
+    //
+    // }, []);
+    let userid = getUserIdFromLocalStorage();
+    if (userid !== null)
+    {
+        const fetchUserName = async () => {
+            const response = axios.get(`http://localhost:8081/user/get-user-name/${userid}`).then((response) => {
+                //console.log(response)
+                setName(response.data)
+
+            });
+
+        }
+        fetchUserName()
+    }
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -46,9 +78,9 @@ function PatientHeaderHelper(props) {
                 <div className="container">
                     <nav className="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
                         <Link to="/" className="navbar-brand">
-                            <h1 className="m-0 text-uppercase text-primary full-logo-container">
+                            <h1 className="m-0 text-primary full-logo-container">
                                 <div className="logo-container">
-                                    <img className="logo-photo" src={require("./../../images/Logo/logo-nobg.png")} alt="Logo" />
+                                    <img className="logo-photo" src={require("./../../images/Logo/logo-circular.png")} alt="Logo" />
                                 </div>
                                 <div className="logo-name">{Constant.APP_NAME_STRING}</div>
                             </h1>
@@ -60,7 +92,7 @@ function PatientHeaderHelper(props) {
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
                                 <Link to="/patient-records" className={`nav-item nav-link ${props.data === 'record' ? 'active' : ''}`} >Records</Link>
-                                <Link to="/patient-profile" className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >Profile</Link>
+                                <Link to={"/patient-profile/"+props.id} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
                                 <Link to="/" className="nav-item nav-link" >Logout</Link>
                                 {/*<Link to="/" className="custom-nav-item" >*/}
                                 {/*    <img className="logout" src={require("../../images/patient_landing_page/logout.png")} alt="Logout"/>*/}

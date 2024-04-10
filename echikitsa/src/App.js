@@ -14,6 +14,9 @@ import MonitorDoctor from "./components/doctor-components/MonitorDoctor";
 import ProfileDoctor from "./components/doctor-components/ProfileDoctor";
 import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
 import WelcomeAdmin from "./components/admin-components/WelcomeAdmin";
+import MonitorCallDoctor from "./components/doctor-components/MonitorCallDoctor";
+import ForgotPassword from "./components/common-components/ForgotPassword";
+
 
 function App() {
     return (
@@ -22,23 +25,29 @@ function App() {
             <Route path='/' element={ <Home/> } />
             <Route path='/signup' element={ <SignUp/> } />
             <Route path='/login' element={ <Login/> } />
+                <Route path='/forgot-password' element={ <ForgotPassword/> } />
+
 
             {/*Patient Page Routes*/}
             <Route path='/welcome' element={<WelcomePatient/>}/>
-            <Route path='/patient-profile' element={<ProfilePatient/>}/>
+            <Route path='/patient-profile/*' element={<ProfilePatient/>}/>
             <Route path='/patient-records' element={<RecordsPatient/>}/>
             <Route path='/hospital' element={ <HospitalDetailPatient/> } />
-            <Route path='/call' element={ <CallPagePatient/> } />
+            <Route path='/call/*' element={ <CallPagePatient/> } />
 
             {/*Doctor Page Routes*/}
             <Route path='/dashboard' element={<DashboardDoctor/>}/>
-            <Route path='/consult' element={<ConsultationPageDoctor/>}/>
-            <Route path='/monitor' element={<MonitorDoctor/>}/>
+            <Route path='/consult/*' element={<ConsultationPageDoctor/>}/>
             <Route path='/doctor-profile' element={<ProfileDoctor/>}/>
             <Route path='/doctor-records' element={<RecordsDoctor/>}/>
 
+            {/*Senior Doctor Page Routes*/}
+            <Route path='/monitor' element={<MonitorDoctor/>}/>
+            <Route path='/monitor-call/*' element={<MonitorCallDoctor/>}/>
+
             {/*Admin Page Routes*/}
             <Route path='/admin' element={<WelcomeAdmin/>}/>
+
         </Routes>
     );
 }

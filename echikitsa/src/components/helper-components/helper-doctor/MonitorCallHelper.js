@@ -1,116 +1,22 @@
 import React, {useEffect, useRef, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
-import {Link, useNavigate, useLocation} from "react-router-dom";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
-import styled from 'styled-components';
-import Collapsible from "react-collapsible";
 import "../../../css/helper-components/helper-patient/call-page-style.css"
+import "../../../css/helper-components/helper-doctor/monitor-call-style.css"
+import 'reactjs-popup/dist/index.css';
 import 'firebase/compat/database';
 import {Device} from 'mediasoup-client'
 import io from 'socket.io-client'
-import axios from "axios";
-import SockJS from "sockjs-client";
-import {over} from "stompjs";
-import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
-function CallPageHelper(effect, deps) {
-    const [prevRecords, setPrevRecords] = useState([])
-    const [today, setToday] = useState("")
-    const [suggestDate, setSuggestDate] = useState("");
-    const [diagnosisSummary, setDiagnosisSummary] = useState("");
-    const [medicines, setMedicines] = useState([]);
-    const [prescription, setPrescription] = useState([]);
-    const [isOpen, setIsOpen] = useState(true);
-    const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
+function MonitorCallHelper(effect, deps) {
+
+    const [videoArray, setVideoArray] = useState(["Patient", "Doctor"]);
     let i = 0;
-
-
-    const navigate = useNavigate();
-    const {state} = useLocation();
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
-    const [localStream, setLocalStream] = useState(null);
     //endregion
-
-    const writePrescription = () => {
-        const newPrescribe = document.getElementById("chat-field").value;
-        setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
-    }
-    const cancelPrescription =(id) => {
-        setPrescription(prevPrescription => {
-            const updatedPrescription = [...prevPrescription];
-            updatedPrescription.splice(id, 1);
-            return updatedPrescription;
-        });
-    }
-    const [emailOtpValues, setEmailOtpValues] = useState(Array(6).fill(''));
-    const inputRefsCall = useRef([]);
-
-    const handleConsentOtp = (index, value) => {
-        const newOtpValues = [...emailOtpValues];
-        newOtpValues[index] = value;
-        if (value === '') {
-            if (index > 0) {
-                inputRefsCall.current[index].value = '';
-                inputRefsCall.current[index - 1].focus();
-            }
-        } else if (index < emailOtpValues.length - 1 && value.length === 1) {
-            inputRefsCall.current[index + 1].focus();
-        }
-        setEmailOtpValues(newOtpValues);
-    };
-
-
-    const submittedMedicines = () => {
-        const medicineName = document.getElementById("medicine").value;
-        const afterBefore = document.getElementById("after-before").value;
-        const dosage1 = document.getElementById("dosage-1").value;
-        const dosage2 = document.getElementById("dosage-2").value;
-        const dosage3 = document.getElementById("dosage-3").value;
-        const prescribe = {
-            "name" : medicineName,
-            "food" : afterBefore,
-            "dos1" : dosage1,
-            "dos2" : dosage2,
-            "dos3" : dosage3
-        }
-        setMedicines(prevMedicines => [...prevMedicines, prescribe]);
-    };
-    const cancelMedicine = (id) => {
-        setMedicines(prevMedicines => {
-            const updatedMedicines = [...prevMedicines];
-            updatedMedicines.splice(id, 1);
-            return updatedMedicines;
-        });
-    }
-
-    const summaryDiagnosis = () => {
-        const diagnosis = document.getElementById("diagnosis-summary").value;
-        setDiagnosisSummary(diagnosis);
-        document.getElementById("diagnosis-submit").disabled = true;
-        document.getElementById("diagnosis-submit").style.cursor = "not-allowed";
-    };
-    const cancelDiagnosis = () => {
-        setDiagnosisSummary("");
-        document.getElementById("diagnosis-submit").disabled = false;
-        document.getElementById("diagnosis-submit").style.cursor = "pointer";
-    }
-
-    const suggestADate = () => {
-        const suggestedDate = document.getElementById("next-date").value;
-        setSuggestDate(suggestedDate);
-    };
-
-    const switchView = async() => {
-        let videoArray = document.getElementsByName("switch-call-patient");
-        const remote = videoArray.item(0).id;
-        videoArray.item(0).id = videoArray.item(1).id;
-        videoArray.item(1).id = remote;
-    }
 
     //region Call Methods
     // https://mediasoup.org/documentation/v3/mediasoup-client/api/#ProducerOptions
@@ -223,7 +129,6 @@ function CallPageHelper(effect, deps) {
             console.log('Before');
             const newElem = document.createElement('div')
             newElem.setAttribute('id', `td-${remoteProducerId}`)
-
             if (params.kind === 'audio') {
                 console.log('Middle');
                 //append to the audio container
@@ -440,7 +345,7 @@ function CallPageHelper(effect, deps) {
     const streamSuccess = (stream) => {
         const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
-        setLocalStream(stream);
+
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -468,48 +373,6 @@ function CallPageHelper(effect, deps) {
             })
     }
     //endregion
-
-    const confirmJoin = () => {
-        const room = window.location.pathname.split("/")[2];
-        if (room === "" || room === undefined) {
-            setError("Please add a room name to the URL.");
-            return;
-        }
-        setIsOpen(false);
-        setRoomName(room);
-
-        //Creating socket connection
-        if(socket === null) {
-            const sock = io("/mediasoup");
-            setSocket(sock);
-        }
-    }
-
-    const handleCallEnd = async () => {
-        let room;
-        if(roomName === "") room = parseInt(window.location.pathname.split("/")[2]);
-        else room = parseInt(roomName);
-        if(socket !== null) {
-            await socket.disconnect();
-            await localStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-        }
-        await axios.post("http://localhost:9193/local/remove", {
-            patientId: null,
-            doctorId: room
-        }).then(async (response) => {
-            const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
-            stompClient.connect({}, async () => {
-                await stompClient.send("/app/reload-position");
-                await stompClient.send(`/app/send-data/${room}`);
-                if(socket !== null) {
-                    alert("call ended successfully");
-                }
-                navigate("/welcome");
-            });
-        })
-    }
 
     //region Call Use Effects
     useEffect(() => {
@@ -564,86 +427,34 @@ function CallPageHelper(effect, deps) {
     //endregion
 
     useEffect(() => {
-        setPrevRecords(askRecord);
-        const today = new Date();
-        const tomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1);
-        const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
-        setToday(tomorrowFormatted);
 
         //region Connection & Room
         //Handle room name
+        const room = window.location.pathname.split('/')[2];
+        console.log(room)
+        if (room === "" || room === undefined) {
+            setError("Please add a room name to the URL.");
+            return;
+        }
+        setRoomName(room);
 
+        //Creating socket connection
+        if(socket === null) {
+            const sock = io("/mediasoup");
+            setSocket(sock);
+        }
         //endregion
 
     }, [])
 
 
-    function off() {
-        const overlay = document.getElementById("overlay");
-        overlay.style.display = "none";
-    }
-
-    const StyledPopup = styled(Popup)`
-      // use your custom style for ".popup-overlay"
-      &-overlay {
-        ...;
-      }
-      // use your custom style for ".popup-content"
-      &-content {
-        ...;
-      }
-    `;
-
-    const StarRating = ({ totalStars }) => {
-        const [rating, setRating] = useState(0);
-
-        const handleStarClick = (star) => {
-            setRating(star);
-        };
-
-        return (
-            <div>
-                {[...Array(totalStars)].map((_, index) => {
-                    const starValue = index + 1;
-                    return (
-                        <span
-                            key={index}
-                            style={{ cursor: 'pointer', color: starValue <= rating ? 'gold' : 'gray' }}
-                            onClick={() => handleStarClick(starValue)}
-                        >
-            ★
-          </span>
-                    );
-                })}
-            </div>
-        );
-    };
-
-    const returnWelcome = () => {
-        navigate('/welcome');
-    }
-
     return (
 
         <div className="consult-page-container">
-            <div>
-                {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
-                    <div className="confirmation-content">
-                        <h3>Confirmation!!!</h3>
-                        <p>Are you sure?<br/>
-                        You want to join video consultation.</p>
-                        <div className="Feedbutton">
-                            <button className="confirm-call" onClick={confirmJoin}>YES</button>
-                            <button className="confirm-call" onClick={handleCallEnd}>NO</button>
-                        </div>
-                    </div>
-                </StyledPopup>}
-            </div>
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">Patient</p>
+                        <p className="tag">Senior Doctor</p>
                         <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
@@ -667,93 +478,90 @@ function CallPageHelper(effect, deps) {
                                 <img className="button-icon"
                                      src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
                             </button>
-                            <StyledPopup className="Feedback"
-                                trigger={<button className="call-buttons">
-                                    <img className="button-icon"
-                                         src={require("../../../images/doctor-page-images/call-end-icon.png")}
-                                         alt="End"/>
-                                </button>}
-                                modal
-                                closeOnDocumentClick >
-                                <div className="Feedcontent">
-                                    <h4>FeedBack</h4>
-                                    <div>
-                                        <h1><StarRating className="stars" totalStars={5}/></h1>
-                                    </div>
-                                    <div className="Feedbutton">
-                                        <Link to="/welcome"><button className="submit-button" onClick={handleCallEnd}>Submit</button></Link>
-                                        <Link to="/welcome"><button className="cancel-button" onClick={handleCallEnd}>Cancel</button></Link>
-                                    </div>
-                                </div>
-                            </StyledPopup>
                         </div>
                     </div>
                 </div>
-                <div className="activity-section-patient">
-                    <div>
-                        <Collapsible trigger="Consent for Retrieval of Past Medical Records" className="ask-record"
-                                     openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger"
-                                     triggerOpenedClassName="ask-record-open-trigger">
-                            <div>
-                                <div id="dialogBox" className="dialog">
-                                    <div className="dialog-content">
-                                        <div className="doctor-icon">Dr. [Doctor's Name]</div>
-                                        <p className="request">is requesting access to your medical records.</p>
-                                        <div className="button-container">
-                                            <button id="allowButton" onClick={() => {
-                                                const isHidden = document.getElementById("consent-otp-check");
-                                                if (isHidden !== null) {
-                                                    isHidden.className = "fg";
-                                                }
-                                            }}>Allow
-                                            </button>
-                                            <button id="cancelButton">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="visually-hidden fg" id="consent-otp-check" style={{color: "black"}}>
-                                    <div className="container-otp">
-                                        <div id="inputs" className="inputs">
-                                            {emailOtpValues.map((value, index) => (
-                                                <input key={index} ref={(ref) => (inputRefsCall.current[index] = ref)}
-                                                       className="input-otp" type="text" inputMode="numeric"
-                                                       maxLength="1" value={value}
-                                                       onChange={(e) => handleConsentOtp(index, e.target.value)}/>
-                                            ))}
-                                        </div>
-                                        <div className="field">
-                                            <input type="submit" value={`Verify`} onClick={() => {
-                                                const isHidden = document.getElementById("consent-otp-check");
-                                                if (isHidden !== null) {
-                                                    isHidden.className = "fg visually-hidden";
-                                                }
-                                            }}/>
-                                        </div>
-                                        <div id="resend-otp">
-                                            <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </Collapsible>
+                <div className="activity-section-patient monitor-activity">
+                    <div className="monitor-doctor-details">
+                        <div className="monitor-head">
+                            <p className="activity-tag">Doctor</p>
+                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                        </div>
+                        <table className="monitor-detail">
+                            <tbody>
+                                <tr>
+                                    <td>Doctor Name</td>
+                                    <td>Dr. Rishav Chandel</td>
+                                </tr>
+                                <tr>
+                                    <td>Specialization</td>
+                                    <td>Orthopaedics</td>
+                                </tr>
+                                <tr>
+                                    <td>Degree</td>
+                                    <td>MBBS(Kolkata), MD</td>
+                                </tr>
+                                <tr>
+                                    <td>Email ID</td>
+                                    <td>rishav.chandel@gmail.com</td>
+                                </tr>
+                                <tr>
+                                    <td>Experience</td>
+                                    <td>10 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td>30 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Rating</td>
+                                    <td>4.3/5</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <Collapsible trigger="Upload Documents (if required)" className="ask-record"
-                                     openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger"
-                                     triggerOpenedClassName="ask-record-open-trigger">
-                            <div className="next-date-sections">
-
-                                <div className="fg form-group mt-3">
-                                    <input type="file" name="file" className="file-input"/>
-                                </div>
-                            </div>
-                        </Collapsible>
+                    <div className="monitor-patient-style">
+                        <div className="monitor-head">
+                            <p className="activity-tag">Patient</p>
+                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                        </div>
+                        <table className="monitor-detail">
+                            <tbody>
+                                <tr>
+                                    <td>Patient Name</td>
+                                    <td>Suraj Subedi</td>
+                                </tr>
+                                <tr>
+                                    <td>Email ID</td>
+                                    <td>suraj.subedi@gmail.com</td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td>36 Years</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnosis</td>
+                                    <td>Asthma</td>
+                                </tr>
+                                <tr>
+                                    <td>Repeat Patient</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td>Height</td>
+                                    <td>170 cm</td>
+                                </tr>
+                                <tr>
+                                    <td>Weight</td>
+                                    <td>68 kg</td>
+                                </tr>
+                                <tr>
+                                    <td>Blood Group</td>
+                                    <td>O+</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -780,4 +588,4 @@ const askRecord = [
 ]
 
 
-export default CallPageHelper;
+export default MonitorCallHelper;

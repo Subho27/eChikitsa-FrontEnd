@@ -1,12 +1,21 @@
 import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../../../css/helper-components/helper-doctor/dashboard-style.css"
+import "../../../css/helper-components/helper-doctor/call-notification.css"
 import Chart from "chart.js/auto"
 import {Rating} from "react-simple-star-rating";
+import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {useNavigate} from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import SockJS from "sockjs-client";
+import {over} from "stompjs";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
     const [patient, setPatient] = useState(0)
+    const [stompClient, setStompClient] = useState(null);
     const [fiveStar, setFiveStar] = useState(totalFiveStar/totalPatient)
     const [fourStar, setFourStar] = useState(totalFourStar/totalPatient)
     const [threeStar, setThreeStar] = useState(totalThreeStar/totalPatient)
@@ -14,8 +23,45 @@ function DashboardHelper() {
     const [oneStar, setOneStar] = useState(totalOneStar/totalPatient)
     const [patientsInQueue, setPatientsInQueue] = useState([])
     const [lastPatient, setLastPatient] = useState({})
+    const [noOfPatient,setNoOfPatient] = useState("");
+    const [noOfPatientToday,setNoOfPatientToday] = useState("");
+    const [todayData ,setTodayDate] = useState("");
+    const [data, setData] = useState([]);
+    const [isJoinLater, setIsJoinLater] = useState(false);
+    const navigate = useNavigate();
+    let notifyCount = 0;
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
+    useEffect(() => {
+        const getNoOfPatient = async () => {
+            try {
+                const responses = await axios.get(
+                    "http://localhost:8081/ehr/get-history/10"
+
+                );
+                setData(responses.data);
+                const totalConsulted = await axios.get(
+                    "http://localhost:8081/ehr/get-no-patient/10"
+                );
+                setNoOfPatient(totalConsulted.data);
+                const totalConsulteds = await axios.get(
+                    "http://localhost:8081/ehr/get-no-patient-consulted-today/10"
+
+                );
+                setNoOfPatientToday(totalConsulteds.data);
+                const response = await axios.get(
+                    "http://localhost:8081/ehr/get-freq-patient/10"
+
+                );
+                setTodayDate(response.data);
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        getNoOfPatient();
+    }, []);
     useEffect(() => {
         //Set dummy values
         let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
@@ -106,6 +152,8 @@ function DashboardHelper() {
                 }
             }
         })
+
+
 
         // Ratings
         // document.getElementById("progress-canvas5").style.width = fiveStar*100 +"%";
@@ -203,15 +251,89 @@ function DashboardHelper() {
     },
     [data, todayData]);
 
+    useEffect(() => {
+        const initializeWebSocket = () => {
+            let sock = new SockJS('http://localhost:9193/ws-endpoint');
+            const stompC = over(sock);
+            stompC.connect({}, () => {
+                setStompClient(stompC);
+                const topic = `/topic/call-incoming/${getUserIdFromLocalStorage()}`;
+                stompC.subscribe(topic, async (message) => {
+                    console.log(message);
+                    if(notifyCount === 0) {
+                        notify();
+                        notifyCount++;
+                    }
+                });
+            });
+        };
+        initializeWebSocket();
+
+        return () => {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+        };
+    }, []);
+
+    const toastId = React.useRef(null);
+
+    const notify = () => {
+        toastId.current = toast( <div className="call-notification">
+            <p>Incoming Call</p>
+            <table className="call-table">
+                <tbody>
+                <tr>
+                    <td>Patient Name : </td>
+                    <td>Rishav Chandel</td>
+                </tr>
+                <tr>
+                    <td>Gender : </td>
+                    <td>Male</td>
+                </tr>
+                <tr>
+                    <td>Age : </td>
+                    <td>21</td>
+                </tr>
+                <tr>
+                    <td>Repeat : </td>
+                    <td>No</td>
+                </tr>
+                </tbody>
+            </table>
+            <div className="call-handle-buttons">
+                <button className="accept-call-now" onClick={handleJoinCall}>Join Call</button>
+                <button className="accept-call-later" onClick={handleJoinLater}>Join Later</button>
+            </div>
+        </div>, {
+            position: "bottom-right"
+        });
+    };
+
+    const CloseButton = () => (
+        <i className="material-icons" onClick={handleJoinLater}>X</i>
+    );
+
+    const handleJoinCall = async () => {
+        navigate("/consult/"+ getUserIdFromLocalStorage() )
+    }
+
+    const handleJoinLater = async () => {
+        toast.dismiss(toastId.current);
+        setIsJoinLater(true);
+    }
+
     return (
         <div>
+            <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
+            {isJoinLater && <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>}
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
                         <img className="common-icon" src={require("../../../images/doctor-page-images/consultation-icon.png")} alt="consultation"/>
                         <div className="common-text">
                             <p>Total patients</p>
-                            <p className="number-text">2000+</p>
+                            <p className="number-text">{noOfPatient}+</p>
                             <p>till today</p>
                         </div>
                     </div>
@@ -226,7 +348,7 @@ function DashboardHelper() {
                         <img className="common-icon" src={require("../../../images/doctor-page-images/today-icon.png")} alt="queue"/>
                         <div className="common-text">
                             <p>Patients consulted today</p>
-                            <p className="number-text">5</p>
+                            <p className="number-text">{noOfPatientToday}</p>
                         </div>
                     </div>
                 </div>
@@ -328,33 +450,33 @@ function DashboardHelper() {
 
 }
 
-const data = [
-    {"date": "2024-02-01", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-02", "repeat": 15, "non_repeat": 7},
-    {"date": "2024-02-03", "repeat": 8, "non_repeat": 4},
-    {"date": "2024-02-04", "repeat": 12, "non_repeat": 6},
-    {"date": "2024-02-05", "repeat": 20, "non_repeat": 8},
-    {"date": "2024-02-06", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-07", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-08", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-09", "repeat": 16, "non_repeat": 8},
-    {"date": "2024-02-10", "repeat": 12, "non_repeat": 6},
-    {"date": "2024-02-11", "repeat": 22, "non_repeat": 11},
-    {"date": "2024-02-12", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-13", "repeat": 16, "non_repeat": 8},
-    {"date": "2024-02-14", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-15", "repeat": 20, "non_repeat": 10},
-    {"date": "2024-02-16", "repeat": 24, "non_repeat": 12},
-    {"date": "2024-02-17", "repeat": 18, "non_repeat": 9},
-    {"date": "2024-02-18", "repeat": 14, "non_repeat": 7},
-    {"date": "2024-02-19", "repeat": 10, "non_repeat": 5},
-    {"date": "2024-02-20", "repeat": 16, "non_repeat": 8}
-];
+// const data = [
+//     {"date": "2024-02-01", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-02", "repeat": 15, "non_repeat": 7},
+//     {"date": "2024-02-03", "repeat": 8, "non_repeat": 4},
+//     {"date": "2024-02-04", "repeat": 12, "non_repeat": 6},
+//     {"date": "2024-02-05", "repeat": 20, "non_repeat": 8},
+//     {"date": "2024-02-06", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-07", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-08", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-09", "repeat": 16, "non_repeat": 8},
+//     {"date": "2024-02-10", "repeat": 12, "non_repeat": 6},
+//     {"date": "2024-02-11", "repeat": 22, "non_repeat": 11},
+//     {"date": "2024-02-12", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-13", "repeat": 16, "non_repeat": 8},
+//     {"date": "2024-02-14", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-15", "repeat": 20, "non_repeat": 10},
+//     {"date": "2024-02-16", "repeat": 24, "non_repeat": 12},
+//     {"date": "2024-02-17", "repeat": 18, "non_repeat": 9},
+//     {"date": "2024-02-18", "repeat": 14, "non_repeat": 7},
+//     {"date": "2024-02-19", "repeat": 10, "non_repeat": 5},
+//     {"date": "2024-02-20", "repeat": 16, "non_repeat": 8}
+// ];
 
-const todayData = {
-    "repeat": 10,
-    "non_repeat": 5
-};
+// const todayData = {
+//     "repeat": 10,
+//     "non_repeat": 5
+// };
 
 const ratingNumber = 4.3;
 const totalPatient = 42;

@@ -65,5 +65,44 @@ export const dummy=[
         "DoctorName": "Pooja",
         "Email": "pooja@example.com",
         "Specialization": "Endocrinology"
+    },
+    {
+        "id": 5,
+        "DoctorName": "Vikram",
+        "Email": "vikram@gmail.com",
+        "Specialization": "Ophthalmology", "isActive":"false"
+
+    },
+    {
+        "id": 6,
+        "DoctorName": "Priya",
+        "Email": "priya@example.com",
+        "Specialization": "Psychiatry",
+        "isActive":"false"
+    },
+    {
+        "id": 7,
+        "DoctorName": "Sanjay",
+        "Email": "sanjay@gmail.com",
+        "Specialization": "Oncology", "isActive":"false"
+
+    },
+    {
+        "id": 8,
+        "DoctorName": "Neha",
+        "Email": "neha@example.com",
+        "Specialization": "Pediatrics", "isActive":"false"
+    },
+    {
+        "id": 9,
+        "DoctorName": "Rajesh",
+        "Email": "rajesh@gmail.com",
+        "Specialization": "Gastroenterology"
+    },
+    {
+        "id": 10,
+        "DoctorName": "Pooja",
+        "Email": "pooja@example.com",
+        "Specialization": "Endocrinology"
     }
 ]

@@ -3,18 +3,31 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHospital } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../css/helper-components/sign-up-style.css';
-import {Link} from "react-router-dom";
-import Validation from "../validation/validation";
-import {isDisabled} from "bootstrap/js/src/util";
-import button from "bootstrap/js/src/button";
+import {Link, useNavigate} from "react-router-dom";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
+import 'firebase/compat/auth';
+import {firebaseConfig} from "../firebase-config/firebaseConfigs";
+import axios from "axios";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 
 const SignUpHelper = () => {
+    const navigate = useNavigate();
+
     const [signupType, setSignUpType] = useState('patient');
+    const [imageUpload, setImageUpload] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]);
+    const imagesListRef = ref(storage, "images/");
+//******************************************************************************************************
+
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
+        role:'PATIENT',
         phoneNumber: '',
         password: '',
         age:'',
@@ -23,12 +36,38 @@ const SignUpHelper = () => {
         city:'',
         confirmPassword: '',
         gender: '',
+        img_url:'',
+        active:true
+
+    });
+    const [formDataHospital, setFormDataHospital] = useState({
+        name: '',
+        category: '',
+        email: '',
+        role:'ADMIN',
+        phoneNumber: '',
+        password: '',
+        registrationNumber:'',
+        address:'',
+        confirmPassword: '',
+        website:'',
+        pincode:'',
+        imgUrl:''
+
 
     });
 
+    const handleInputChangeHospital = (e) => {
+        const { name, value, type, checked } = e.target;
 
-    const [formIsValid, setFormIsValid] = useState(false);
+        setFormDataHospital((prevData) => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+    //***********************************************************************************************
 
+    const [confResult, setConfResult] = useState({});
 
     const [selectedGender, setSelectedGender] = useState('');
     const handleSignUpType = (type) => {
@@ -41,151 +80,318 @@ const SignUpHelper = () => {
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
-
-        // Consider using a separate validation function
-        validateField(name, value);
-
     };
-
-    // useEffect(() => {
-    //     setEmailValid(Validation.validate(formData.email));
-    //
-    // }, [formData]);
-
-    let isValid = true;
-    const [firstNameValid, setFirstNameValid] = useState("");
-    const [lastNameValid, setLastNameValid] = useState("");
-    const [emailValid, setEmailValid] = useState("");
-    const validateField = (fieldName, fieldValue) => {
-
-        if (fieldName === 'firstName') {
-            if (!fieldValue.match(/^[a-zA-Z]/)) {
-                setFirstNameValid('First Name is invalid - ONLY LETTERS');
-                console.log(firstNameValid);
-                isValid = false;
-            }
-            else {
-                setFirstNameValid('');
-                isValid = true;
-            }
-        }
-        if(fieldName === 'lastName'){
-            if(!fieldValue.match(/^[a-zA-Z]/)){
-                setLastNameValid('Last Name is invalid - ONLY LETTERS');
-                isValid = false;
-            }
-            else{
-                setLastNameValid('');
-                isValid = true;
-            }
-        }
-        if(fieldName === 'email'){
-            if (!fieldValue.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
-                setEmailValid('Not valid.');
-                isValid = false;
-            } else {
-                setEmailValid('');
-                isValid = true;
-            }
-        }
-        // else if (fieldName === 'email') {
-        //     isValid = Validation.validateEmail(fieldValue); // Assuming Validation component
-        // } else if (fieldName === 'password'){
-        //     // Add password strength validation logic \(e\.g\., minimum length, lowercase, uppercase, numbers, symbols\)
-        //     const passwordRegex = /^\(?\=\.\*\\d\)\(?\=\.\*\[a\-z\]\)\(?\=\.\*\[A\-Z\]\)\[^\\s\]\{8,\}<span>;
-        //     isValid = passwordRegex.test(fieldValue);
-        //     if (!isValid) {
-        //         setFirstNameValid('Password must be at least 8 characters and include lowercase, uppercase, numbers, and symbols');
-        //     } else {
-        //         setFirstNameValid('');
-        //     }
-        // } else if (fieldName === 'confirmPassword') {
-        //     // Check if confirm password matches password
-        //     isValid = fieldValue === formData.password;
-        //     if (!isValid) {
-        //         setFirstNameValid('Confirm Password does not match Password');
-        //     } else {
-        //         setFirstNameValid('');
-        //     }
-        // }
-        // Add validation logic for other fields (e.g., phone number format, age range)
-
-        // Update overall form validity based on individual field validations
-        setFormIsValid(isValid && checkAllFieldsValid()); // Check all fields are filled
-    };
-
-    const checkAllFieldsValid = () => {
-        // Define required fields using a dedicated object or array
-        const requiredFields = {
-            firstname: true,
-            lastname: true,
-            email: true,
-            phoneNumber: true,
-            password: true,
-            confirmPassword: true,
-            // Add other required fields here
-        };
-
-        // Loop through formData and check for missing values in required fields
-        for (const fieldName in formData) {
-            if (requiredFields[fieldName] && !formData[fieldName]) {
-                return false; // Early return if a required field is empty
-            }
-        }
-
-        return true; // All required fields have values
-    };
-
-
-
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
     const handleGenderChange = (e) => {
+        formData.gender = e.target.value;
         setSelectedGender(e.target.value);
     };
 
-    // EMAIL - OTP functions
+    //region EMAIL Patient - OTP functions
     const [emailOtpValues, setEmailOtpValues] = useState(Array(6).fill(''));
-    const inputRefs = useRef([]);
-
+    const inputRefsPatient = useRef([]);
 
     const handleEmailChange = (index, value) => {
         const newOtpValues = [...emailOtpValues];
         newOtpValues[index] = value;
         if (value === '') {
             if (index > 0) {
-                inputRefs.current[index].value = '';
-                inputRefs.current[index - 1].focus();
+                inputRefsPatient.current[index].value = '';
+                inputRefsPatient.current[index - 1].focus();
             }
         } else if (index < emailOtpValues.length - 1 && value.length === 1) {
-            inputRefs.current[index + 1].focus();
+            inputRefsPatient.current[index + 1].focus();
         }
+        //console.log(newOtpValues)
         setEmailOtpValues(newOtpValues);
     };
+    //endregion
 
-    // REGISTRATION - OTP functions
-    const [registrationOtpValues, setRegistrationOtpValues] = useState(Array(6).fill(''));
-    const inputRRefs = useRef([]);
+    //region EMAIL Hospital - OTP functions
+    const [emailOtpValuesHospital, setEmailOtpValuesHospital] = useState(Array(6).fill(''));
+    const inputHRefs = useRef([]);
+
+    const handleEmailChangeHospital = (index, value) => {
+        const newOtpValues = [...emailOtpValuesHospital];
+        newOtpValues[index] = value;
+        if (value === '') {
+            if (index > 0) {
+                inputHRefs.current[index].value = '';
+                inputHRefs.current[index - 1].focus();
+            }
+        } else if (index < emailOtpValuesHospital.length - 1 && value.length === 1) {
+            inputHRefs.current[index + 1].focus();
+        }
+        console.log(newOtpValues)
+        setEmailOtpValuesHospital(newOtpValues);
+    };
+    //endregion
+
+    //region REGISTRATION - OTP functions
+    const [phoneOtpValues, setPhoneOtpValues] = useState(Array(6).fill(''));
+    const inputPRefs = useRef([]);
 
     const handleRegistrationChange = (index, value) => {
-        const newerOtpValues = [...registrationOtpValues];
+        const newerOtpValues = [...phoneOtpValues];
         newerOtpValues[index] = value;
         if (value === '') {
             if (index > 0) {
-                inputRRefs.current[index].value = '';
-                inputRRefs.current[index - 1].focus();
+                inputPRefs.current[index].value = '';
+                inputPRefs.current[index - 1].focus();
             }
-        } else if (index < registrationOtpValues.length - 1 && value.length === 1) {
-            inputRRefs.current[index + 1].focus();
+        } else if (index < phoneOtpValues.length - 1 && value.length === 1) {
+            inputPRefs.current[index + 1].focus();
         }
-        setRegistrationOtpValues(newerOtpValues);
+        setPhoneOtpValues(newerOtpValues);
     };
+    //endregion
+
+    const onClickSendOtp = async () => {
+        try {
+            if(signupType === 'patient')
+            {
+                const headers = { 'Content-Type' : 'application/json' }
+                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formData.email}).then((response) => {
+                    if (response.data) {
+                        alert("OTP Sent Successfully on your email!!")
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }else {
+
+                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
+                    if (response.data) {
+                        alert("OTP Sent Successfully on your email!!")
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+    };
+
+    const verifyOtpEmail = async (id) => {
+        let verificationCode = '';
+
+        console.log(verificationCode)
+        try {
+            if (signupType === 'patient') {
+                verificationCode = emailOtpValues.join('');
+                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
+                    if (response.data) {
+                        alert("Verified")
+                        document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
+                        document.getElementById("email-patient-send-otp").innerText = "Verified";
+                        document.getElementById("email-patient-send-otp").style.backgroundColor = "#39c239";
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            } else {
+                verificationCode = emailOtpValuesHospital.join('');
+
+
+                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
+                    console.log(response.data)
+                    if (response.data) {
+                        alert("Verified")
+                        document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
+                        document.getElementById("email-hospital-send-otp").innerText = "Verified";
+                        document.getElementById("email-hospital-send-otp").style.backgroundColor = "#39c239";
+
+                    } else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+
+            }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+
+
+    };
+
+    const verifyOtp = (id) => {
+        let verificationCode = '';
+        if(id === 0) { verificationCode = emailOtpValues.join(''); }
+        else if(id === 1) { verificationCode = phoneOtpValues.join(''); }
+        else { verificationCode = emailOtpValuesHospital.join(''); }
+        confResult.confirm(verificationCode).then((result) => {
+            console.log("Success");
+            if(id === 0) {
+                document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
+            }
+            else if(id === 1) {
+                document.getElementById("phone-otp-check-patient").className = "fg visually-hidden";
+                document.getElementById("phone-patient-send-otp").innerText = "Verified";
+                document.getElementById("phone-patient-send-otp").style.backgroundColor = "#39c239";
+            }
+            else {
+                document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
+            }
+        }).catch((error) => {
+            console.log("Error");
+        });
+    }
+
+    const sendOtp = () => {
+        const phoneNumber = document.getElementById("phone-number").value;
+        const appVerifier = window.recaptchaVerifier;
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                setConfResult(confirmationResult);
+            }).catch((error) => {
+            console.log("expire");
+        });
+    }
+
+
+
+    const onClickSendOtpMobile = () => {
+        firebase.auth().useDeviceLanguage();
+        try {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    },
+                    'error-callback': (error) => {
+                        console.log(error);
+                    }
+                });
+                window.recaptchaVerifier.render().then(() =>{
+                    sendOtp();
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        if (!firebase.apps.length) {
+           // firebase.initializeApp(firebaseConfig);
+        }
+    }, []);
+
+    const uploadFiles = () => {
+        console.log(imageUpload)
+        if (imageUpload == null) return Promise.reject("No image to upload");
+
+        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+
+        return uploadBytes(imageRef, imageUpload)
+            .then((snapshot) => {
+                return getDownloadURL(snapshot.ref);
+            })
+            .then((url) => {
+                // Optionally, you can also update state or perform other actions here
+                if(signupType === 'patient')
+                {
+                    formData.img_url = url;
+                }
+                else {
+                    formDataHospital.imgUrl = url;
+                }
+                console.log("Image uploaded successfully. Download URL:", url);
+                return url; // Return the download URL
+            })
+            .catch((error) => {
+                console.error("Error uploading image:", error);
+                throw error; // Propagate the error
+            });
+    };
+
+    ///*****************************************************************************************************
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        await uploadFiles()
+        // Logic to handle login based on login method
+        if (signupType === 'patient') {
+            console.log(formData)
+
+            try {
+
+                const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+
+
+        }
+        else
+        {
+            console.log(formDataHospital);
+            try {
+
+                const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
+                    //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
+                    console.log(response.data);
+                    if (response.data) {
+                        alert("registered successfully !!")
+                        let path = '/login'
+                        navigate(path);
+
+                    }
+                    else {
+                        alert("Something went wrong !!")
+                    }
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+        }
+    };
+    //****************************************
 
     return (
         <div className="wrapper wrapper-margin" id="wrap1">
+            <div id='recaptcha-container'></div>
             <div className="title">
                 Registration Form
             </div>
@@ -206,36 +412,84 @@ const SignUpHelper = () => {
             </div>
 
             {signupType === 'patient' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
 
                         <div className="field">
                             <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
                                    required/>
-                            <p>{firstNameValid}</p>
                             <label>First Name</label>
                         </div>
                         <div className="field">
                             <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
                                    required/>
-                            <p>{lastNameValid}</p>
                             <label>Last Name</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange}
-                                   required/>
-                            <p>{emailValid}</p>
+                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
+                            <button className="ver" id="email-patient-send-otp" onClick={() => {
+                                const isHidden = document.getElementById("patient-email-otp-check");
+                                if (isHidden !== null) {
+                                    isHidden.className = "fg";
+                                }
+                                onClickSendOtp();
+                            }}>
+                                Send OTP
+                            </button>
                             <label>Email</label>
                         </div>
+                    </div>
+                    <div className="fg visually-hidden" id="patient-email-otp-check">
+                        <div className="container-otp">
+                            <div id="inputs" className="inputs">
+                                {emailOtpValues.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputRefsPatient.current[index] = ref)}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
+                                           onChange={(e) => handleEmailChange(index, e.target.value)}/>
+                                ))}
+                            </div>
+                            <div className="field">
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(0);}}/>
+                            </div>
+                            <div id="resend-otp">
+                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="fg">
                         <div className="field">
-                            <input type="text" name="phoneNumber" value={formData.phoneNumber}
-                                   onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" id="phone-number" onChange={handleInputChange} required/>
+                            <button className="ver" id="phone-patient-send-otp" onClick={() => {
+                                const isHidden = document.getElementById("phone-otp-check-patient");
+                                if (isHidden !== null) {
+                                    isHidden.className = "fg";
+                                }
+                                onClickSendOtpMobile();
+                            }}>
+                                Send OTP
+                            </button>
                             <label>Phone Number</label>
                         </div>
                     </div>
-
+                    <div className="fg visually-hidden" id="phone-otp-check-patient">
+                        <div className="container-otp">
+                            <div id="inputs" className="inputs">
+                                {phoneOtpValues.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputPRefs.current[index] = ref)}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
+                                           onChange={(e) => handleRegistrationChange(index, e.target.value)}/>
+                                ))}
+                            </div>
+                            <div className="field">
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtp(1);}}/>
+                            </div>
+                            <div id="resend-otp">
+                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
+                            </div>
+                        </div>
+                    </div>
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="age" value={formData.age} onChange={handleInputChange}
@@ -298,7 +552,10 @@ const SignUpHelper = () => {
                     <div className="fg form-group mt-3 upload-photo-section">
                         <span className="upload-photo-label">Upload your Photo</span>
                         <div className="upload-photo-button">
-                            <input type="file" name="file" className="file-input"/>
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
+
                         </div>
                     </div>
 
@@ -309,48 +566,44 @@ const SignUpHelper = () => {
             )}
 
             {signupType === 'hospital' && (
-                <form action="#">
+                <form onSubmit={handleSignUp}>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="firstName" value={formData.hospitalname}
-                                   onChange={handleInputChange} required/>
+                            <input type="text" name="name" value={formDataHospital.name}
+                                   onChange={handleInputChangeHospital} required/>
                             <label>Hospital Name</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="lastName" value={formData.category} onChange={handleInputChange} required/>
+                            <input type="text" name="category" value={formDataHospital.category} onChange={handleInputChangeHospital} required/>
                             <label>Category</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.email} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
-                                const isHidden = document.getElementById("email-otp-check");
+                            <input type="text" name="email" value={formDataHospital.email} onChange={handleInputChangeHospital} required/>
+                            <button className="ver" id="email-hospital-send-otp" onClick={() => {
+                                const isHidden = document.getElementById("email-otp-check-Hospital");
                                 if (isHidden !== null) {
                                     isHidden.className = "fg";
                                 }
+                                onClickSendOtp();
                             }}>
                                 Send OTP
                             </button>
                             <label>Email</label>
                         </div>
                     </div>
-                    <div className="fg visually-hidden" id="email-otp-check">
+                    <div className="fg visually-hidden" id="email-otp-check-Hospital">
                         <div className="container-otp">
                             <div id="inputs" className="inputs">
-                                {emailOtpValues.map((value, index) => (
-                                    <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
+                                {emailOtpValuesHospital.map((value, index) => (
+                                    <input key={index} ref={(ref) => (inputHRefs.current[index] = ref)}
                                         className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
-                                        onChange={(e) => handleEmailChange(index, e.target.value)}/>
+                                        onChange={(e) => handleEmailChangeHospital(index, e.target.value)}/>
                                 ))}
                             </div>
                             <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {
-                                    const isHidden = document.getElementById("email-otp-check");
-                                    if (isHidden !== null) {
-                                        isHidden.className = "fg visually-hidden";
-                                    }
-                                }}/>
+                                <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(2);}}/>
                             </div>
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
@@ -359,82 +612,57 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="email" value={formData.regis} onChange={handleInputChange} required/>
-                            <button className="ver" onClick={() => {
-                                const isHidden = document.getElementById("regis-otp-check");
-                                if (isHidden !== null) {
-                                    isHidden.className = "fg";
-                                }
-                            }}>
-                                Send OTP
-                            </button>
+                            <input type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChangeHospital} required/>
                             <label>Registration Number</label>
                         </div>
                     </div>
-                    <div className="fg visually-hidden" id="regis-otp-check">
-                        <div className="container-otp">
-                            <div id="inputs" className="inputs">
-                                {registrationOtpValues.map((value, index) => (
-                                    <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
-                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={value}
-                                           onChange={(e) => handleRegistrationChange(index, e.target.value)}/>
-                                ))}
-                            </div>
-                            <div className="field">
-                                <input type="submit" value={`Verify`} onClick={() => {
-                                    const isHidden = document.getElementById("regis-otp-check");
-                                    if (isHidden !== null) {
-                                        isHidden.className = "fg visually-hidden";
-                                    }
-                                }}/>
-                            </div>
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
-                        </div>
-                    </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="password" value={formData.contact} onChange={handleInputChange} required/>
+                            <input type="text" name="phoneNumber" value={formDataHospital.phoneNumber} onChange={handleInputChangeHospital} required/>
                             <label>Contact</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="text" name="website" value={formDataHospital.website} onChange={handleInputChangeHospital} required/>
                             <label>Website Link</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="text" name="state" value={formData.address} onChange={handleInputChange} required/>
+                            <input type="text" name="address" value={formDataHospital.address} onChange={handleInputChangeHospital} required/>
                             <label>Address</label>
                         </div>
                         <div className="field">
-                            <input type="text" name="city" value={formData.pincode} onChange={handleInputChange} required/>
+                            <input type="text" name="pincode" value={formDataHospital.pincode} onChange={handleInputChangeHospital} required/>
                             <label>Pincode</label>
                         </div>
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="password" name="password" value={formData.password} onChange={handleInputChange} required/>
+                            <input type="password" name="password" value={formDataHospital.password} onChange={handleInputChangeHospital} required/>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required/>
+                            <input type="password" name="confirmPassword" value={formDataHospital.confirmPassword} onChange={handleInputChangeHospital} required/>
                             <label>Confirm Password</label>
                         </div>
                     </div>
                     <div className="fg form-group mt-3 upload-photo-section">
                         <span className="upload-photo-label">Upload Hospital Photo</span>
                         <div className="upload-photo-button">
-                            <input type="file" name="file" className="file-input"/>
+                            {/*<input*/}
+                            {/*    type="file"*/}
+                            {/*    onChange={(event) => {*/}
+                            {/*        setImageUpload(event.target.files[0]);*/}
+                            {/*    }}*/}
+                            {/*/>*/}
+                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}/>
+                            {/*<button onClick={uploadFiles}> Upload Image</button>*/}
                         </div>
                     </div>
                     <div className="field">
-                        <input
-                            type="submit"
-                            value={`Register`}
-                            disabled={!formIsValid}
-                        />
+                        <input type="submit" value={`Register`}/>
                     </div>
                 </form>
             )}

@@ -1,24 +1,33 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import '../../../css/helper-components/helper-patient/profile-style.css';
+import axios from "axios";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {useLocation} from "react-router-dom";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {v4} from "uuid";
 
 
-function ProfilePage() {
+function ProfilePage(props) {
     const [profile, setProfile] = useState({
-        "firstName": "John",
-        "lastName": "Doe",
-        "mobile": "8782788392",
-        "address": "123 Main Street, City, Country",
-        "email": "john.doe@example.com",
-        "age": 30,
-        "gender": "Male",
-        "aadhar": "1234 - 5678 - 9012",
-        "weight": "70",
-        "height": "180",
-        "bloodGroup": "O+",
+        "firstName": "Ajay",
+        "lastName": "Gidd",
+        "phoneNumber": "",
+        "address": "",
+        "email": "",
+        "age": "",
+        "gender": "M",
+        "aadhar": "123456",
+        "weight": "",
+        "height": "",
+        "bloodGroup": "",
         "profilePicture": "review_profile.jpeg",
-        "prevRecords": "previous.pdf"
+        "prevRecords": "previous.pdf",
+        "password":""
     });
-
+    const [userId, setUserId] = useState(0);
+    const {state}=useLocation();
+    const [docUpload, setDocUpload] = useState(null);
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
         email: '',
@@ -27,8 +36,8 @@ function ProfilePage() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUpdatedProfile({
-            ...updatedProfile,
+        setProfile({
+            ...profile,
             [name]: value
         });
     };
@@ -38,6 +47,10 @@ function ProfilePage() {
         target = parseInt(target[target.length - 1]);
         let element = document.getElementsByClassName("user-data-value editable")[target];
         element.readOnly = false;
+        element.style.borderRadius = "5px"
+        element.style.border = "2px solid #1D2A4D"
+        element.focus();
+        element.select();
 
         let saveButton = document.getElementById("profile-update-button");
         saveButton.className = "update-profile-button";
@@ -50,10 +63,15 @@ function ProfilePage() {
         let element = document.getElementsByClassName("user-data-value editable");
         for(let i=0; i<element.length; i++) {
             element[i].readOnly = true;
+            element[i].style.border = "none"
         }
+        console.log(profile)
     }
 
+
+
     const updateProfile = () => {
+
 
         console.log('Updated profile:', updatedProfile);
         setProfile(updatedProfile);
@@ -71,15 +89,56 @@ function ProfilePage() {
     const off = () => {
         document.getElementById("overlay-patient-profile").style.display = "none";
     }
+    useEffect(() => {
+        const id = parseInt(window.location.pathname.split("/")[2]);
+        console.log(id);
+        setUserId(id);
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            const getUserData = async (e) => {
+                // e.preventDefault();
+                //console.log(hospitalData);
+                try {
+                    const token = getJwtTokenFromLocalStorage();
+                    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
+                    const response = await axios.get(`http://localhost:8081/user/get-user/?id=${userId}`,{headers}).then((response) => {
+                        console.log(response.data);
+                        if (response.data) {
+                            //alert(response.data)
+                            setProfile(response.data)
+
+                        }
+                        else {
+                            alert("Something went wrong !!")
+                        }
+
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+
+                }
+
+
+
+            };
+
+            getUserData();
+        }
+    }, [userId])
+
+
 
     return (
         <div>
             <div id="overlay-patient-profile" onClick={off}>
-                <img className="overlay-profile" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="profile"/>
+                <img className="overlay-profile" src={profile.img_url} alt="profile"/>
             </div>
             <div className="containerProfile">
                 <div className="leftSideContents">
-                    <img className="profile-picture" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="Profile"/>
+                    <img className="profile-picture" src={profile.img_url} alt="Profile"/>
                     <div>
                         <p className="profile-info">{profile.firstName + " " + profile.lastName}</p>
                         <p className="address-info">{profile.address}</p>
@@ -124,7 +183,7 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.email} readOnly={true}/>
+                                    <input className="user-data-value editable" name="email" value={profile.email} onChange={handleChange} type="text" placeholder={profile.email} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -133,14 +192,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={"+91-" + profile.mobile} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="phoneNumber" value={profile.phoneNumber} onChange={handleChange }placeholder={"+91-" + profile.mobile} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Age : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.age + " Years"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="age" value={profile.age} onChange={handleChange } placeholder={profile.age + " Years"} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -155,7 +214,7 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Aadhaar : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.aadhar} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={profile.aadhaar} readOnly/>
                                 </div>
                             </td>
                         </tr>
@@ -163,14 +222,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.address} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="address" value={profile.address} onChange={handleChange } placeholder={profile.city + " " + profile.state} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Password : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="XXXXXXXXXXXXXX" readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="password" value={"XXXXXXXXXXXXXX"} onChange={handleChange } placeholder={"XXXXXXXXXXXXXX"} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -179,14 +238,14 @@ function ProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Weight : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.weight + " kg"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="weight" value={profile.weight} onChange={handleChange } placeholder={profile.weight + " kg"} readOnly={true}/>
                                     <i className="fa fa-pencil 5" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Height : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.height + " cm"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" name="height" value={profile.height} onChange={handleChange } placeholder={profile.height + " cm"} readOnly={true}/>
                                     <i className="fa fa-pencil 6" onClick={makeEditable}></i>
                                 </div>
                             </td>

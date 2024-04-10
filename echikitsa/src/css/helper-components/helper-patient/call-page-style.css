@@ -107,3 +107,40 @@
     margin: 0 2px 0 2px;
     padding: 5px;
 }
+
+.confirmation-content {
+    text-align: center;
+}
+
+.popup-overlay {
+}
+
+.popup-content {
+    border-radius: 0;
+}
+
+.confirm-call {
+    width: 50%;
+    border-radius: 0;
+    background-color: #0B7CF3;
+    color: white;
+    margin: 10px;
+}
+
+.confirm-call:hover {
+    background-color: white;
+    border-width: 2px;
+    border-color: #0B7CF3;
+    color: black;
+}
+
+.remoteVideo {
+    margin: 5px;
+    background-color: #13c5dd;
+    padding: 2px;
+    border-radius: 10px;
+}
+
+video {
+    border-radius: 10px;
+}

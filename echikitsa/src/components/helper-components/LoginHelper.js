@@ -3,7 +3,12 @@ import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
-import Validation from "../validation/validation";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
+// import {authentication} from '../../firebase/firebaseConfig'
+import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
+import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -14,12 +19,8 @@ const LoginHelper = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const inputRefs = useRef([]);
-
-    const [loginValue, SetLoginValue] = useState( {
-        emailId: '',
-        password:''
-    })
-
+    const navigate = useNavigate();
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -60,12 +61,108 @@ const LoginHelper = () => {
         setIsOtpSent(true);
     };
 
-    const handleLogin = (e) => {
+    const handleForgotPassword = async (e) => {
+
+        let role;
+        if(loginType === 'patient')
+        {
+            role = "PATIENT"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'doctor')
+        {
+            role = "DOCTOR"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+        }
+        if(loginType === 'admin'){
+            role = "ADMIN"
+            navigate("/forgot-password",{state:{
+                    role:role}
+            });
+
+        }
+    }
+
+
+
+    const handleLogin = async (e) => {
         e.preventDefault();
         // Logic to handle login based on login method
         if (loginMethod === 'password') {
-            console.log('Logging in with email and password:', email, password);
-            // Implement login with email and password
+            //console.log('Logging in with email and password:', email, password);
+
+            try {
+                const headers = { 'Content-Type' : 'application/json' }
+                let role;
+                if(loginType == 'patient')
+                {
+                   role = "PATIENT"
+                }
+                if(loginType == 'doctor')
+                {
+                    role = "DOCTOR"
+                }
+                if(loginType == 'admin'){
+                    role = "ADMIN"
+
+                }
+
+                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then((response) => {
+
+                    if (response.data && response.data.role ==loginType.toUpperCase()) {
+                        //console.log(response.data)
+                        saveJwtTokenToLocalStorage(response.data.token);
+                        saveUserIdToLocalStorage(response.data.id);
+                        saveJwtTokenToLocalStorage(response.data.token)
+                        alert("Login Successfully")
+                        if(loginType === 'patient')
+                        {
+                            // let path = '/welcome'
+                            // navigate(path);
+                            navigate("/welcome",{state:{
+                                    patient_id:response.data.id}
+                            });
+                        }
+                        if(loginType === 'doctor')
+                        {
+                            // let path = '/dashboard'
+                            // navigate(path);
+                            navigate("/dashboard",{state:{
+                                    doctor_id:response.data.id}
+                            });
+                        }
+                        if(loginType === 'admin'){
+                            // let path = '/admin'
+                            // navigate(path);
+                            // let path = `/admin/${response.data.id}`
+                            // navigate(path);
+
+                            navigate("/admin",{state:{
+                                    hospital_id:response.data.id}
+                            });
+
+                        };
+
+
+
+
+
+                    }
+                    else {
+                        alert("email and password are incorrect")
+                    }
+                    //console.log('Response:', response);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+
+            }
+            //**********************************************
+
         } else if (loginMethod === 'otp') {
             console.log('Logging in with mobile number and OTP:', mobileNumber, otp);
             // Implement login with mobile number and OTP
@@ -140,9 +237,7 @@ const LoginHelper = () => {
                             Login via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
                         </div>
                     </div>
-                    <Link to={(loginType === "patient") ? '/welcome' : ((loginType === "admin") ? '/admin' : '/dashboard')}>
-                        <button type="submit" className="button-background">Login</button>
-                    </Link>
+                    <button type="submit" className="button-background">Login</button>
                 </div>
             </form>
 
@@ -152,7 +247,7 @@ const LoginHelper = () => {
                     <span className="remember-text">Remember me</span>
                 </div>
                 <div className="pass-link">
-                    <a href="#">Forgot password?</a>
+                    <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>
             </div>
 
