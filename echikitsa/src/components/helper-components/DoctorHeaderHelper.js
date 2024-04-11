@@ -86,7 +86,7 @@ const DoctorHeaderHelper = (props) => {
                                 <Link to="/dashboard" className={`nav-item nav-link ${props.data === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
                                 <Link to="/doctor-records" className={`nav-item nav-link ${props.data === 'records' ? 'active' : ''}`} >Records</Link>
                                 <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>
-                                <Link to="/doctor-profile" style={{ color: 'black' }} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
+                                <Link to="/doctor-profile" style={{ color: 'black' }} className={`nav-item nav-link profile-font ${props.data === 'profile' ? 'active' : ''}`} >{"Dr.  " + name}</Link>
                                 <Link to="/" className={`nav-item nav-link ${props.data === 'logout' ? 'active' : ''}`} >Logout</Link>
                                 {/*<div className="nav-item dropdown">*/}
                                 {/*    <Link to="/" className={`nav-link dropdown-toggle ${props.data === 'profile' ? 'active' : ''}`} data-bs-toggle="dropdown" id="more">More</Link>*/}
