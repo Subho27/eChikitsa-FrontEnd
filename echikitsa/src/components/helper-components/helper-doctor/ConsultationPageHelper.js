@@ -5,19 +5,17 @@ import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
-import axios from "axios";
-import {over} from "stompjs";
-import SockJS from "sockjs-client";
-import 'firebase/compat/auth';
-import {firebaseConfig} from "../../firbaseConfiguration/config";
+// import 'firebase/compat/auth';
+// import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 import axios from 'axios';
-import { storage } from "../../firbaseConfiguration/config";
-import { ref, uploadBytes } from "firebase/storage";
+import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import firebase from "firebase/compat/app";
 
 // Initialize Firebase if it's not already initialized
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+// if (!firebase.apps.length) {
+//     firebase.initializeApp(firebaseConfig);
+// }
 function ConsultationPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([]);
     const [today, setToday] = useState("");
@@ -45,9 +43,19 @@ function ConsultationPageHelper(effect, deps) {
             // Create a blob URL for the PDF data
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const prescriptionRef = ref(storage, `echikitsa/Patient/2/${"2"+Date.now().toLocaleString()}`);
-            await uploadBytes(prescriptionRef, blob).then(() => {
-                alert("Prescription Uploaded");
-            });
+            // await uploadBytes(prescriptionRef, blob).then(() => {
+            //     alert("Prescription Uploaded");
+            // });
+            await uploadBytes(prescriptionRef, blob)
+                .then((snapshot) => {
+                    return getDownloadURL(snapshot.ref);
+                })
+                .then((url) => {
+                    // Optionally, you can also update state or perform other actions here
+                    alert("Prescription Uploaded");
+                    console.log("Image uploaded successfully. Download URL:", url);
+                    return url; // Return the download URL
+                })
             const pdfUrl = URL.createObjectURL(blob);
 
             // Open the PDF in a new window/tab
@@ -71,6 +79,8 @@ function ConsultationPageHelper(effect, deps) {
             console.error("Error generating, uploading PDF, and adding data:", error);
         }
     };
+
+
 
     const [videoArray, setVideoArray] = useState(["Patient", "Senior Doctor"]);
     let i = 0;
@@ -557,6 +567,7 @@ function ConsultationPageHelper(effect, deps) {
     //endregion
 
     const handleCallEnd = async () => {
+        await handleClick();
         await socket.disconnect();
         await localStream.getTracks().forEach(function(track) {
             track.stop();
