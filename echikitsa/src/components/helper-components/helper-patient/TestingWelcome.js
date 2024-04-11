@@ -248,7 +248,7 @@ function TestingWelcome() {
                     </div>
                 </div>
                 <div className="hospital-list">
-                    <div className="search-section">
+                    <div className="search-section_patient">
                         <div className="search-hospital">
                             <input type="text" placeholder="Search Hospitals here..." className="search-field-hospital" onChange={(e) => setQuery(e.target.value.toLowerCase())}/>
                         </div>

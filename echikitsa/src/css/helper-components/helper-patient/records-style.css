@@ -45,6 +45,16 @@
     border-radius: 5px;
     /*margin: auto;*/
 }
+.search-section_patient {
+    color: black;
+    width: 100%;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-right: 5px;
+    border-radius: 5px;
+    display: flex;
+    /*margin: auto;*/
+}
 .searchall{
     display: flex;
     flex-direction: row-reverse;
