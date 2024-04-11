@@ -92,7 +92,7 @@ function PatientHeaderHelper(props) {
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
                                 <Link to="/patient-records" className={`nav-item nav-link ${props.data === 'record' ? 'active' : ''}`} >Records</Link>
-                                <Link to={"/patient-profile/"+props.id} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
+                                <Link to={"/patient-profile"} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
                                 <Link to="/" className="nav-item nav-link" >Logout</Link>
                                 {/*<Link to="/" className="custom-nav-item" >*/}
                                 {/*    <img className="logout" src={require("../../images/patient_landing_page/logout.png")} alt="Logout"/>*/}
