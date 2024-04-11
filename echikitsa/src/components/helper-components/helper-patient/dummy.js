@@ -90,7 +90,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 11,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -99,7 +99,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 12,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -108,7 +108,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 13,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -117,7 +117,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 14,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -126,7 +126,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 15,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -135,7 +135,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 16,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -144,7 +144,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 17,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -153,7 +153,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 18,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -162,7 +162,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 19,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -171,7 +171,7 @@ export const dummy = [
         "NextAppointment": "2024-03-23"
     },
     {
-        "id": 10,
+        "id": 20,
         "Date": "2024-03-03",
         "Hospital": "Oceanview Hospital",
         "Doctor": "Garcia",
@@ -179,22 +179,5 @@ export const dummy = [
         "Reason": "Allergy",
         "NextAppointment": "2024-03-23"
     },
-    {
-        "id": 10,
-        "Date": "2024-03-03",
-        "Hospital": "Oceanview Hospital",
-        "Doctor": "Garcia",
-        "Active": "Yes",
-        "Reason": "Allergy",
-        "NextAppointment": "2024-03-23"
-    },
-    {
-        "id": 10,
-        "Date": "2024-03-03",
-        "Hospital": "Oceanview Hospital",
-        "Doctor": "Garcia",
-        "Active": "Yes",
-        "Reason": "CAllergy",
-        "NextAppointment": "2024-03-22"
-    }
+
 ]

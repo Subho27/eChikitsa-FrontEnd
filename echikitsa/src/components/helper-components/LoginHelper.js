@@ -242,10 +242,10 @@ const LoginHelper = () => {
             </form>
 
             <div className="content">
-                <div className="checkbox-style">
-                    <input type="checkbox" id="remember-me"/>
-                    <span className="remember-text">Remember me</span>
-                </div>
+                {/*<div className="checkbox-style">*/}
+                {/*    <input type="checkbox" id="remember-me"/>*/}
+                {/*    <span className="remember-text">Remember me</span>*/}
+                {/*</div>*/}
                 <div className="pass-link">
                     <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>

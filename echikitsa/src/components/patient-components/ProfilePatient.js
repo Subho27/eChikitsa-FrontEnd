@@ -4,7 +4,6 @@ import PatientHeaderHelper from "../helper-components/PatientHeaderHelper";
 import ProfileHelper from "../helper-components/helper-patient/ProfileHelper";
 
 function ProfilePatient() {
-    // const {state}=useLocation();
     return(
         <div>
             <PatientHeaderHelper data="profile"/>
