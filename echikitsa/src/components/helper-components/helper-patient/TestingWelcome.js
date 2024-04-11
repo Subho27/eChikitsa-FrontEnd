@@ -186,6 +186,7 @@ function TestingWelcome() {
     for (let i = 1; i <= Math.ceil(totalPosts / hospitalsPerPage); i++) {
         pageNumbers.push(i);
     }
+    //endregion
 
     return (
         <div>
