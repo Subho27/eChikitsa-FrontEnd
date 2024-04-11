@@ -34,7 +34,8 @@
 }
 
 .hospital-detail-table {
-    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 20px;
 }
 
@@ -46,8 +47,12 @@
 .hospital-detail-table td:first-child {
     font-weight: bold;
     color: grey;
-    width: 50%;
-    text-align: right;
+    text-align: left;
+}
+
+.hospital-detail-table td:last-child {
+    color: black;
+    text-align: left;
 }
 
 .hospital-details-image-section {
@@ -56,6 +61,17 @@
     margin-right: auto;
     margin-bottom: 20px;
     border: 1px solid black;
+    object-fit: fill;
+    padding: 8px;
+}
+
+.hospital-details-image-section-page {
+    height: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    border: 1px solid black;
+    border-radius: 10px 10px 0 0;
     object-fit: fill;
     padding: 8px;
 }
