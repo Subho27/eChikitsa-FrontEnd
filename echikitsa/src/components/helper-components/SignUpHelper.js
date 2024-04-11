@@ -321,11 +321,10 @@ const SignUpHelper = () => {
                 else {
                     formDataHospital.imgUrl = url;
                 }
-                console.log("Image uploaded successfully. Download URL:", url);
                 return url; // Return the download URL
             })
             .catch((error) => {
-                console.error("Error uploading image:", error);
+                console.error("Error uploading prescription:", error);
                 throw error; // Propagate the error
             });
     };
