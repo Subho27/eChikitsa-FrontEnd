@@ -13,3 +13,10 @@ code {
     monospace;
 }
 
+.poppins {
+  font-family: "Poppins", sans-serif;
+}
+
+.bold-font {
+  font-weight: bold;
+}

@@ -341,7 +341,7 @@ function ProfilePage(props) {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Gender : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.gender} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={profile.gender !== undefined && profile.gender.toUpperCase()} readOnly/>
                                 </div>
                             </td>
                             <td>
@@ -396,10 +396,10 @@ function ProfilePage(props) {
                             <div className="upload-records-text">
                                 <span>Upload your Records</span>
                             </div>
-                            <input type="file" name="file" className="file-input" onChange={(event) => {
+                            <input type="file" name="file" className="file-input-profile" accept=".pdf" onChange={(event) => {
                                 setImageUpload(event.target.files[0]);
                             }}/>
-                            <button onClick={uploadFiles}>Upload File</button>
+                            <button className="upload-profile-photo-button" onClick={uploadFiles}>Upload File</button>
                         </div>
                         <div className="previous-records-section">
                             <div className="previous-records-text">

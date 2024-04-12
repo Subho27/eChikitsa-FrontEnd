@@ -38,7 +38,7 @@
 .location-section {
     margin-left: 10px;
     height: 250px;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 .rating-section {
@@ -142,10 +142,14 @@
 
 .search-field-hospital {
     height: 35px;
+    border-radius: 5px;
+    border-color: lightblue !important;
 }
 
 .search-field-doctor {
     height: 35px;
+    border-radius: 5px;
+    border-color: lightblue !important;
 }
 
 .search-hospital {

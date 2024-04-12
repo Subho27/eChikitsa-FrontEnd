@@ -197,7 +197,7 @@ function TestingWelcome() {
                     </div>
                     <div className="filter-text">
                         <div className="filter-title">Filter by Location</div>
-                        <div className="location-section">
+                        <div className="location-section" style={{ height: `${locations.length*30 > 250 ? 250 : locations.length*30}px` }}>
                             {locations.map((location, index) => (
                                 <div key={index} className="hospital-location">
                                     <input type="checkbox" id={`location_${index}`} value={location} className="location-checkbox" onChange={handleLocationCheckboxChange}  checked={selectedLocations.includes(location)}/>
@@ -208,7 +208,7 @@ function TestingWelcome() {
                     </div>
                     <div className="filter-text">
                         <div className="filter-title">Filter by Specialisation</div>
-                        <div className="location-section">
+                        <div className="location-section" style={{ height: `${specialisations.length*30 > 250 ? 250 : specialisations.length*30}px` }}>
                             {specialisations.map((specialisation, index) => (
                                 <div key={index} className="hospital-location">
                                     <input type="checkbox" id={`specialisation_${index}`} value={specialisation} className="location-checkbox" onChange={handleSpecialisationCheckboxChange}  checked={selectedSpecialisations.includes(specialisation)}/>
