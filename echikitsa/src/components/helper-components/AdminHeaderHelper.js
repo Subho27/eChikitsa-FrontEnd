@@ -6,8 +6,14 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link, useLocation} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
+import {removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 
 function AdminHeaderHelper(props) {
+
+    const handleLogout = () => {
+        removeUserIdFromLocalStorage()
+
+    };
 
     return (
         <div>
@@ -60,7 +66,7 @@ function AdminHeaderHelper(props) {
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
-                                <Link to="/" className="nav-item nav-link" >Logout</Link>
+                                <Link to="/" onClick={handleLogout} className="nav-item nav-link" >Logout</Link>
                             </div>
                         </div>
                     </nav>
