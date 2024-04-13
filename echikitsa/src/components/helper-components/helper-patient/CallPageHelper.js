@@ -519,8 +519,10 @@ function CallPageHelper(effect, deps) {
             // server notification is received when a producer is closed
             // we need to close the client-side consumer and associated transport
             const producerToClose = consumerTransports.find(transportData => transportData.producerId === remoteProducerId);
-            producerToClose.consumerTransport.close();
-            producerToClose.consumer.close();
+            if(producerToClose != null) {
+                producerToClose.consumerTransport.close();
+                producerToClose.consumer.close();
+            }
 
             // remove the consumer transport from the list
             consumerTransports = consumerTransports.filter(transportData => transportData.producerId !== remoteProducerId);

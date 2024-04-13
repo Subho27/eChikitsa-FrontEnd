@@ -45,14 +45,17 @@
 }
 
 .hospital-detail-table td:first-child {
+    width: 40%;
     font-weight: bold;
     color: grey;
-    text-align: left;
+    text-align: center;
 }
 
 .hospital-detail-table td:last-child {
+    width: 60%;
     color: black;
-    text-align: left;
+    text-align: center;
+    font-family: "Poppins", sans-serif;
 }
 
 .hospital-details-image-section {
@@ -61,6 +64,7 @@
     margin-right: auto;
     margin-bottom: 20px;
     border: 1px solid black;
+    border-radius: 5px 5px 0 0;
     object-fit: fill;
     padding: 8px;
 }
@@ -189,6 +193,7 @@
 .consult-button-patient {
     color: #fff;
     border: none;
+    border-radius: 5px;
     padding-left: 0;
     width: 60%;
     /*margin-top: 30px;*/
@@ -199,8 +204,10 @@
     transition: all 0.3s ease;
 }
 
-.consult-button-patient:active {
-    transform: scale(0.95);
+.consult-button-patient:hover {
+    background-color: #FFFFFF;
+    color: #13c5dd;
+    border: 2px solid #13c5dd;
 }
 
 /* Responsive styles */
