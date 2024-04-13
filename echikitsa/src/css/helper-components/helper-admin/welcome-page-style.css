@@ -436,6 +436,11 @@ form .input-box span.details{
     color: #FFFFFF;
 }
 
+.terminate-row {
+    line-height: 40px;
+    border-bottom: 2px solid lightblue;
+}
+
 /*.adminRecordTable  {*/
 /*    background-color: #848E9F;*/
 /*}*/
@@ -527,7 +532,7 @@ th i:hover {
 .admin-welcome-action {
     margin: 10px;
     width: 70%;
-    height: 900px;
+    /*height: 900px;*/
     border-radius: 25px 25px 10px 10px;
     box-shadow: 0 0 5px 0 #ababab;
 }
@@ -554,6 +559,10 @@ th i:hover {
     font-weight: bold;
     color: grey;
     width: 40%;
+}
+
+.admin-hospital-detail-table td:last-child {
+    font-family: "Poppins", sans-serif;
 }
 
 .admin-ask-record-open {

@@ -377,8 +377,10 @@ function AdminWelcomeHelper(props) {
         element.focus();
         element.select();
 
-        let selector = document.getElementById("selector-specialisation");
-        selector.className = "department-selector";
+        if (e.target.classList.contains('5')) {
+            let selector = document.getElementById("selector-specialisation");
+            selector.className = "department-selector";
+        }
         let saveButton = document.getElementById("profile-update-button");
         saveButton.className = "update-profile-button";
     }
@@ -569,14 +571,15 @@ function AdminWelcomeHelper(props) {
                                 <table className="admin-record-table-terminate">
                                     <tbody>
                                     <tr>
-                                        <th>Doctor Name </th>
-                                        <th>Specialization </th>
+                                        <th>Doctor Name</th>
+                                        <th>Doctor Type</th>
+                                        <th>Specialization</th>
                                         <th>Email</th>
                                         {/*<th>Active</th>*/}
                                     </tr>
-                                    {filteredData.map((item) => (<tr key={item.id}>
-
+                                    {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
+                                            <td>Please Add This</td>
                                             <td>{item.specialization}</td>
                                             <td>{item.email}</td>
                                             {/*<td>{item.Active}</td>*/}
@@ -608,7 +611,7 @@ function AdminWelcomeHelper(props) {
                                         <th>Active/Deactive</th>
                                     </tr>
                                     {filteredData.map((item) => (
-                                        <tr key={item.id}>
+                                        <tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
                                             <td>{item.email}</td>
                                             <td>
@@ -716,7 +719,6 @@ function AdminWelcomeHelper(props) {
             </div>
             <div className="admin-welcome-hospital">
                 <div className="hospital-details-section">
-                    <div className="hospital-detail-header">Hello, ADMIN</div>
                     <div className="hospital-details-image-section">
                         <img className="hospital-details-image" src={hospitalName.image_path} alt="Hospital"/>
                     </div>

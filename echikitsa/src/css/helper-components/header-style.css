@@ -169,3 +169,10 @@
 .logout:hover ~ .tooltip-text {
     visibility: visible;
 }
+
+.profile-font {
+    font-family: "Poppins", sans-serif !important;
+    color: #FFFFFF !important;
+    font-size: 20px !important;
+    background-color: #1D2A4D !important;
+}
