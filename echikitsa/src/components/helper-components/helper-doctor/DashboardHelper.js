@@ -28,6 +28,9 @@ function DashboardHelper() {
     const [todayData ,setTodayDate] = useState("");
     const [data, setData] = useState([]);
     const [isJoinLater, setIsJoinLater] = useState(false);
+    const [isEmptyQueue, setIsEmptyQueue] = useState(true);
+    const [queueSize, setQueueSize] = useState(0);
+    const [nextPatients, setNextPatients] = useState([]);
     const navigate = useNavigate();
     let notifyCount = 0;
 
@@ -153,69 +156,6 @@ function DashboardHelper() {
             }
         })
 
-
-
-        // Ratings
-        // document.getElementById("progress-canvas5").style.width = fiveStar*100 +"%";
-        // document.getElementById("progress-canvas4").style.width = fourStar*100 + "%";
-        // document.getElementById("progress-canvas3").style.width = threeStar*100 + "%";
-        // document.getElementById("progress-canvas2").style.width = twoStar*100 + "%";
-        // document.getElementById("progress-canvas1").style.width = oneStar*100 + "%";
-
-
-
-        // //region Five rating
-        // const canvas5Rating = document.getElementById('progress-canvas5');
-        // if (canvas5Rating) {
-        //     const ctx5 = canvas5Rating.getContext('2d');
-        //     canvas5Rating.height = 18;
-        //     ctx5.fillStyle = '#4861AB';
-        //     ctx5.fillRect(0, 0, canvas5Rating.width, canvas5Rating.height);
-        //     ctx5.fillStyle = '#1D2A4D';
-        //     ctx5.fillRect(0, 0, canvas5Rating.width * fiveStar, canvas5Rating.height);
-        // }
-        // //endregion
-        //
-        // //region Four rating
-        // const canvas4Rating = document.getElementById('progress-canvas4');
-        // const ctx4 = canvas4Rating.getContext('2d');
-        // canvas4Rating.height = 18;
-        // ctx4.fillStyle = '#4861AB';
-        // ctx4.fillRect(0, 0, canvas4Rating.width, canvas4Rating.height);
-        // ctx4.fillStyle = '#1D2A4D';
-        // ctx4.fillRect(0, 0, canvas4Rating.width * fourStar, canvas4Rating.height);
-        // //endregion
-        //
-        // //region Three rating
-        // const canvas3Rating = document.getElementById('progress-canvas3');
-        // const ctx3 = canvas3Rating.getContext('2d');
-        // canvas3Rating.height = 18;
-        // ctx3.fillStyle = '#4861AB';
-        // ctx3.fillRect(0, 0, canvas3Rating.width, canvas3Rating.height);
-        // ctx3.fillStyle = '#1D2A4D';
-        // ctx3.fillRect(0, 0, canvas3Rating.width * threeStar, canvas3Rating.height);
-        // //endregion
-        //
-        // //region Two rating
-        // const canvas2Rating = document.getElementById('progress-canvas2');
-        // const ctx2 = canvas2Rating.getContext('2d');
-        // canvas2Rating.height = 18;
-        // ctx2.fillStyle = '#4861AB';
-        // ctx2.fillRect(0, 0, canvas2Rating.width, canvas2Rating.height);
-        // ctx2.fillStyle = '#1D2A4D';
-        // ctx2.fillRect(0, 0, canvas2Rating.width * twoStar, canvas2Rating.height);
-        // //endregion
-        //
-        // //region One rating
-        // const canvas1Rating = document.getElementById('progress-canvas1');
-        // const ctx1 = canvas1Rating.getContext('2d');
-        // canvas1Rating.height = 18;
-        // ctx1.fillStyle = '#4861AB';
-        // ctx1.fillRect(0, 0, canvas1Rating.width, canvas1Rating.height);
-        // ctx1.fillStyle = '#1D2A4D';
-        // ctx1.fillRect(0, 0, canvas1Rating.width * oneStar, canvas1Rating.height);
-        // //endregion
-
         return () => {
             if (canvas.chart) {
                 canvas.chart.destroy();
@@ -225,27 +165,6 @@ function DashboardHelper() {
                 canvasToday.chart.destroy();
                 delete canvasToday.chart;
             }
-            // if (canvas5Rating.chart) {
-            //     canvas5Rating.chart.destroy();
-            //     delete  canvas5Rating.chart;
-            // }
-            // if (canvas4Rating.chart) {
-            //     canvas4Rating.chart.destroy();
-            //     delete  canvas4Rating.chart;
-            // }
-            // if (canvas3Rating.chart) {
-            //     canvas3Rating.chart.destroy();
-            //     delete  canvas3Rating.chart;
-            // }
-            // if (canvas2Rating.chart) {
-            //     canvas2Rating.chart.destroy();
-            //     delete  canvas2Rating.chart;
-            // }
-            // if (canvas1Rating.chart) {
-            //     canvas1Rating.chart.destroy();
-            //     delete  canvas1Rating.chart;
-            // }
-            //
 
         };
     },
@@ -257,13 +176,18 @@ function DashboardHelper() {
             const stompC = over(sock);
             stompC.connect({}, () => {
                 setStompClient(stompC);
-                const topic = `/topic/call-incoming/${getUserIdFromLocalStorage()}`;
-                stompC.subscribe(topic, async (message) => {
-                    console.log(message);
+                const callTopic = `/topic/call-incoming/${getUserIdFromLocalStorage()}`;
+                stompC.subscribe(callTopic, async (message) => {
+                    // console.log(message);
                     if(notifyCount === 0) {
                         notify();
                         notifyCount++;
                     }
+                });
+                const nextTopic = `/topic/next-patients/${getUserIdFromLocalStorage()}`;
+                stompC.subscribe(nextTopic, async (message) => {
+                    // console.log(message);
+                    setNextPatients(JSON.parse(message.body));
                 });
             });
         };
@@ -306,7 +230,7 @@ function DashboardHelper() {
                 <button className="accept-call-later" onClick={handleJoinLater}>Join Later</button>
             </div>
         </div>, {
-            position: "bottom-right"
+            position: "top-right"
         });
     };
 
@@ -320,45 +244,53 @@ function DashboardHelper() {
 
     const handleJoinLater = async () => {
         toast.dismiss(toastId.current);
-        setIsJoinLater(true);
+        // setIsJoinLater(true);
     }
+
+    useEffect(() => {
+        axios.get(`http://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
+            .then((response) => {
+                // console.log(response);
+                setNextPatients(response.data);
+            })
+    }, [])
 
     return (
         <div>
             <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
-            {isJoinLater && <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>}
+            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
                         <img className="common-icon" src={require("../../../images/doctor-page-images/consultation-icon.png")} alt="consultation"/>
                         <div className="common-text">
-                            <p>Total patients</p>
+                            <p className="poppins">Total patients</p>
                             <p className="number-text">{noOfPatient}+</p>
-                            <p>till today</p>
+                            <p className="poppins">till today</p>
                         </div>
                     </div>
                     <div className="patients-in-queue common-tab-1">
                         <img className="common-icon" src={require("../../../images/doctor-page-images/queue-icon.png")} alt="queue"/>
                         <div className="common-text">
-                            <p>Patients waiting in queue</p>
-                            <p className="number-text">19</p>
+                            <p className="poppins">Patients waiting in queue</p>
+                            <p className="number-text">{(nextPatients.length === 2) ? "2+" : nextPatients.length}</p>
                         </div>
                     </div>
                     <div className="today-consulted common-tab-1">
                         <img className="common-icon" src={require("../../../images/doctor-page-images/today-icon.png")} alt="queue"/>
                         <div className="common-text">
-                            <p>Patients consulted today</p>
+                            <p className="poppins">Patients consulted today</p>
                             <p className="number-text">{noOfPatientToday}</p>
                         </div>
                     </div>
                 </div>
                 <div className="dashboard-container-2 dashboard-container-common">
                     <div className="bar-graph">
-                        <p className="graph-label">Number of consultations by date (Past 20 days)</p>
+                        <p className="graph-label poppins bold-font">Number of consultations by date (Past 20 days)</p>
                         <canvas className="repeat-graph" id="non-repeat-repeat"></canvas>
                     </div>
                     <div className="pie-graph">
-                        <p className="graph-label">Number of consultations TODAY </p>
+                        <p className="graph-label poppins bold-font">Number of consultations TODAY </p>
                         <canvas className="repeat-graph" id="non-repeat-repeat-today"></canvas>
                     </div>
                 </div>
@@ -367,9 +299,9 @@ function DashboardHelper() {
                         <div className="star-rating">
                             <Rating initialValue={rating} size={24} transition fillColor="#1D2A4D" emptyColor="#ccc" strokeColor="gold"
                             readonly="true" SVGstyle={ {display : "inline"} } allowFraction={true} />
-                            <p className="star-rating-text"><span>{rating}</span> out of 5</p>
+                            <p className="star-rating-text poppins"><span>{rating}</span> out of 5</p>
                         </div>
-                        <p className="patient-rating-label"><span>{patient}</span> patients ratings</p>
+                        <p className="patient-rating-label poppins"><span>{patient}</span> patients ratings</p>
                         <div>
                             <div className="star-count-section"><span className="star-count-text">5 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas5" style={{ width: fiveStar*100+"%" }}></div></div></div>
                             <div className="star-count-section"><span className="star-count-text">4 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas4" style={{ width: fourStar*100+"%" }}></div></div></div>
@@ -378,20 +310,20 @@ function DashboardHelper() {
                             <div className="star-count-section"><span className="star-count-text">1 star</span> <div className="patient-count-rating"><div className="progress-canvas-rating" id="progress-canvas1" style={{ width: oneStar*100+"%" }}></div></div></div>
                         </div>
                     </div>
-                    <div className="queue common-tab-2">
-                        <span>Patients in queue</span>
+                    <div className="queue common-tab-2 poppins">
+                        <span className="bold-font">Patients in queue</span>
                         <table className="custom-table">
                             <thead>
                                 <tr>
                                     <th>Patient</th>
                                     <th>Name</th>
-                                    <th>Repeat/Non-repeat</th>
+                                    <th>Repeat</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {patientsInQueue.map((patient, index) => (
                                 <tr key={index}>
-                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/"+(index+1)+".jpg")} alt="Patient" /></td>
+                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/"+(index+2)+".jpg")} alt="Patient" /></td>
                                     <td>{patient.name}</td>
                                     <td>{patient.repeat}</td>
                                 </tr>
@@ -399,8 +331,8 @@ function DashboardHelper() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="next-patient common-tab-2">
-                        <span>Next Patient</span>
+                    <div className="next-patient common-tab-2 poppins">
+                        <span className="bold-font">Next Patient</span>
                         <table className="custom-table" style={{ textAlign:"center" }}>
                             <tbody>
                                 <tr>
@@ -413,14 +345,14 @@ function DashboardHelper() {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>D.O.B.</th>
+                                    <th>ID</th>
                                     <th>Sex</th>
                                     <th>Weight</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{lastPatient.dob}</td>
+                                    <td>{nextPatients.length>0 ? nextPatients.at(0) : "Empty Queue"}</td>
                                     <td>{lastPatient.sex}</td>
                                     <td>{lastPatient.weight}</td>
                                 </tr>
@@ -487,9 +419,9 @@ const totalTwoStar = 7;
 const totalOneStar = 2;
 
 const patientQueue = [
-    {"photo": "1.jpg", "name": "Subhodip Rudra", "repeat": "Repeat"},
-    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "Non-repeat"},
-    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Repeat"}
+    // {"photo": "1.jpg", "name": "Subhodip Rudra", "repeat": "Repeat"},
+    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
+    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
 ];
 
 const nextPatient = {

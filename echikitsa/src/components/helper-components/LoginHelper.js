@@ -9,6 +9,9 @@ import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
 // import {authentication} from '../../firebase/firebaseConfig'
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
 import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
+import { useAuth } from '../route-guard/AuthContext';
+import 'react-toastify/dist/ReactToastify.css';
+import {toast, ToastContainer} from "react-toastify";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -21,6 +24,7 @@ const LoginHelper = () => {
     const inputRefs = useRef([]);
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
+    const { setUser } = useAuth();
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -111,14 +115,16 @@ const LoginHelper = () => {
 
                 }
 
-                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then((response) => {
+                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then( async (response) => {
 
-                    if (response.data && response.data.role ==loginType.toUpperCase()) {
+                    if (response.data && response.data.role ===loginType.toUpperCase()) {
                         //console.log(response.data)
+
                         saveJwtTokenToLocalStorage(response.data.token);
-                        saveUserIdToLocalStorage(response.data.id);
-                        saveJwtTokenToLocalStorage(response.data.token)
-                        alert("Login Successfully")
+                        saveUserIdToLocalStorage(response.data.id,response.data.role);
+
+                        // alert("Login Successfully")
+                        await notify();
                         if(loginType === 'patient')
                         {
                             // let path = '/welcome'
@@ -169,8 +175,13 @@ const LoginHelper = () => {
         }
     };
 
+    const notify = async () => {
+        toast.success("Login Successful.", { position: "top-center" });
+    }
+
     return (
         <div className="wrapper" id="wrap">
+            <ToastContainer autoClose={false}/>
             <div className="title">
                 Login Form
             </div>
@@ -242,10 +253,10 @@ const LoginHelper = () => {
             </form>
 
             <div className="content">
-                <div className="checkbox-style">
-                    <input type="checkbox" id="remember-me"/>
-                    <span className="remember-text">Remember me</span>
-                </div>
+                {/*<div className="checkbox-style">*/}
+                {/*    <input type="checkbox" id="remember-me"/>*/}
+                {/*    <span className="remember-text">Remember me</span>*/}
+                {/*</div>*/}
                 <div className="pass-link">
                     <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>

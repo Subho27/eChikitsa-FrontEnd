@@ -6,11 +6,15 @@ import {dummy} from "./dummy";
 function RecordHelper() {
     const [query, setQuery] = useState("");
     const [expandedRows, setExpandedRows] = useState([]);
-    const [filteredData, setFilteredData] = useState(dummy.filter(item =>
-        item.Doctor.toLowerCase().includes(query.toLowerCase()) ||
-        item.Hospital.toLowerCase().includes(query.toLowerCase()) ||
-        item.Date.includes(query)||item.Active.toLowerCase().includes(query.toLowerCase())
-    ));
+    const filteredData = useMemo(() => {
+        return dummy.filter(item =>
+            item.Doctor.toLowerCase().includes(query.toLowerCase()) ||
+            item.Hospital.toLowerCase().includes(query.toLowerCase()) ||
+            item.Date.includes(query) ||
+            item.Reason.toLowerCase().includes(query.toLowerCase()) ||
+            item.NextAppointment.includes(query)
+        );
+    }, [query, dummy]);
     const handleToggleRow = (id) => {
         const isRowExpanded = expandedRows.includes(id);
         setExpandedRows(prevState => {
@@ -35,10 +39,10 @@ function RecordHelper() {
     //region Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [hospitalsPerPage, setHospitalsPerPage] = useState(7);
-    const [currentPosts, setCurrentPosts] = useState([]);
-    // const indexOfLastPost = currentPage * hospitalsPerPage;
-    // const indexOfFirstPost = indexOfLastPost - hospitalsPerPage;
-    // setCurrentPosts(filteredData.slice(indexOfFirstPost, indexOfLastPost));
+    // const [currentPosts, setCurrentPosts] = useState([]);
+    const indexOfLastPost = currentPage * hospitalsPerPage;
+    const indexOfFirstPost = indexOfLastPost - hospitalsPerPage;
+    const currentPosts = filteredData.slice(indexOfFirstPost, indexOfLastPost);
     const totalPosts = filteredData.length;
     const paginate = pageNumber => setCurrentPage(pageNumber);
     const pageNumbers = [];
@@ -46,66 +50,6 @@ function RecordHelper() {
         pageNumbers.push(i);
     }
     //endregion
-
-    //region Sort Table
-    const [sortByADate, setSortByADate] = useState(true);
-    const [sortByHospital, setSortByHospital] = useState(true);
-    const [sortByDoctor, setSortByDoctor] = useState(true);
-    const [sortByNDate, setSortByNDate] = useState(true);
-    const [sortByReason, setSortByReason] = useState(true);
-    const sortData = async (e) => {
-        let sorted = [...filteredData];
-        if (e.target.id === "aDate") {
-            if (sortByADate) {
-                setSortByADate(false);
-                sorted = sorted.sort((a, b) => new Date(a.Date) - new Date(b.Date));
-            } else {
-                setSortByADate(true);
-                sorted = sorted.sort((a, b) => new Date(b.Date) - new Date(a.Date));
-            }
-        } else if (e.target.id === "hospital") {
-            if (sortByHospital) {
-                setSortByHospital(false);
-                sorted = sorted.sort((a, b) => a.Hospital.localeCompare(b.Hospital));
-            } else {
-                setSortByHospital(true);
-                sorted = sorted.sort((a, b) => b.Hospital.localeCompare(a.Hospital));
-            }
-        } else if (e.target.id === "doctor") {
-            if (sortByDoctor) {
-                setSortByDoctor(false);
-                sorted = sorted.sort((a, b) => a.Doctor.localeCompare(b.Doctor));
-            } else {
-                setSortByDoctor(true);
-                sorted = sorted.sort((a, b) => b.Doctor.localeCompare(a.Doctor));
-            }
-        } else if (e.target.id === "nDate") {
-            if (sortByNDate) {
-                setSortByNDate(false);
-                sorted = sorted.sort((a, b) => new Date(a.NextAppointment) - new Date(b.NextAppointment));
-            } else {
-                setSortByNDate(true);
-                sorted = sorted.sort((a, b) => new Date(b.NextAppointment) - new Date(a.NextAppointment));
-            }
-        } else if (e.target.id === "reason") {
-            if (sortByReason) {
-                setSortByReason(false);
-                sorted = sorted.sort((a, b) => a.Reason.localeCompare(b.Reason));
-            } else {
-                setSortByReason(true);
-                sorted = sorted.sort((a, b) => b.Reason.localeCompare(a.Reason));
-            }
-        }
-        await setFilteredData(sorted);
-    };
-    //endregion
-
-    useEffect(() => {
-        const indexOfLastPost = currentPage * hospitalsPerPage;
-        const indexOfFirstPost = indexOfLastPost - hospitalsPerPage;
-        const updatedCurrentPosts = filteredData.slice(indexOfFirstPost, indexOfLastPost);
-        setCurrentPosts(updatedCurrentPosts);
-    }, [filteredData, currentPage, hospitalsPerPage])
 
     return (
         <div className="Container">
@@ -131,11 +75,11 @@ function RecordHelper() {
                     </div>
                     <div className="table-body-section">
                         <div className="column-header-section">
-                            <div className="table-cell-section">Appointment Date <i className="fa fa-sort sort-table-data" id="aDate" onClick={sortData}></i></div>
-                            <div className="table-cell-section">Hospital <i className="fa fa-sort sort-table-data" id="hospital" onClick={sortData}></i></div>
-                            <div className="table-cell-section">Doctor <i className="fa fa-sort sort-table-data" id="doctor" onClick={sortData}></i></div>
-                            <div className="table-cell-section">Next Consultation Date <i className="fa fa-sort sort-table-data" id="nDate" onClick={sortData}></i></div>
-                            <div className="table-cell-section">Reason <i className="fa fa-sort sort-table-data" id="reason" onClick={sortData}></i></div>
+                            <div className="table-cell-section">Appointment Date</div>
+                            <div className="table-cell-section">Hospital</div>
+                            <div className="table-cell-section">Doctor</div>
+                            <div className="table-cell-section">Next Consultation Date</div>
+                            <div className="table-cell-section">Reason</div>
                             <div className="table-cell-section">Prescription</div>
                         </div>
                         <hr className="table-row-divider"/>

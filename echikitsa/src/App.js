@@ -16,39 +16,53 @@ import RecordsDoctor from "./components/doctor-components/RecordsDoctor";
 import WelcomeAdmin from "./components/admin-components/WelcomeAdmin";
 import MonitorCallDoctor from "./components/doctor-components/MonitorCallDoctor";
 import ForgotPassword from "./components/common-components/ForgotPassword";
+import ProtectedRoute from "./components/route-guard/ProtectedRoute";
+import {AuthProvider} from "./components/route-guard/AuthContext";
+import {
+    BrowserRouter as Router,
+    Switch,
+} from "react-router-dom";
+import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLogin";
 
 
 function App() {
     return (
+<AuthProvider>
         <Routes>
+
             {/*Common Page Routes*/}
             <Route path='/' element={ <Home/> } />
-            <Route path='/signup' element={ <SignUp/> } />
-            <Route path='/login' element={ <Login/> } />
-                <Route path='/forgot-password' element={ <ForgotPassword/> } />
+            <Route path='/signup' element={ <SignUp /> } />
+            <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
+            {/*<Route path='/forgot-password' element={<ProtectedRouteForLogin Component={ForgotPassword}  />} />*/}
+            <Route path='/forgot-password' element={ <ForgotPassword/> } />
+
 
 
             {/*Patient Page Routes*/}
-            <Route path='/welcome' element={<WelcomePatient/>}/>
-            <Route path='/patient-profile/*' element={<ProfilePatient/>}/>
-            <Route path='/patient-records' element={<RecordsPatient/>}/>
-            <Route path='/hospital' element={ <HospitalDetailPatient/> } />
-            <Route path='/call/*' element={ <CallPagePatient/> } />
+            <Route path="/welcome" element={<ProtectedRoute Component={WelcomePatient} role ="PATIENT" /> } />
+            <Route path='/patient-profile/*' element={<ProtectedRoute Component={ProfilePatient} role ="PATIENT" />}/>
+            <Route path='/patient-records' element={<ProtectedRoute Component={RecordsPatient} role ="PATIENT" />}/>
+            <Route path='/hospital' element={ <ProtectedRoute Component={HospitalDetailPatient} role ="PATIENT" /> } />
+            <Route path='/call/*' element={ <ProtectedRoute Component={CallPagePatient} role ="PATIENT" /> } />
 
             {/*Doctor Page Routes*/}
-            <Route path='/dashboard' element={<DashboardDoctor/>}/>
-            <Route path='/consult/*' element={<ConsultationPageDoctor/>}/>
-            <Route path='/doctor-profile' element={<ProfileDoctor/>}/>
-            <Route path='/doctor-records' element={<RecordsDoctor/>}/>
+            <Route path='/dashboard' element={<ProtectedRoute Component={DashboardDoctor} role ="DOCTOR" />}/>
+            <Route path='/consult/*' element={<ProtectedRoute Component={ConsultationPageDoctor} role ="DOCTOR" />}/>
+            <Route path='/doctor-profile' element={<ProtectedRoute Component={ProfileDoctor} role ="DOCTOR" />}/>
+            <Route path='/doctor-records' element={<ProtectedRoute Component={RecordsDoctor} role ="DOCTOR" />}/>
 
             {/*Senior Doctor Page Routes*/}
-            <Route path='/monitor' element={<MonitorDoctor/>}/>
-            <Route path='/monitor-call/*' element={<MonitorCallDoctor/>}/>
+            <Route path='/monitor' element={<ProtectedRoute Component={MonitorDoctor} role ="DOCTOR" />}/>
+            <Route path='/monitor-call/*' element={<ProtectedRoute Component={MonitorCallDoctor} role ="DOCTOR" />}/>
 
             {/*Admin Page Routes*/}
-            <Route path='/admin' element={<WelcomeAdmin/>}/>
+            <Route path='/admin' element={<ProtectedRoute Component={WelcomeAdmin} role ="DOCTOR" />}/>
+
 
         </Routes>
+</AuthProvider>
+
     );
 }
 

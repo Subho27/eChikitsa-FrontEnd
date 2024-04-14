@@ -141,7 +141,8 @@ hr {
 .user-data-value {
     width: 70%;
     height: 35px;
-    border: none;
+    border: 1px solid lightblue;
+    border-radius: 5px;
 }
 
 .user-data-value::placeholder {
@@ -160,7 +161,7 @@ hr {
 }
 
 .update-profile-button {
-    width: 10%;
+    width: 120px;
     margin-top: 10px;
     float: right;
     right: 15px;
@@ -172,8 +173,26 @@ hr {
 }
 
 .update-profile-button:hover {
+    background-color: #FFFFFF;
+    border-color: #13c5dd;
+    color: #13c5dd;
+}
+
+.upload-profile-photo-button {
+    width: 11.5%;
+    float: right;
+    right: 15px;
+    border-radius: 5px;
+    border-width: 2px;
     background-color: #13c5dd;
-    color: #FFFFFF;
+    border-color: #13c5dd;
+    color: #ffffff;
+}
+
+.upload-profile-photo-button:hover {
+    background-color: #FFFFFF;
+    border-color: #13c5dd;
+    color: #13c5dd;
 }
 
 .UploadsRecords{
@@ -221,8 +240,19 @@ hr {
     align-items: center;
 }
 
-.upload-records-text {
+.file-input-profile {
     width: 40%;
+    color: black;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.upload-records-text {
+    width: 20%;
     color: black;
     padding-left: 15px;
 }
