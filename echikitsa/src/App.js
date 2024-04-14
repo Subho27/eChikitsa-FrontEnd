@@ -31,10 +31,12 @@ function App() {
         <Routes>
 
             {/*Common Page Routes*/}
-            <Route path='/' element={ <ProtectedRouteForLogin Component={Home}  /> } />
-            <Route path='/signup' element={ <ProtectedRouteForLogin Component={SignUp}  /> } />
+            <Route path='/' element={ <Home/> } />
+            <Route path='/signup' element={ <SignUp /> } />
             <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
-            <Route path='/forgot-password' element={<ProtectedRouteForLogin Component={ForgotPassword}  />} />
+            {/*<Route path='/forgot-password' element={<ProtectedRouteForLogin Component={ForgotPassword}  />} />*/}
+            <Route path='/forgot-password' element={ <ForgotPassword/> } />
+
 
 
             {/*Patient Page Routes*/}
