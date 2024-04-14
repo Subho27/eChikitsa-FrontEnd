@@ -11,22 +11,7 @@ import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../res
 
 function PatientHeaderHelper(props) {
     const [name, setName] = useState("");
-    // useEffect(() => {
-    //     let userid = getUserIdFromLocalStorage();
-    //     if (userid !== null)
-    //     {
-    //         const fetchUserName = async () => {
-    //             const response = axios.get(`http://localhost:8081/user/get-user-name/${userid}`).then((response) => {
-    //                 console.log(response)
-    //
-    //             });
-    //
-    //         }
-    //         fetchUserName()
-    //     }
-    //
-    //
-    // }, []);
+
     let userid = getUserIdFromLocalStorage();
     if (userid !== null)
     {
@@ -97,7 +82,7 @@ function PatientHeaderHelper(props) {
                             <div className="navbar-nav ms-auto py-0">
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
                                 <Link to="/patient-records" className={`nav-item nav-link ${props.data === 'record' ? 'active' : ''}`} >Records</Link>
-                                <Link to={"/patient-profile/"+props.id} className={`nav-item nav-link ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
+                                <Link to={"/patient-profile"} className={`nav-item nav-link profile-font ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
                                 <Link to="/" onClick={handleLogout} className="nav-item nav-link" >Logout</Link>
                                 {/*<Link to="/" className="custom-nav-item" >*/}
                                 {/*    <img className="logout" src={require("../../images/patient_landing_page/logout.png")} alt="Logout"/>*/}
