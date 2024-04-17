@@ -31,6 +31,7 @@ const LoginHelper = () => {
     const { setUser } = useAuth();
     const [confResult, setConfResult] = useState({});
     const [phoneOtpValues, setPhoneOtpValues] = useState(Array(6).fill(''));
+    const [passwordFieldType, setPasswordFieldType] = useState(true);
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
     };
@@ -319,7 +320,8 @@ const LoginHelper = () => {
                 </div>
                 {loginMethod === 'password' && (
                     <div className="field">
-                        <input type="password" value={password} onChange={handlePasswordChange} required/>
+                        <input type={passwordFieldType ? "password" : "text"} value={password} onChange={handlePasswordChange} required/>
+                        <i className={`${passwordFieldType ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType(!passwordFieldType)}}></i>
                         <label>Password</label>
                     </div>
                 )}
