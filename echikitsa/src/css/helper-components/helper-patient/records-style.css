@@ -280,6 +280,13 @@ th i:hover {
     cursor: pointer;
 }
 
+.down-icon {
+    margin: auto;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
 .sort-table-data {
     cursor: pointer;
 }
