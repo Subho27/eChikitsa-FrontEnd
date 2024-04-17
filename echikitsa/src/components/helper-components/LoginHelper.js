@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
@@ -11,6 +11,12 @@ import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../res
 import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
 import { useAuth } from '../route-guard/AuthContext';
 
+import 'firebase/compat/database';
+import 'firebase/compat/auth';
+
+import {firebaseConfig} from "../firebase-config/firebaseConfigProfileImages";
+import firebase from "firebase/compat/app";
+
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
     const [loginMethod, setLoginMethod] = useState('password'); // Default login method
@@ -18,12 +24,13 @@ const LoginHelper = () => {
     const [password, setPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
-    const [isOtpSent, setIsOtpSent] = useState(false);
+    const [isOtpSent, setIsOtpSent] = useState(true);
     const inputRefs = useRef([]);
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
     const { setUser } = useAuth();
-
+    const [confResult, setConfResult] = useState({});
+    const [phoneOtpValues, setPhoneOtpValues] = useState(Array(6).fill(''));
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
     };
@@ -93,22 +100,21 @@ const LoginHelper = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // Logic to handle login based on login method
+
         if (loginMethod === 'password') {
-            //console.log('Logging in with email and password:', email, password);
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
                 let role;
-                if(loginType == 'patient')
+                if(loginType === 'patient')
                 {
                    role = "PATIENT"
                 }
-                if(loginType == 'doctor')
+                if(loginType === 'doctor')
                 {
                     role = "DOCTOR"
                 }
-                if(loginType == 'admin'){
+                if(loginType === 'admin'){
                     role = "ADMIN"
 
                 }
@@ -116,7 +122,6 @@ const LoginHelper = () => {
                 const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then((response) => {
 
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
-                        //console.log(response.data)
 
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
@@ -139,11 +144,6 @@ const LoginHelper = () => {
                             });
                         }
                         if(loginType === 'admin'){
-                            // let path = '/admin'
-                            // navigate(path);
-                            // let path = `/admin/${response.data.id}`
-                            // navigate(path);
-
                             navigate("/admin",{state:{
                                     hospital_id:response.data.id}
                             });
@@ -168,12 +168,120 @@ const LoginHelper = () => {
 
         } else if (loginMethod === 'otp') {
             console.log('Logging in with mobile number and OTP:', mobileNumber, otp);
-            // Implement login with mobile number and OTP
+           try {
+               const headers = { 'Content-Type' : 'application/json' }
+               let role;
+               if(loginType === 'patient')
+               {
+                   role = "PATIENT"
+               }
+               if(loginType === 'doctor')
+               {
+                   role = "DOCTOR"
+               }
+               const response = await axios.post('http://localhost:9191/auth/login-using-otp', {mobileNumber,role},{headers}).then((response) => {
+
+                   if (response.data && response.data.role ===loginType.toUpperCase()) {
+                       saveJwtTokenToLocalStorage(response.data.token);
+                       saveUserIdToLocalStorage(response.data.id,response.data.role);
+                       alert("Login Successfully")
+                       if(loginType === 'patient')
+                       {
+                           let path = '/welcome'
+                           navigate(path);
+
+                       }
+                       if(loginType === 'doctor')
+                       {
+                           let path = '/dashboard'
+                           navigate(path);
+
+                       }
+
+
+                   }
+                   else {
+                       alert("email and password are incorrect")
+                   }
+               });
+
+
+           }catch (e) {
+               console.error('Error:', e);
+
+           }
+
+
         }
     };
 
+    const verifyOtp = () => {
+        let verificationCode = '';
+        verificationCode = phoneOtpValues.join('');
+        confResult.confirm(verificationCode).then((result) => {
+            // console.log("Success");
+            alert("Verified")
+
+        }).catch((error) => {
+            console.log("Error");
+        });
+    }
+
+    const sendOtp = () => {
+
+         const phoneNumber = "+91"+document.getElementById("phone-number").value;
+        console.log(phoneNumber)
+        const appVerifier = window.recaptchaVerifier;
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                setConfResult(confirmationResult);
+                console.log("REsult",confirmationResult)
+            }).catch((error) => {
+            console.log("expire");
+        });
+    }
+
+
+
+    const onClickSendOtpMobile = () => {
+        setIsOtpSent(true);
+        firebase.auth().useDeviceLanguage();
+
+        try {
+            if (!window.recaptchaVerifier) {
+
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    },
+                    'error-callback': (error) => {
+                        console.log(error);
+                    }
+                });
+
+                window.recaptchaVerifier.render().then(() =>{
+
+                    sendOtp();
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    }, []);
+
     return (
         <div className="wrapper" id="wrap">
+            <div id='recaptcha-container'></div>
             <div className="title">
                 Login Form
             </div>
@@ -203,9 +311,9 @@ const LoginHelper = () => {
 
             <form onSubmit={handleLogin}>
                 <div className="field" style={{ position: 'relative' }}>
-                    <input type="text" value={loginMethod === 'password' ? email : mobileNumber} onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange} required/>
+                    <input type="text" id="phone-number"  value={loginMethod === 'password' ? email : mobileNumber} onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange} required/>
                     {loginMethod === 'otp' && !isOtpSent && (
-                        <button className="send-otp-btn" type="button" onClick={handleGenerateOtp}>Send OTP</button>
+                        <button className="send-otp-btn" type="button" onClick={onClickSendOtpMobile}>Send OTP</button>
                     )}
                     <label>{loginMethod === 'password' ? 'Email Address' : 'Mobile Number'}</label>
                 </div>
@@ -226,7 +334,8 @@ const LoginHelper = () => {
                                 ))}
                             </div>
                             <div className="field">
-                                <input type="submit" value="Verify"/>
+                                <input type="submit" onClick={() => {verifyOtp();}} value="Verify"/>
+
                             </div>
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
