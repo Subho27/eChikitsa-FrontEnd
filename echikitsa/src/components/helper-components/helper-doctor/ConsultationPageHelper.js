@@ -8,9 +8,12 @@ import io from "socket.io-client";
 // import 'firebase/compat/auth';
 // import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 import axios from 'axios';
-import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import firebase from "firebase/compat/app";
+import {over} from "stompjs";
+import SockJS from "sockjs-client";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
 // Initialize Firebase if it's not already initialized
 // if (!firebase.apps.length) {
@@ -25,6 +28,9 @@ function ConsultationPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [addMedicines, setAddMedicines] = useState([]);
     const [prescriptionUpload, setPrescriptionUpload] = useState(null);
+    const [hasConsent, setHasConsent] = useState(false);
+    const [waitingConsent, setWaitingConsent] = useState(false);
+    const [consentGiven, setConsentGiven] = useState("");
 
     // Function to upload PDF file to Firebase Storage
     const generatePDF = async () => {
@@ -602,6 +608,35 @@ function ConsultationPageHelper(effect, deps) {
 
     }, [])
 
+    const askConsent = async () => {
+        setWaitingConsent(true);
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            await stompClient.send(`/app/send-consent-request/${getUserIdFromLocalStorage()}`);
+        });
+    }
+
+    useEffect(() => {
+        if(consentGiven !== "") {
+            if(consentGiven === "false") {
+                document.getElementById("consent-message").innerText = "Sorry, consent was not given by patient.";
+            }
+            else {
+                setWaitingConsent(false);
+                setHasConsent(true);
+            }
+        }
+    }, [consentGiven]);
+
+    useEffect(() => {
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
+            stompClient.subscribe(waiting, async (message) => {
+                setConsentGiven(message.body);
+            });
+        });
+    }, [])
 
     return (
         <div className="consult-page-container">
@@ -663,7 +698,14 @@ function ConsultationPageHelper(effect, deps) {
                         <Collapsible trigger="Ask for previous record" className="ask-record" openedClassName="ask-record-open"
                                      triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
                             <div>
-                                <table className="ask-record-table">
+                                {!hasConsent && !waitingConsent &&
+                                    <div>
+                                        <button className="ask-past-records" id="ask-consent-button" onClick={askConsent}>
+                                            Ask past records
+                                        </button>
+                                    </div>}
+                                {waitingConsent && <p id="consent-message">Waiting for patients' consent...</p>}
+                                {hasConsent && <table className="ask-record-table">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
@@ -676,11 +718,13 @@ function ConsultationPageHelper(effect, deps) {
                                             <tr key={index}>
                                                 <td>{new Date(record.date).toLocaleDateString()}</td>
                                                 <td>{record.doctor_name}</td>
-                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">Download Here</a></td>
+                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">
+                                                    <img className="download-prescription" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/>
+                                                </a></td>
                                             </tr>
                                         ))}
                                     </tbody>
-                                </table>
+                                </table>}
                             </div>
                         </Collapsible>
                     </div>
