@@ -7,26 +7,11 @@ import '../../css/helper-components/header-style.css'
 import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 import axios from "axios";
-import {getUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 
 function PatientHeaderHelper(props) {
     const [name, setName] = useState("");
-    // useEffect(() => {
-    //     let userid = getUserIdFromLocalStorage();
-    //     if (userid !== null)
-    //     {
-    //         const fetchUserName = async () => {
-    //             const response = axios.get(`http://localhost:8081/user/get-user-name/${userid}`).then((response) => {
-    //                 console.log(response)
-    //
-    //             });
-    //
-    //         }
-    //         fetchUserName()
-    //     }
-    //
-    //
-    // }, []);
+
     let userid = getUserIdFromLocalStorage();
     if (userid !== null)
     {
@@ -40,6 +25,11 @@ function PatientHeaderHelper(props) {
         }
         fetchUserName()
     }
+    const handleLogout = () => {
+        removeUserIdFromLocalStorage()
+
+    };
+
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">
@@ -93,7 +83,7 @@ function PatientHeaderHelper(props) {
                                 <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
                                 <Link to="/patient-records" className={`nav-item nav-link ${props.data === 'record' ? 'active' : ''}`} >Records</Link>
                                 <Link to={"/patient-profile"} className={`nav-item nav-link profile-font ${props.data === 'profile' ? 'active' : ''}`} >{name}</Link>
-                                <Link to="/" className="nav-item nav-link" >Logout</Link>
+                                <Link to="/" onClick={handleLogout} className="nav-item nav-link" >Logout</Link>
                                 {/*<Link to="/" className="custom-nav-item" >*/}
                                 {/*    <img className="logout" src={require("../../images/patient_landing_page/logout.png")} alt="Logout"/>*/}
                                 {/*    <span className="tooltip-text">Logout</span>*/}

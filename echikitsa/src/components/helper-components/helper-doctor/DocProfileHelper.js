@@ -1,27 +1,104 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import '../../../css/helper-components/helper-patient/profile-style.css';
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {number} from "sockjs-client/lib/utils/random";
 
 
 function DocProfilePage() {
-    const [profile, setProfile] = useState({
-        "firstName": "John",
-        "lastName": "Doe",
-        "mobile": "8782788392",
-        "address": "123 Main Street, City, Country",
-        "email": "john.doe@example.com",
-        "age": 30,
-        "gender": "Male",
-        "aadhar": "1234 - 5678 - 9012",
-        "registration": "DEL-123456",
-        "degree": "MBBS(Kolkata), MD",
-        "availability": "true",
-        "profilePicture": "review_profile.jpeg",
-        "seniority": "senior",
-        "rating": "4.3",
-        "specialization" : "General Medicine",
-        "experience": "15",
-        "hospital": "Sanjeevani Hospital"
-    });
+    const [profile, setProfile] = useState({});
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
+    const [age, setAge] = useState("");
+    const [gender, setGender] = useState('');
+    const [aadhaar, setAadhaar] = useState('');
+    const [role, setRole] = useState('');
+    const [state, setState] = useState('');
+    const [city, setCity] = useState('');
+    const [password, setPassword] = useState('');
+    const [imgUrl, setImgUrl] = useState('');
+    const [active, setActive] = useState('');
+    const [registrationNumber, setRegistrationNumber] = useState('');
+    const [degree, setDegree] = useState('');
+    const [experiences, setExperiences] = useState(10);
+    const [specialization, setSpecialization] = useState('');
+    // const [load, setLoad] = useState(false);
+    const [tmp, setTmp] = useState({});
+    const userId =  getUserIdFromLocalStorage();
+    useEffect(() => {
+        if (userId) {
+            const getUserData = async (e) => {
+                try {
+                    const token = getJwtTokenFromLocalStorage();
+                    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
+                    const response = await axios.get(`http://localhost:8081/doctor/get/${userId}`,{headers}).then((response) => {
+                         console.log(response.data);
+                        if (response.data) {
+                            setTmp(response.data);
+
+                            // setProfile(response.data)
+                            // const { data } = response
+                            // setFirstName(data.firstName);
+                            // setLastName(data.lastName);
+                            // setPhoneNumber(data.phoneNumber);
+                            // setExperiences(data.yearOfExp );
+                            // setEmail(data.email);
+                            // setAadhaar(data.aadhaar);
+                            // setState(data.state);
+                            // setCity(data.city);
+                            // setPassword(data.password);
+                            // setImgUrl(data.img_url);
+                            // setRole(data.role);
+                            // setAge(56);
+                            // setGender(data.gender);
+                            // setActive(data.active);
+                            // setRegistrationNumber(data.registrationNumber);
+                            // setDegree(data.degree);
+                            //
+                            // setSpecialization(data.specialization);
+
+
+                        }
+                        else {
+                            alert("Something went wrong !!")
+                        }
+
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+
+                }
+
+
+
+            };
+
+            getUserData();
+        }
+    }, [])
+    const handlePatientSave = async (newDocumentUrl) => {
+
+        try {
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+            const updatedData = {
+            };
+
+            const response = await axios.put(`http://localhost:9191/doctor/update-details/?id=${userId}`, tmp, { headers });
+            console.log(response.data);
+            if (response.data) {
+                alert(response.data);
+            } else {
+                alert("Something went wrong !!");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     const [updatedProfile, setUpdatedProfile] = useState({
         name: '',
@@ -31,10 +108,10 @@ function DocProfilePage() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUpdatedProfile({
-            ...updatedProfile,
+        setTmp(prevState => ({
+            ...prevState,
             [name]: value
-        });
+        }));
     };
 
     const makeEditable = (e) => {
@@ -83,17 +160,17 @@ function DocProfilePage() {
     return (
         <div>
             <div id="overlay-patient-profile" onClick={off}>
-                <img className="overlay-profile" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="profile"/>
+                <img className="overlay-profile" src={tmp.img_url} alt="profile"/>
             </div>
             <div className="containerProfile">
                 <div className="leftSideContents">
-                    <img className="profile-picture" src={require("../../../images/landing_body_img/"+profile.profilePicture)} alt="Profile"/>
+                    <img className="profile-picture" src={tmp.img_url} alt="Profile"/>
                     <div>
-                        <p className="profile-info">{((profile.seniority === "senior") ? "SDr. " : "JDr. ") + profile.firstName + " " + profile.lastName}</p>
-                        <p className="address-info">{profile.address}</p>
-                        <p className="address-info">{profile.hospital}</p>
-                        <p className="address-info">{profile.degree}</p>
-                        <p className="address-info">Rating : {profile.rating}/5</p>
+                        <p className="profile-info">{((tmp.yearOfExp > 15 ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
+                        <p className="address-info">{tmp.city +", "+ tmp.state}</p>
+                        {/*<p className="address-info">{profile.hospital}</p>*/}
+                        <p className="address-info">{tmp.age}</p>
+                        <p className="address-info">Rating : {tmp.rating}/5</p>
                     </div>
                     <div className="update-picture-button-section">
                         <button className="show-button" onClick={on}>SHOW PHOTO</button>
@@ -111,13 +188,13 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Name : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.firstName + " " + profile.lastName} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={tmp.firstName + " " + tmp.lastName} readOnly/>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Email ID : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.email} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => setTmp(prevState => ({ ...prevState, email: e.target.value }))} placeholder={tmp.email} readOnly={true}/>
                                     <i className="fa fa-pencil 0" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -126,13 +203,13 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Registration No. : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.registration} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={tmp.registrationNumber} readOnly/>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Degree : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.degree} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => setTmp(prevState => ({ ...prevState, degree: e.target.value }))} placeholder={tmp.degree} readOnly={true}/>
                                     <i className="fa fa-pencil 1" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -141,14 +218,14 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Phone : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={"+91-" + profile.mobile} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => setTmp(prevState => ({ ...prevState, phoneNumber: e.target.value }))} placeholder={"+91-" + tmp.phoneNumber} readOnly={true}/>
                                     <i className="fa fa-pencil 2" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Age : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.age + " Years"} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text"  onChange={(e) => setTmp(prevState => ({ ...prevState, age: e.target.value }))} placeholder={tmp.age + " Years"} readOnly={true}/>
                                     <i className="fa fa-pencil 3" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -157,13 +234,13 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Gender : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.gender} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={tmp.gender} readOnly/>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Aadhaar : </span>
-                                    <input className="user-data-value" type="text" placeholder={profile.aadhar} readOnly/>
+                                    <input className="user-data-value" type="text" placeholder={tmp.aadhaar} readOnly/>
                                 </div>
                             </td>
                         </tr>
@@ -171,15 +248,14 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.address} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => tmp.state(e.target.value)} placeholder={tmp.state} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Password : </span>
-                                    <input className="user-data-value editable" type="text" placeholder="XXXXXXXXXXXXXX" readOnly={true}/>
-                                    <i className="fa fa-pencil 5" onClick={makeEditable}></i>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => tmp.password(e.target.value)}placeholder="   ****    " readOnly={true}/>
                                 </div>
                             </td>
                         </tr>
@@ -187,14 +263,14 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Specialization : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.specialization} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text"  onChange={(e) => setTmp(prevState => ({ ...prevState, specialization: e.target.value }))} placeholder={tmp.specialization} readOnly={true}/>
                                     <i className="fa fa-pencil 6" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Experience : </span>
-                                    <input className="user-data-value editable" type="text" placeholder={profile.experience} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => setTmp(prevState => ({ ...prevState, yearOfExp: e.target.value }))} placeholder={tmp.yearOfExp} readOnly={true}/>
                                     <i className="fa fa-pencil 7" onClick={makeEditable}></i>
                                 </div>
                             </td>
@@ -202,7 +278,7 @@ function DocProfilePage() {
                         </tbody>
                     </table>
                     <div className="update-profile-button-section">
-                        <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={onProfileSave}>SAVE</button>
+                        <button className="update-profile-button visually-hidden" id="profile-update-button" onClick={handlePatientSave}>SAVE</button>
                     </div>
                 </div>
             </div>
