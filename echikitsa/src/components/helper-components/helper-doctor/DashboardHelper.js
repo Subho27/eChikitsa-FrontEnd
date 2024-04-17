@@ -204,6 +204,9 @@ function DashboardHelper() {
 
     const notify = () => {
         toastId.current = toast( <div className="call-notification">
+            <audio controls={false} autoPlay loop>
+                <source src={require('../../../images/Logo/call-sound.mp3')}  type="audio/mpeg"/>
+            </audio>
             <p>Incoming Call</p>
             <table className="call-table">
                 <tbody>
