@@ -64,6 +64,23 @@ function WelcomeHelper(props){
         });
     }
 
+    const quitWaiting = async () => {
+        await axios.post("http://localhost:9193/local/cancel-waiting", {
+            patientId: getUserIdFromLocalStorage(),
+            doctorId: assignedDoctorId
+        }).then(async (response) => {
+            console.log(response.data);
+            if(response.data.toString() === "true") {
+                const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+                stompClient.connect({}, async () => {
+                    await stompClient.send("/app/reload-position");
+                    alert("You chose not to wait for our Doctor. Please try again after some time.");
+                    setIsWaiting(false);
+                });
+            }
+        })
+    }
+
     useEffect(() => {
         if (assignedDoctorId) {
             const initializeWebSocket = () => {
@@ -114,7 +131,7 @@ function WelcomeHelper(props){
                     {!havePosition && <p className="queue-text">Note : Getting your position...</p>}
                     {havePosition && <p className="queue-text">Note : You are currently in position <span className="queue-position">{position.toString().padStart(2, "0")}</span></p>}
                     <img className="queue-image" src={require("../../../images/patient_landing_page/queue.jpg")} alt="queue"/>
-                    <button className="quit-waiting">QUIT WAITING</button>
+                    <button className="quit-waiting" onClick={quitWaiting}>QUIT WAITING</button>
                 </div>
             </div>)}
             <div className="image1">
