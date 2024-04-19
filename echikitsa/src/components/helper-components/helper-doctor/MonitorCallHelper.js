@@ -16,6 +16,10 @@ function MonitorCallHelper(effect, deps) {
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
+    const [isMuted, setIsMuted] = useState(true);
+    const [hasSound, setHasSound] = useState(true);
+    const [hasVideo, setHasVideo] = useState(true);
+    const [mediaStream, setMediaStream] = useState(null);
     //endregion
 
     //region Call Methods
@@ -345,7 +349,7 @@ function MonitorCallHelper(effect, deps) {
     const streamSuccess = (stream) => {
         const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
-
+        setMediaStream(stream);
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -448,6 +452,26 @@ function MonitorCallHelper(effect, deps) {
     }, [])
 
 
+    useEffect(() => {
+        const audioElements = document.getElementsByTagName("audio");
+        if(audioElements) {
+            const audioElementList = Array.from(audioElements);
+            audioElementList.forEach(audioElement => audioElement.muted = !hasSound);
+        }
+    }, [hasSound]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getAudioTracks()[0].enabled = isMuted;
+        }
+    }, [isMuted]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getVideoTracks()[0].enabled = hasVideo;
+        }
+    }, [hasVideo]);
+
     return (
 
         <div className="consult-page-container">
@@ -463,16 +487,16 @@ function MonitorCallHelper(effect, deps) {
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>
                         <div className="button-section">
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
+                                {hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-on-icon.png")} alt="Sound Off" onClick={() => setHasSound(!hasSound)}/>}
+                                {!hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound On" onClick={() => setHasSound(!hasSound)}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>
+                                {isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-on.png")} alt="Mic Off" onClick={() => {setIsMuted(!isMuted)}}/>}
+                                {!isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-off.png")} alt="Mic On" onClick={() => {setIsMuted(!isMuted)}}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video"/>
+                                {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
+                                {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
                             <button className="call-buttons">
                                 <img className="button-icon"
