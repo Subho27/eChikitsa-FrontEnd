@@ -100,7 +100,7 @@ function ProfilePage(props) {
                     const token = getJwtTokenFromLocalStorage();
                     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-                    const response = await axios.get(`http://localhost:8081/user/get-user/?id=${userId}`,{headers}).then((response) => {
+                    const response = await axios.get(`http://localhost:8083/echikitsa-backend/user/get-user/?id=${userId}`,{headers}).then((response) => {
                         console.log(response.data);
                         if (response.data) {
                             setProfile(response.data)
@@ -168,7 +168,7 @@ function ProfilePage(props) {
 
             };
 
-            const response = await axios.put(`http://localhost:9191/patient/update-details/?id=${userId}`, updatedData, { headers });
+            const response = await axios.put(`http://localhost:8083/user-handle/patient/update-details/?id=${userId}`, updatedData, { headers });
             console.log(response.data);
             if (response.data) {
                 alert(response.data);
@@ -205,7 +205,7 @@ function ProfilePage(props) {
 
             };
 
-            const response = await axios.put(`http://localhost:9191/patient/update-details/?id=${userId}`, updatedData, { headers });
+            const response = await axios.put(`http://localhost:8083/user-handle/patient/update-details/?id=${userId}`, updatedData, { headers });
             console.log(response.data);
             if (response.data) {
                 alert(response.data);

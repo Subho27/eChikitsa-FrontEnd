@@ -8,15 +8,17 @@ import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 import axios from "axios";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
 
 function PatientHeaderHelper(props) {
     const [name, setName] = useState("");
-
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     let userid = getUserIdFromLocalStorage();
     if (userid !== null)
     {
         const fetchUserName = async () => {
-            const response = axios.get(`http://localhost:8081/user/get-user-name/${userid}`).then((response) => {
+            const response = axios.get(`http://localhost:8083/echikitsa-backend/user/get-user-name/${userid}`,{headers}).then((response) => {
                 //console.log(response)
                 setName(response.data)
 
@@ -27,6 +29,7 @@ function PatientHeaderHelper(props) {
     }
     const handleLogout = () => {
         removeUserIdFromLocalStorage()
+        removeJwtTokenFromLocalStorage()
 
     };
 
