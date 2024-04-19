@@ -33,7 +33,9 @@ function App() {
         <Routes>
 
             {/*Common Page Routes*/}
-            <Route path='/' Component={ Home}  />
+
+            <Route path='/' Component={Home}  />
+
             <Route path='/signup' Component={SignUp}   />
             <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
             <Route path='/forgot-password' Component={ForgotPassword}   />

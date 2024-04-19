@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/doc-records-style.css";
+import Collapsible from "react-collapsible";
+import Select from "react-select";
 
 // Dummy patient records
 const dummyPatientRecords = [
@@ -168,7 +170,11 @@ const dummyPatientRecords = [
 
 const DocRecordHelper = () => {
     const [expandedRecordId, setExpandedRecordId] = useState(null);
+    const [isAge, setIsAge] = useState(false);
+    const [isDate, setIsDate] = useState(false);
+    const [isGender, setIsGender] = useState(false);
     const [filters, setFilters] = useState({ age: "", gender: "", date: "" });
+    const [selectedOption, setSelectedOption] = useState(null);
 
     const toggleExpandedRecord = (recordId) => {
         setExpandedRecordId(expandedRecordId === recordId ? null : recordId);
@@ -177,6 +183,18 @@ const DocRecordHelper = () => {
     const handleFilterChange = (e) => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
+
+    useEffect(() => {
+        if(selectedOption !== null) {
+            const e = {
+                "target" : {
+                    "name" : "gender",
+                    "value" : selectedOption.value
+                }
+            }
+            handleFilterChange(e);
+        }
+    }, [selectedOption])
 
     const filteredRecords = dummyPatientRecords.filter((record) => {
         return (
@@ -206,12 +224,164 @@ const DocRecordHelper = () => {
         }
     };
 
+    //region Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hospitalsPerPage, setHospitalsPerPage] = useState(7);
+    // const [currentPosts, setCurrentPosts] = useState([]);
+    const indexOfLastPost = currentPage * hospitalsPerPage;
+    const indexOfFirstPost = indexOfLastPost - hospitalsPerPage;
+    const currentPosts = filteredRecords.slice(indexOfFirstPost, indexOfLastPost);
+    const totalPosts = filteredRecords.length;
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        setNoOfOpened(0);
+    }
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalPosts / hospitalsPerPage); i++) {
+        pageNumbers.push(i);
+    }
+    //endregion
+
+    const [noOfOpened, setNoOfOpened] = useState(0);
+    useEffect(() => {
+        let changed = 930 + noOfOpened*95;
+        console.log(changed);
+        console.log(document.getElementById("change-height").style.height);
+        document.getElementById("change-height").style.height = `${changed}px`;
+    }, [noOfOpened]);
+
     return (
-        <div className="DocRecordContainer">
-            <div className="DocRecordTitle">
+        <div className="Container">
+            <div className="DocRecordTitle visually-hidden">
                 <span>Previous Records</span>
             </div>
-            <div className="DocRecordFilters">
+            <div className="doc-record-right" id="change-height">
+                <div className="whole-table-section">
+                    <div className="table-header-section">
+                        <div className="table-title">
+                            Previous Consultation Records
+                        </div>
+                        <div className="table-filter-section">
+                            {isAge && <input
+                                type="number"
+                                placeholder="Age"
+                                name="age"
+                                className="DocRecordAgeFilter"
+                                value={filters.age}
+                                onChange={handleFilterChange}
+                            />}
+                            <img src={require("../../../images/doctor-page-images/age.png")} alt="Age" className="doc-search-button-table"
+                                 onClick={() => {
+                                     setIsAge(!isAge);
+                                     setIsDate(false);
+                                     setIsGender(false);
+                                 }}/>
+                            {isGender && <Select
+                                className="DocRecordGenderFilter"
+                                options={[
+                                    { value: 'Male', label: 'Male' },
+                                    { value: 'Female', label: 'Female' },
+                                    { value: 'Others', label: 'Others' },
+                                ]}
+                                defaultValue={selectedOption}
+                                onChange={setSelectedOption}/>}
+                            <img src={require("../../../images/doctor-page-images/gender.png")} alt="Gender" className="doc-search-button-table"
+                                 onClick={() => {
+                                     setIsGender(!isGender);
+                                     setIsDate(false);
+                                     setIsAge(false);
+                                 }}/>
+                            {isDate && <input
+                                type="date"
+                                name="date"
+                                className="DocRecordDateFilter"
+                                value={filters.date}
+                                onChange={handleFilterChange}
+                            />}
+                            <img src={require("../../../images/doctor-page-images/date.png")} alt="Date" className="doc-search-button-table"
+                                 onClick={() => {
+                                     setIsDate(!isDate);
+                                     setIsAge(false);
+                                     setIsGender(false);
+                                 }}/>
+                        </div>
+                        {/*<div className="table-search">*/}
+                        {/*    <div className="search-widget">*/}
+                        {/*        <input*/}
+                        {/*            className="search-section visually-hidden"*/}
+                        {/*            id="search-field"*/}
+                        {/*            placeholder="Filter Here..."*/}
+                        {/*            onChange={(e) => setQuery(e.target.value.toLowerCase())} />*/}
+                        {/*        <i className="fa fa-search search-button-table" onClick={handleSearchClick}></i>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+                    </div>
+                    <div className="table-body-section">
+                        <div className="column-header-section">
+                            <div className="doc-table-cell-section">Appointment Date</div>
+                            <div className="doc-table-cell-section">Patient Name</div>
+                            <div className="doc-table-cell-section">Gender</div>
+                            <div className="doc-table-cell-section">Age</div>
+                            <div className="doc-table-cell-section">Reason</div>
+                            <div className="doc-table-cell-section">Prescription</div>
+                            <div className="doc-table-cell-small-section"></div>
+                        </div>
+                        <hr className="table-row-divider"/>
+                        <div className="table-data-section">
+                            {currentPosts.map((item) => (
+                                <div key={item.id}>
+                                    <Collapsible
+                                        trigger={
+                                            <div className="table-row-section">
+                                                <div className="doc-table-cell-section">{item.date}</div>
+                                                <div className="doc-table-cell-section">{item.firstName + " " + item.lastName}</div>
+                                                <div className="doc-table-cell-section">{item.gender}</div>
+                                                <div className="doc-table-cell-section">{item.age}</div>
+                                                <div className="doc-table-cell-section">{item.patientHistory[0]}</div>
+                                                <div className="doc-table-cell-section"><img className="download-icon" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/></div>
+                                                <div className="doc-table-cell-small-section"><img className="down-icon" src={require("../../../images/doctor-page-images/down-arrow.png")} alt="Down"/></div>
+                                            </div>
+                                        }
+                                         triggerWhenOpen = {
+                                             <div className="table-row-section">
+                                                 <div className="doc-table-cell-section">{item.date}</div>
+                                                 <div className="doc-table-cell-section">{item.firstName + " " + item.lastName}</div>
+                                                 <div className="doc-table-cell-section">{item.gender}</div>
+                                                 <div className="doc-table-cell-section">{item.age}</div>
+                                                 <div className="doc-table-cell-section">{item.patientHistory[0]}</div>
+                                                 <div className="doc-table-cell-section"><img className="download-icon" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/></div>
+                                                 <div className="doc-table-cell-small-section"><img className="down-icon" src={require("../../../images/doctor-page-images/up-arrow.png")} alt="Up"/></div>
+                                             </div>
+                                         }
+                                         onOpening={() => setNoOfOpened(noOfOpened+1)}
+                                         onClose={() => setNoOfOpened(noOfOpened-1)}>
+                                        <div className="table-row-section">
+                                            <div className="doc-table-cell-child-section"><strong>Repeat : </strong>{item.repeatPatient !== undefined && item.repeatPatient.toUpperCase()}</div>
+                                            <div className="doc-table-cell-child-section"><strong>Last Appointment : </strong>{item.lastAppointment}</div>
+                                            <div className="doc-table-cell-child-section"><strong>Height : </strong>{item.height}</div>
+                                            <div className="doc-table-cell-child-section"><strong>Weight : </strong>{item.weight}</div>
+                                            <div className="doc-table-cell-child-section"><strong>Blood Group : </strong>{item.blood}</div>
+                                        </div>
+                                    </Collapsible>
+                                    <hr className="table-row-divider"/>
+                                </div>
+                            ))}
+                        </div>
+                        <nav>
+                            <ul className='pagination custom-pagination'>
+                                {pageNumbers.map(number => (
+                                    <li key={number} className='page-item'>
+                                <span onClick={() => paginate(number)} className={`page-link ${currentPage === number ? 'active' : ''}`}>
+                                    {number}
+                                </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div className="DocRecordFilters visually-hidden">
                 <input
                     type="number"
                     placeholder="Age"
@@ -233,7 +403,7 @@ const DocRecordHelper = () => {
                     onChange={handleFilterChange}
                 />
             </div>
-            <div className="DocRecordList">
+            <div className="DocRecordList visually-hidden">
                 <div className="records">
                     <div className="record imp">
                         <div className="field field-heading">ID</div>

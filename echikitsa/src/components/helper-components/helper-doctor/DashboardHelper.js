@@ -208,6 +208,9 @@ function DashboardHelper() {
 
     const notify = () => {
         toastId.current = toast( <div className="call-notification">
+            <audio controls={false} autoPlay loop>
+                <source src={require('../../../images/Logo/call-sound.mp3')}  type="audio/mpeg"/>
+            </audio>
             <p>Incoming Call</p>
             <table className="call-table">
                 <tbody>
@@ -262,7 +265,7 @@ function DashboardHelper() {
     return (
         <div>
             <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
-            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>
+            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
