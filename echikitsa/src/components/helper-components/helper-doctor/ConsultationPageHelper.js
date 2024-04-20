@@ -8,9 +8,12 @@ import io from "socket.io-client";
 // import 'firebase/compat/auth';
 // import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 import axios from 'axios';
-import {storage} from "../../firebase-config/firebaseConfigProfileImages";
+import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import firebase from "firebase/compat/app";
+import {over} from "stompjs";
+import SockJS from "sockjs-client";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
 // Initialize Firebase if it's not already initialized
 // if (!firebase.apps.length) {
@@ -25,6 +28,9 @@ function ConsultationPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [addMedicines, setAddMedicines] = useState([]);
     const [prescriptionUpload, setPrescriptionUpload] = useState(null);
+    const [hasConsent, setHasConsent] = useState(false);
+    const [waitingConsent, setWaitingConsent] = useState(false);
+    const [consentGiven, setConsentGiven] = useState("");
 
     // Function to upload PDF file to Firebase Storage
     const generatePDF = async () => {
@@ -92,6 +98,10 @@ function ConsultationPageHelper(effect, deps) {
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
     const [localStream, setLocalStream] = useState(null);
+    const [isMuted, setIsMuted] = useState(true);
+    const [hasSound, setHasSound] = useState(true);
+    const [hasVideo, setHasVideo] = useState(true);
+    const [mediaStream, setMediaStream] = useState(null);
     //endregion
 
     const writePrescription = () => {
@@ -270,7 +280,7 @@ function ConsultationPageHelper(effect, deps) {
             if (params.kind === 'audio') {
                 console.log('Middle');
                 //append to the audio container
-                newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>'
+                newElem.innerHTML = `<audio id=${remoteProducerId} autoplay ></audio>`
             } else {
                 console.log('Middle');
                 //append to the video container
@@ -484,6 +494,8 @@ function ConsultationPageHelper(effect, deps) {
         const localVideo = document.querySelector('video#doctorLocalStream');
         localVideo.srcObject = stream
         setLocalStream(stream);
+        setMediaStream(stream);
+        // stream.getAudioTracks()[0].enabled = false;
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -602,6 +614,55 @@ function ConsultationPageHelper(effect, deps) {
 
     }, [])
 
+    const askConsent = async () => {
+        setWaitingConsent(true);
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            await stompClient.send(`/app/send-consent-request/${getUserIdFromLocalStorage()}`);
+        });
+    }
+
+    useEffect(() => {
+        if(consentGiven !== "") {
+            if(consentGiven === "false") {
+                document.getElementById("consent-message").innerText = "Sorry, consent was not given by patient.";
+            }
+            else {
+                setWaitingConsent(false);
+                setHasConsent(true);
+            }
+        }
+    }, [consentGiven]);
+
+    useEffect(() => {
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
+            stompClient.subscribe(waiting, async (message) => {
+                setConsentGiven(message.body);
+            });
+        });
+    }, [])
+
+    useEffect(() => {
+        const audioElements = document.getElementsByTagName("audio");
+        if(audioElements) {
+            const audioElementList = Array.from(audioElements);
+            audioElementList.forEach(audioElement => audioElement.muted = !hasSound);
+        }
+    }, [hasSound]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getAudioTracks()[0].enabled = isMuted;
+        }
+    }, [isMuted]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getVideoTracks()[0].enabled = hasVideo;
+        }
+    }, [hasVideo]);
 
     return (
         <div className="consult-page-container">
@@ -639,13 +700,16 @@ function ConsultationPageHelper(effect, deps) {
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>
                         <div className="button-section">
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
+                                {hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-on-icon.png")} alt="Sound Off" onClick={() => setHasSound(!hasSound)}/>}
+                                {!hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound On" onClick={() => setHasSound(!hasSound)}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>
+                                {isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-on.png")} alt="Mic Off" onClick={() => {setIsMuted(!isMuted)}}/>}
+                                {!isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-off.png")} alt="Mic On" onClick={() => {setIsMuted(!isMuted)}}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video"/>
+                                {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
+                                {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
                             <button className="call-buttons">
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
@@ -663,7 +727,14 @@ function ConsultationPageHelper(effect, deps) {
                         <Collapsible trigger="Ask for previous record" className="ask-record" openedClassName="ask-record-open"
                                      triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
                             <div>
-                                <table className="ask-record-table">
+                                {!hasConsent && !waitingConsent &&
+                                    <div>
+                                        <button className="ask-past-records" id="ask-consent-button" onClick={askConsent}>
+                                            Ask past records
+                                        </button>
+                                    </div>}
+                                {waitingConsent && <p id="consent-message">Waiting for patients' consent...</p>}
+                                {hasConsent && <table className="ask-record-table">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
@@ -676,11 +747,13 @@ function ConsultationPageHelper(effect, deps) {
                                             <tr key={index}>
                                                 <td>{new Date(record.date).toLocaleDateString()}</td>
                                                 <td>{record.doctor_name}</td>
-                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">Download Here</a></td>
+                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">
+                                                    <img className="download-prescription" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/>
+                                                </a></td>
                                             </tr>
                                         ))}
                                     </tbody>
-                                </table>
+                                </table>}
                             </div>
                         </Collapsible>
                     </div>

@@ -3,7 +3,6 @@
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    color: white;
 }
 
 .DocRecordTitle {
@@ -29,23 +28,22 @@
 }
 
 .DocRecordDateFilter {
-    width: 15%;
-    border-radius: 20px;
+    width: 45%;
+    border-radius: 5px;
+    color: black;
+    padding-left: 30px;
 }
 
 .DocRecordGenderFilter {
-    width: 15%;
-    height: 38px;
-    border-radius: 20px;
+    width: 45%;
+    border-radius: 2px;
+    color: black;
 }
 
 .DocRecordAgeFilter {
-    width: 15%;
-    border-radius: 20px;
-    height: 38px;
-}
-.DocRecordAgeFilter::placeholder{
-    color:black;
+    width: 45%;
+    border-radius: 2px;
+    color: black;
 }
 
 .DocRecordFilters select,
@@ -208,4 +206,66 @@
 
 .field-heading {
     color: #FFFFFF !important;
+}
+
+.doc-record-right {
+    width: 100%;
+    height: 930px;
+    margin-bottom: 80px;
+}
+
+.doc-record-right::-webkit-scrollbar {
+    width: 10px;
+}
+
+
+.doc-record-right::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+
+.doc-record-right::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+.doc-record-right::-webkit-scrollbar-thumb:hover {
+    background: #848E9F;
+}
+
+.doc-table-cell-section {
+    width: 15%;
+    text-align: center;
+}
+
+.doc-table-cell-child-section {
+    width: 20%;
+    text-align: center;
+    justify-content: space-evenly;
+}
+
+.doc-table-cell-small-section {
+    width: 10%;
+    text-align: center;
+}
+
+.table-filter-section {
+    width: 30%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+    padding-right: 3px;
+    column-gap: 5px;
+}
+
+.doc-search-button-table {
+    background-color: #FFFFFF;
+    color: black;
+    height: 40px;
+    width: 40px;
+    padding: 2px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 5px;
 }

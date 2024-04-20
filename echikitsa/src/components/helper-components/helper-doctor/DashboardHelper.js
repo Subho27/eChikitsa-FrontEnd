@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SockJS from "sockjs-client";
 import {over} from "stompjs";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
@@ -33,27 +34,30 @@ function DashboardHelper() {
     const [nextPatients, setNextPatients] = useState([]);
     const navigate = useNavigate();
     let notifyCount = 0;
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
         const getNoOfPatient = async () => {
             try {
                 const responses = await axios.get(
-                    "http://localhost:8081/ehr/get-history/10"
+                    "http://localhost:8083/echikitsa-backend/ehr/get-history/10",{headers}
 
                 );
                 setData(responses.data);
                 const totalConsulted = await axios.get(
-                    "http://localhost:8081/ehr/get-no-patient/10"
+                    "http://localhost:8083/echikitsa-backend/ehr/get-no-patient/10",{headers}
                 );
                 setNoOfPatient(totalConsulted.data);
                 const totalConsulteds = await axios.get(
-                    "http://localhost:8081/ehr/get-no-patient-consulted-today/10"
+                    "http://localhost:8083/echikitsa-backend/ehr/get-no-patient-consulted-today/10",{headers}
 
                 );
                 setNoOfPatientToday(totalConsulteds.data);
                 const response = await axios.get(
-                    "http://localhost:8081/ehr/get-freq-patient/10"
+                    "http://localhost:8083/echikitsa-backend/ehr/get-freq-patient/10",{headers}
 
                 );
                 setTodayDate(response.data);
@@ -204,6 +208,9 @@ function DashboardHelper() {
 
     const notify = () => {
         toastId.current = toast( <div className="call-notification">
+            <audio controls={false} autoPlay loop>
+                <source src={require('../../../images/Logo/call-sound.mp3')}  type="audio/mpeg"/>
+            </audio>
             <p>Incoming Call</p>
             <table className="call-table">
                 <tbody>
@@ -257,8 +264,8 @@ function DashboardHelper() {
 
     return (
         <div>
-            {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
-            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.webp")} alt="Call"/></button>
+            <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
+            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">

@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-patient/testing-welcome.css"
 import {useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
 function TestingWelcome() {
     const [query, setQuery] = useState("");
@@ -23,11 +24,12 @@ function TestingWelcome() {
     const [selectedSpecialisations, setSelectedSpecialisations] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
     const [selectedSrDoctor, setSelectedSrDoctor] = useState([]);
-
-
     const navigate = useNavigate();
     const {state}=useLocation();
    // console.log(state.user_id)
+
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     const handleHospitalTabClick = (id) => {
 
          navigate("/hospital",{state:{
@@ -40,7 +42,7 @@ function TestingWelcome() {
         const getHospitalDetails = async () => {
             try {
                 const response = await axios.get(
-                    "http://localhost:8081/hospital/get-hospitals-landing"
+                    "http://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
                 );
                 console.log(response.data)
                 setHospitalData(response.data);
