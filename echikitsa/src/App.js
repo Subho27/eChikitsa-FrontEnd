@@ -23,6 +23,8 @@ import {
     Switch,
 } from "react-router-dom";
 import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLogin";
+import {ToastContainer} from "react-toastify";
+import React from "react";
 
 
 function App() {

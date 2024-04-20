@@ -119,46 +119,37 @@ const LoginHelper = () => {
 
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
                         //console.log(response.data)
+                        // toast.success("Login Successful.", { position: "top-right" });
 
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
-
-                        // alert("Login Successfully")
                         await notify();
-                        if(loginType === 'patient')
-                        {
-                            // let path = '/welcome'
-                            // navigate(path);
-                            navigate("/welcome",{state:{
-                                    patient_id:response.data.id}
-                            });
-                        }
-                        if(loginType === 'doctor')
-                        {
-                            // let path = '/dashboard'
-                            // navigate(path);
-                            navigate("/dashboard",{state:{
-                                    doctor_id:response.data.id}
-                            });
-                        }
-                        if(loginType === 'admin'){
-                            // let path = '/admin'
-                            // navigate(path);
-                            // let path = `/admin/${response.data.id}`
-                            // navigate(path);
 
-                            navigate("/admin",{state:{
-                                    hospital_id:response.data.id}
-                            });
+                         // alert("Login Successfully")
 
-                        };
+                            if(loginType === 'patient')
+                            {
+                                navigate("/welcome",{state:{
+                                        patient_id:response.data.id}
+                                });
+                            }
+                            if(loginType === 'doctor')
+                            {
+                                navigate("/dashboard",{state:{
+                                        doctor_id:response.data.id}
+                                });
+                            }
+                            if(loginType === 'admin')
+                            {
+                                navigate("/admin",{state:{
+                                        hospital_id:response.data.id}
+                                });
 
-
-
-
+                            }
 
                     }
                     else {
+                        await notify2();
                         alert("email and password are incorrect")
                     }
                     //console.log('Response:', response);
@@ -176,12 +167,15 @@ const LoginHelper = () => {
     };
 
     const notify = async () => {
-        toast.success("Login Successful.", { position: "top-center" });
-    }
+        toast.success("Login Successful.", { position: "top-right" });
+    };
+    const notify2 = async () => {
+        toast.success("Email or Password is incorrect", { position: "top-right" });
+    };
 
     return (
         <div className="wrapper" id="wrap">
-            <ToastContainer autoClose={false}/>
+            {/*<ToastContainer autoClose={5000}/>*/}
             <div className="title">
                 Login Form
             </div>
