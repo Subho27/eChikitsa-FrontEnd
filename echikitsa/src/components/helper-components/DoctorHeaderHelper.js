@@ -7,6 +7,7 @@ import '../../css/helper-components/header-style.css'
 import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 import axios from "axios";
+import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
 
 
 
@@ -21,11 +22,14 @@ const DoctorHeaderHelper = (props) => {
     }
     const handleLogout = () =>{
         removeUserIdFromLocalStorage();
+        removeJwtTokenFromLocalStorage()
     }
 
 
     const fetchUserName = async () => {
-        const response = axios.get(`http://localhost:8081/user/get-user-name/${getUserIdFromLocalStorage()}`).then((response) => {
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        const response = axios.get(`http://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
             //console.log(response)
             setName(response.data)
 

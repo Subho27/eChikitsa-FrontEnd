@@ -155,7 +155,7 @@ const SignUpHelper = () => {
             if(signupType === 'patient')
             {
                 const headers = { 'Content-Type' : 'application/json' }
-                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formData.email}).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/email/sendEmail', {"email":formData.email}).then((response) => {
                     if (response.data) {
                         alert("OTP Sent Successfully on your email!!")
 
@@ -167,7 +167,7 @@ const SignUpHelper = () => {
 
             }else {
 
-                const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
                     if (response.data) {
                         alert("OTP Sent Successfully on your email!!")
 
@@ -193,7 +193,7 @@ const SignUpHelper = () => {
         try {
             if (signupType === 'patient') {
                 verificationCode = emailOtpValues.join('');
-                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
                     if (response.data) {
                         alert("Verified")
                         document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
@@ -209,8 +209,7 @@ const SignUpHelper = () => {
             } else {
                 verificationCode = emailOtpValuesHospital.join('');
 
-
-                const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
                     console.log(response.data)
                     if (response.data) {
                         // alert("Verified")
@@ -339,7 +338,7 @@ const SignUpHelper = () => {
 
             try {
 
-                const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/patient/registerPatient', formData).then((response) => {
                     // console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
@@ -365,7 +364,7 @@ const SignUpHelper = () => {
             console.log(formDataHospital);
             try {
 
-                const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/hospital/add-hospital', formDataHospital).then((response) => {
                     // console.log(response.data);
                     if (response.data) {
                         alert("registered successfully !!")
