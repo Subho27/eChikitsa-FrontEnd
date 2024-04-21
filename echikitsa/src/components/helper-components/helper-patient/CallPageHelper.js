@@ -13,6 +13,8 @@ import axios from "axios";
 import SockJS from "sockjs-client";
 import {over} from "stompjs";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import firebase from "firebase/compat/app";
+import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -22,6 +24,9 @@ function CallPageHelper(effect, deps) {
     const [medicines, setMedicines] = useState([]);
     const [prescription, setPrescription] = useState([]);
     const [isOpen, setIsOpen] = useState(true);
+    const [consentFromDoctor, setConsentFromDoctor] = useState("");
+    const [consentOpen, setConsentOpen] = useState(false);
+    const [confResult, setConfResult] = useState({});
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
     let i = 0;
 
@@ -34,6 +39,10 @@ function CallPageHelper(effect, deps) {
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
     const [localStream, setLocalStream] = useState(null);
+    const [isMuted, setIsMuted] = useState(true);
+    const [hasSound, setHasSound] = useState(true);
+    const [hasVideo, setHasVideo] = useState(true);
+    const [mediaStream, setMediaStream] = useState(null);
     //endregion
 
     const liveClock = () => {
@@ -468,6 +477,7 @@ function CallPageHelper(effect, deps) {
         const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
         setLocalStream(stream);
+        setMediaStream(stream);
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -600,13 +610,16 @@ function CallPageHelper(effect, deps) {
         const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
         setToday(tomorrowFormatted);
 
-        //region Connection & Room
-        //Handle room name
-
-        //endregion
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            const waiting = `/topic/get-consent-request/${getUserIdFromLocalStorage()}`;
+            stompClient.subscribe(waiting, async (message) => {
+                setConsentFromDoctor(message.body);
+                setConsentOpen(true);
+            });
+        });
 
     }, [])
-
 
     function off() {
         const overlay = document.getElementById("overlay");
@@ -653,9 +666,101 @@ function CallPageHelper(effect, deps) {
         navigate('/welcome');
     }
 
+    const verifyConsent = () => {
+        const isHidden = document.getElementById("consent-otp-check");
+        if (isHidden !== null) {
+            isHidden.className = "fg visually-hidden";
+        }
+        const verificationCode = parseInt(emailOtpValues.join(''));
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            confResult.confirm(verificationCode).then( (result) => {
+                stompClient.send(`/app/consent-reply/${consentFromDoctor}`, {}, true);
+            }).catch((error) => {
+                stompClient.send(`/app/consent-reply/${consentFromDoctor}`, {}, false);
+            });
+        });
+        setConsentOpen(false);
+    }
+
+    const sendOtp = () => {
+        const phoneNumber = "+91"+document.getElementById("phone-number").value; //---------- Patient Phone Number
+        const appVerifier = window.recaptchaVerifier;
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                setConfResult(confirmationResult);
+            }).catch((error) => {
+            console.log("expire");
+        });
+    }
+
+    const allowConsent = () => {
+        const isHidden = document.getElementById("consent-otp-check");
+        if (isHidden !== null) {
+            isHidden.className = "fg";
+        }
+        firebase.auth().useDeviceLanguage();
+        try {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    },
+                    'error-callback': (error) => {
+                        console.log(error);
+                    }
+                });
+                window.recaptchaVerifier.render().then(() =>{
+                    sendOtp();
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    }, []);
+
+    const cancelConsent = () => {
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            await stompClient.send(`/app/consent-reply/${consentFromDoctor}`, {}, false);
+            setConsentOpen(false);
+        });
+    }
+
+    useEffect(() => {
+        const audioElements = document.getElementsByTagName("audio");
+        if(audioElements) {
+            const audioElementList = Array.from(audioElements);
+            audioElementList.forEach(audioElement => audioElement.muted = !hasSound);
+        }
+    }, [hasSound]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getAudioTracks()[0].enabled = isMuted;
+        }
+    }, [isMuted]);
+
+    useEffect(() => {
+        if(mediaStream) {
+            mediaStream.getVideoTracks()[0].enabled = hasVideo;
+        }
+    }, [hasVideo]);
+
     return (
 
         <div className="consult-page-container">
+            <div id='recaptcha-container'></div>
             <div>
                 {isOpen && <StyledPopup className="call-confirmation" id="confirmation" modal defaultOpen={true} closeOnDocumentClick={false}>
                     <div className="confirmation-content">
@@ -681,16 +786,16 @@ function CallPageHelper(effect, deps) {
                         <div className="time-duration-section"><span className="time-duration">02:34</span></div>
                         <div className="button-section">
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound"/>
+                                {hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-on-icon.png")} alt="Sound Off" onClick={() => setHasSound(!hasSound)}/>}
+                                {!hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-icon.png")} alt="Sound On" onClick={() => setHasSound(!hasSound)}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/mute-icon.png")} alt="Mute"/>
+                                {isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-on.png")} alt="Mic Off" onClick={() => {setIsMuted(!isMuted)}}/>}
+                                {!isMuted && <img className="button-icon" src={require("../../../images/doctor-page-images/mic-off.png")} alt="Mic On" onClick={() => {setIsMuted(!isMuted)}}/>}
                             </button>
                             <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video"/>
+                                {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
+                                {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
                             <button className="call-buttons">
                                 <img className="button-icon"
@@ -720,24 +825,22 @@ function CallPageHelper(effect, deps) {
                 </div>
                 <div className="activity-section-patient">
                     <div>
-                        <Collapsible trigger="Consent for Retrieval of Past Medical Records" className="ask-record"
-                                     openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger"
-                                     triggerOpenedClassName="ask-record-open-trigger">
+                        <Collapsible
+                            trigger="Consent for Retrieval of Past Medical Records"
+                            className="ask-record"
+                            openedClassName="ask-record-open"
+                            triggerClassName="ask-record-closed-trigger"
+                            triggerOpenedClassName="ask-record-open-trigger"
+                            open={consentOpen}
+                            triggerDisabled={true}>
                             <div>
                                 <div id="dialogBox" className="dialog">
                                     <div className="dialog-content">
-                                        <div className="doctor-icon">Dr. [Doctor's Name]</div>
+                                        <div className="doctor-icon">Dr. {consentFromDoctor}</div>
                                         <p className="request">is requesting access to your medical records.</p>
                                         <div className="button-container">
-                                            <button id="allowButton" onClick={() => {
-                                                const isHidden = document.getElementById("consent-otp-check");
-                                                if (isHidden !== null) {
-                                                    isHidden.className = "fg";
-                                                }
-                                            }}>Allow
-                                            </button>
-                                            <button id="cancelButton">Cancel</button>
+                                            <button id="allowButton" onClick={allowConsent}>Allow</button>
+                                            <button id="cancelButton" onClick={cancelConsent}>Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -752,12 +855,7 @@ function CallPageHelper(effect, deps) {
                                             ))}
                                         </div>
                                         <div className="field">
-                                            <input type="submit" value={`Verify`} onClick={() => {
-                                                const isHidden = document.getElementById("consent-otp-check");
-                                                if (isHidden !== null) {
-                                                    isHidden.className = "fg visually-hidden";
-                                                }
-                                            }}/>
+                                            <input type="submit" value={`Verify your Consent`} onClick={verifyConsent}/>
                                         </div>
                                         <div id="resend-otp">
                                             <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>

@@ -18,11 +18,13 @@ import MonitorCallDoctor from "./components/doctor-components/MonitorCallDoctor"
 import ForgotPassword from "./components/common-components/ForgotPassword";
 import ProtectedRoute from "./components/route-guard/ProtectedRoute";
 import {AuthProvider} from "./components/route-guard/AuthContext";
+
 import {
     BrowserRouter as Router,
     Switch,
 } from "react-router-dom";
 import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLogin";
+import PageNotFound from "./components/helper-components/PageNotFound";
 
 
 function App() {
@@ -31,12 +33,10 @@ function App() {
         <Routes>
 
             {/*Common Page Routes*/}
-            <Route path='/' element={ <Home/> } />
-            <Route path='/signup' element={ <SignUp /> } />
+            <Route path='/' Component={ Home}  />
+            <Route path='/signup' Component={SignUp}   />
             <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
-            {/*<Route path='/forgot-password' element={<ProtectedRouteForLogin Component={ForgotPassword}  />} />*/}
-            <Route path='/forgot-password' element={ <ForgotPassword/> } />
-
+            <Route path='/forgot-password' Component={ForgotPassword}   />
 
 
             {/*Patient Page Routes*/}
@@ -58,6 +58,8 @@ function App() {
 
             {/*Admin Page Routes*/}
             <Route path='/admin' element={<ProtectedRoute Component={WelcomeAdmin} role ="DOCTOR" />}/>
+
+            <Route path="*" Component={PageNotFound} />
 
 
         </Routes>

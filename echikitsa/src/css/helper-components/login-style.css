@@ -288,3 +288,11 @@ button:active {
     background-color: #0056b3;
 }
 
+.toggle-password {
+    position: absolute;
+    top: 30%;
+    right: 20px;
+    cursor: pointer;
+    color: #13c5dd;
+}
+

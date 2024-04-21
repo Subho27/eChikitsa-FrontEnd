@@ -12,6 +12,12 @@ import {getUserIdFromLocalStorage, saveUserIdToLocalStorage} from "../../resourc
 import { useAuth } from '../route-guard/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
 import {Bounce, toast, ToastContainer} from "react-toastify";
+//import jwt from 'jsonwebtoken';
+import 'firebase/compat/database';
+import 'firebase/compat/auth';
+
+import {firebaseConfig} from "../firebase-config/firebaseConfigProfileImages";
+import firebase from "firebase/compat/app";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -25,6 +31,10 @@ const LoginHelper = () => {
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
     const { setUser } = useAuth();
+    const [confResult, setConfResult] = useState({});
+    const [phoneOtpValues, setPhoneOtpValues] = useState(Array(6).fill(''));
+
+    const [passwordFieldType, setPasswordFieldType] = useState(true);
 
     const handleLoginType = (type) => {
         setLoginType(type.toLowerCase());
@@ -115,40 +125,40 @@ const LoginHelper = () => {
 
                 }
 
-                const responsew = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then( async (response) => {
+                const response = await axios.post('http://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
 
-                    console.log(response.data);
-                    // eslint-disable-next-line no-mixed-operators
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
+
 
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
+                        // alert("Login Successfully")
                         await notify();
                         if(loginType === 'patient')
                         {
-                            navigate("/welcome",{state:{
-                                    patient_id:response.data.id}
-                            });
+                            let path = '/welcome'
+                            navigate(path);
+
                         }
                         if(loginType === 'doctor')
                         {
-                            navigate("/dashboard",{state:{
-                                    doctor_id:response.data.id}
-                            });
+                            let path = '/dashboard'
+                            navigate(path);
+
                         }
                         if(loginType === 'admin'){
-                            navigate("/admin",{state:{
-                                    hospital_id:response.data.id}
-                            });
+                            let path = '/admin'
+                            navigate(path);
+
 
                         }
                     }
                     else {
                         await notify2();
                     }
+                    //console.log('Response:', response);
                 });
-
             } catch (error) {
                 await notify2();
                 console.error('Error:', error);
@@ -158,7 +168,110 @@ const LoginHelper = () => {
 
         } else if (loginMethod === 'otp') {
             console.log('Logging in with mobile number and OTP:', mobileNumber, otp);
-            // Implement login with mobile number and OTP
+            let verificationCode = otp;
+            //verificationCode = phoneOtpValues.join('');
+            console.log("verificationCode ",verificationCode)
+            confResult.confirm(verificationCode).then(async (result) => {
+                // console.log("Success");
+                alert("Verified")
+                const headers = {'Content-Type': 'application/json'}
+                let role;
+                if (loginType === 'patient') {
+                    role = "PATIENT"
+                }
+                if (loginType === 'doctor') {
+                    role = "DOCTOR"
+                }
+                const response = await axios.post('http://localhost:8083/user-handle/auth/login-using-otp', {
+                    mobileNumber,
+                    role
+                }, {headers}).then((response) => {
+
+                    if (response.data && response.data.role === loginType.toUpperCase()) {
+                        saveJwtTokenToLocalStorage(response.data.token);
+                        saveUserIdToLocalStorage(response.data.id, response.data.role);
+                        alert("Login Successfully")
+                        if (loginType === 'patient') {
+                            let path = '/welcome'
+                            navigate(path);
+
+                        }
+                        if (loginType === 'doctor') {
+                            let path = '/dashboard'
+                            navigate(path);
+
+                        }
+
+
+                    } else {
+                        alert("email and password are incorrect")
+                    }
+                });
+
+            }).catch((error) => {
+                console.log("Error");
+            });
+
+
+
+        }
+    };
+
+    const verifyOtp = () => {
+        let verificationCode = '';
+        verificationCode = phoneOtpValues.join('');
+        confResult.confirm(verificationCode).then((result) => {
+            // console.log("Success");
+            alert("Verified")
+
+        }).catch((error) => {
+            console.log("Error");
+        });
+    }
+
+    const sendOtp = () => {
+
+         const phoneNumber = "+91"+document.getElementById("phone-number").value;
+        console.log(phoneNumber)
+        const appVerifier = window.recaptchaVerifier;
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                setConfResult(confirmationResult);
+                console.log("REsult",confirmationResult)
+            }).catch((error) => {
+            console.log("expire");
+        });
+    }
+
+
+
+    const onClickSendOtpMobile = () => {
+        setIsOtpSent(true);
+        firebase.auth().useDeviceLanguage();
+
+        try {
+            if (!window.recaptchaVerifier) {
+
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    },
+                    'error-callback': (error) => {
+                        console.log(error);
+                    }
+                });
+
+                window.recaptchaVerifier.render().then(() =>{
+
+                    sendOtp();
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
         }
     };
 
@@ -173,9 +286,15 @@ const LoginHelper = () => {
             <div className="notification">Invalid Credentials!</div>
         );
     }
+    useEffect(() => {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    }, []);
 
     return (
         <div className="wrapper" id="wrap">
+            <div id='recaptcha-container'></div>
             <div className="title">
                 Login Form
             </div>
@@ -211,14 +330,18 @@ const LoginHelper = () => {
                     <input type="text" value={loginMethod === 'password' ? email : mobileNumber}
                            onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange}
                            required/>
+            <form >
+                <div className="field" style={{ position: 'relative' }}>
+                    <input type="text" id="phone-number"  value={loginMethod === 'password' ? email : mobileNumber} onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange} required/>
                     {loginMethod === 'otp' && !isOtpSent && (
-                        <button className="send-otp-btn" type="button" onClick={handleGenerateOtp}>Send OTP</button>
+                        <button className="send-otp-btn" type="button" onClick={onClickSendOtpMobile}>Send OTP</button>
                     )}
                     <label>{loginMethod === 'password' ? 'Email Address' : 'Mobile Number'}</label>
                 </div>
                 {loginMethod === 'password' && (
                     <div className="field">
-                        <input type="password" value={password} onChange={handlePasswordChange} required/>
+                        <input type={passwordFieldType ? "password" : "text"} value={password} onChange={handlePasswordChange} required/>
+                        <i className={`${passwordFieldType ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType(!passwordFieldType)}}></i>
                         <label>Password</label>
                     </div>
                 )}
@@ -233,9 +356,10 @@ const LoginHelper = () => {
                                            onChange={(e) => handleEmailChange(index, e.target.value)} required/>
                                 ))}
                             </div>
-                            <div className="field">
-                                <input type="submit" value="Verify"/>
-                            </div>
+                            {/*<div className="field">*/}
+                            {/*    <input type="submit" onClick={() => {verifyOtp();}} value="Verify"/>*/}
+
+                            {/*</div>*/}
                             <div id="resend-otp">
                                 <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
                             </div>
@@ -244,24 +368,26 @@ const LoginHelper = () => {
                 )}
                 <div className="field1">
                     <div className="otp-pass-section" onClick={handleLoginMethodToggle}>
-                        <div className={(loginType === 'admin') ? "visually-hidden" : ""}>
-                            Login
-                            via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
+                        <div className={(loginType === 'admin')? "visually-hidden" : ""}>
+                            Login via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
                         </div>
                     </div>
-                    <button type="submit" className="button-background">Login</button>
-
+                    <button type="submit" className="button-background" onClick={handleLogin} >Login</button>
                 </div>
             </form>
 
             <div className="content">
+                {/*<div className="checkbox-style">*/}
+                {/*    <input type="checkbox" id="remember-me"/>*/}
+                {/*    <span className="remember-text">Remember me</span>*/}
+                {/*</div>*/}
                 <div className="pass-link">
                     <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>
             </div>
 
-            <div className="signup-link">
-                <div className={(loginType === 'doctor') ? "visually-hidden" : ""}>
+            <div className="signup-link" >
+                <div className={(loginType === 'doctor')? "visually-hidden" : ""}>
                     Not a member? <Link to="/signup">SignUp</Link>
                 </div>
             </div>

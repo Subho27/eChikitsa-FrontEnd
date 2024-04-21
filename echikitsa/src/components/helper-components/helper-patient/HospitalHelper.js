@@ -6,6 +6,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import SockJS from "sockjs-client";
 import {over} from "stompjs";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
 function HospitalHelper (props) {
     const {state}=useLocation();
@@ -26,15 +27,17 @@ function HospitalHelper (props) {
     const [position, setPosition] = useState(0);
     const navigate = useNavigate();
     //endregion
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
     useEffect(() => {
         if (state.hospital_ids) {
             const fetchHospitalName = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_ids}`);
+                    const response = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-specific-hospitals/${state.hospital_ids}`,{headers});
                     setHospitalName(response.data);
                     console.log(response.data);
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+                    const response2 = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-doctors/${state.hospital_ids}`,{headers});
 
                     setDoctors(response2.data);
 

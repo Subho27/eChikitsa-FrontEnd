@@ -14,6 +14,7 @@ function AdminHeaderHelper(props) {
     const handleLogout = () => {
         removeUserIdFromLocalStorage()
         removeJwtTokenFromLocalStorage()
+
     };
 
     return (
