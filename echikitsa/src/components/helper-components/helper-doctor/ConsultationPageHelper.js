@@ -5,17 +5,10 @@ import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
-// import 'firebase/compat/auth';
-// import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 import axios from 'axios';
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-import firebase from "firebase/compat/app";
 
-// Initialize Firebase if it's not already initialized
-// if (!firebase.apps.length) {
-//     firebase.initializeApp(firebaseConfig);
-// }
 function ConsultationPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([]);
     const [today, setToday] = useState("");
@@ -25,7 +18,7 @@ function ConsultationPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [addMedicines, setAddMedicines] = useState([]);
     const [prescriptionUrl, setPrescriptionUrl] = useState("");
-    const date = new Date()
+
 
     const liveClock = () => {
         const start_time = new Date(); // Store start time as a Date object
@@ -63,8 +56,8 @@ function ConsultationPageHelper(effect, deps) {
                 duration: "PT1H30M",
                 time: "14:30:00",
                 reason: diagnosisSummary,
-                patient_id: 2,
-                doctor_id: 1,
+                patient_id: 13,
+                doctor_id: 8,
                 follow_up_date: suggestDate,
                 patient_type: "R",
                 prescription_url: prescriptionUrl
@@ -78,8 +71,8 @@ function ConsultationPageHelper(effect, deps) {
     const generatePDF = async () => {
         try {
             const response = await axios.post('http://localhost:9090/prescription/generate_pdf', {
-                patient_id:2,
-                doctor_id:1,
+                patient_id:13,
+                doctor_id:8,
                 instructions:prescription,
                 medication:addMedicines,
                 diagnosis:diagnosisSummary,
@@ -609,7 +602,7 @@ function ConsultationPageHelper(effect, deps) {
     //endregion
 
     const handleCallEnd = async () => {
-        // await handleClick();
+        await handleClick();
         await addRecord();
         await socket.disconnect();
         await localStream.getTracks().forEach(function(track) {

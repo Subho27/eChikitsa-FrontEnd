@@ -7,12 +7,13 @@ import '../../css/helper-components/header-style.css'
 import {Link, useLocation} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 import {removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import {removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
 
 function AdminHeaderHelper(props) {
 
     const handleLogout = () => {
         removeUserIdFromLocalStorage()
-
+        removeJwtTokenFromLocalStorage()
     };
 
     return (

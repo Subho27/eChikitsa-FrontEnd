@@ -3,7 +3,8 @@ import HeaderHelper from "../helper-components/HeaderHelper";
 import FooterHelper from "../helper-components/FooterHelper";
 import '../../css/helper-components/forgot-password-style.css'
 import axios from "axios";
-import {useLocation} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+
 function ForgotPassword () {
     const [email, setEmail] = useState('');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -14,7 +15,7 @@ function ForgotPassword () {
 
 
 
-
+    const navigate = useNavigate();
     const handleChange  = (event) => {
         const { name, value } = event.target;
         // Update the state based on the input field name
@@ -60,8 +61,9 @@ function ForgotPassword () {
 
             const response = await axios.post('http://localhost:9191/auth/reset-password-otp', {email});
             setResponseMessage(response.data.message);
+            alert("OTP Sent Successfully");
         } catch (error) {
-            console.error('Error:', error);
+            alert('Error: ' + error);
             setResponseMessage('An error occurred. Please try again.');
         }
     };
@@ -72,8 +74,10 @@ function ForgotPassword () {
 
             const response = await axios.post('http://localhost:9191/auth/reset-password', {email,otp,password});
             setResponseMessage(response.data.message);
+            alert("Password Changed Successfully");
+            navigate("/login");
         } catch (error) {
-            console.error('Error:', error);
+            alert('Error: '+ error);
             setResponseMessage('An error occurred. Please try again.');
         }
     };

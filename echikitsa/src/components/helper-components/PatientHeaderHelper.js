@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 import axios from "axios";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import {removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
 
 function PatientHeaderHelper(props) {
     const [name, setName] = useState("");
@@ -27,7 +28,7 @@ function PatientHeaderHelper(props) {
     }
     const handleLogout = () => {
         removeUserIdFromLocalStorage()
-
+        removeJwtTokenFromLocalStorage()
     };
 
     return (

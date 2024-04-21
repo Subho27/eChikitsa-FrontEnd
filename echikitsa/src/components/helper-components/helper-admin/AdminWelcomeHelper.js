@@ -11,6 +11,8 @@ import 'react-tabs/style/react-tabs.css';
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
 import Select from "react-select";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {toast} from "react-toastify";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -28,15 +30,15 @@ function AdminWelcomeHelper(props) {
     const [hospitalWebsiteValue, setHospitalWebsiteValue] = useState("");
     const [departmentName, setDepartmentName] = useState([])
 
-    const {state}=useLocation();
+    // const {state}=useLocation();
     const [selectedOption, setSelectedOption] = useState(null);
 
 
     useEffect(() => {
-        if (state.hospital_id) {
+        if (getUserIdFromLocalStorage()) {
             const fetchHospitalName = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${state.hospital_id}`)
+                    const response = await axios.get(`http://localhost:8081/hospital/get-specific-hospitals/${getUserIdFromLocalStorage()}`)
                     setHospitalName(response.data);
                     const { data } = response;
                     setHospitalData(data);
@@ -46,7 +48,7 @@ function AdminWelcomeHelper(props) {
                     setHospitalAddressValue(data.address);
                     setHospitalWebsiteValue(data.website);
 
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_id}`);
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${getUserIdFromLocalStorage()}`);
                     setDoctors(response2.data);
 
                 } catch (error) {
@@ -65,7 +67,7 @@ function AdminWelcomeHelper(props) {
             };
             const fetchDoctorDetails = async () => {
                 try {
-                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${state.hospital_ids}`);
+                    const response2 = await axios.get(`http://localhost:8081/hospital/get-doctors/${getUserIdFromLocalStorage()}`);
                     const doctorsData = response2.data.map(doctor => ({
                         doctorName: doctor.name,
                         specialization: doctor.specialization,
@@ -83,7 +85,7 @@ function AdminWelcomeHelper(props) {
 
             const fetchDepartmentsByHospitalId = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8081/hospital/get-all-departments-by-hospitalId/${state.hospital_id}`);
+                    const response = await axios.get(`http://localhost:8081/hospital/get-all-departments-by-hospitalId/${getUserIdFromLocalStorage()}`);
                     const departmentsByHospitalId = response.data.map(department => department.department_id);
                     setSelectedValues(departmentsByHospitalId);
                     // console.log(departmentsByHospitalId);
@@ -106,7 +108,7 @@ function AdminWelcomeHelper(props) {
             fetchDepartmentsByHospitalId();
             fetchHospitalName();
         }
-    }, [state.hospital_id]);
+    }, [getUserIdFromLocalStorage()]);
 
     const [hospitalData, setHospitalData] = useState({
         name :hospitalName.hospital_name,
@@ -265,14 +267,14 @@ function AdminWelcomeHelper(props) {
                 departments: hospitalData.departments // Preserve existing departments
             };
 
-            const response = await axios.put(`http://localhost:9191/admin/updateHospitalDetails/?id=${state.hospital_id}`, updatedData,{headers}).then((response) => {
+            const response = await axios.put(`http://localhost:9191/admin/updateHospitalDetails/?id=${getUserIdFromLocalStorage()}`, updatedData,{headers}).then((response) => {
                 console.log(response.data);
                 if (response.data) {
-                    alert(response.data)
+                    notify_success(response.data.token)
 
                 }
                 else {
-                    alert("Something went wrong !!")
+                    notify_error(response.data.token)
                 }
 
             });
@@ -285,6 +287,18 @@ function AdminWelcomeHelper(props) {
 
     };
 
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
+
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
+
     const handleAddDoctor = async (e) => {
         e.preventDefault();
         //console.log(formData)
@@ -293,11 +307,11 @@ function AdminWelcomeHelper(props) {
             const token = getJwtTokenFromLocalStorage();
 
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-            const response = await axios.post(`http://localhost:9191/admin/addDoctor/?id=${state.hospital_id}`,formData,{headers}).then((response) => {
-
+            const response = await axios.post(`http://localhost:9191/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
+                notify_success(response.data.token)
             });
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error("Error adding Doctor");
 
         }
 

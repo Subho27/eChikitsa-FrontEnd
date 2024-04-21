@@ -7,11 +7,11 @@ import {Link, useNavigate} from "react-router-dom";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
-import {firebaseConfig} from "../firebase-config/firebaseConfigs";
 import axios from "axios";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import {toast} from "react-toastify";
 
 
 const SignUpHelper = () => {
@@ -148,6 +148,14 @@ const SignUpHelper = () => {
         }
         setPhoneOtpValues(newerOtpValues);
     };
+
+    const notify_success = async (response) =>{
+        toast.success({response});
+    }
+
+    const notify_error = async (response) =>{
+        toast.error({response});
+    }
     //endregion
 
     const onClickSendOtp = async () => {
@@ -157,10 +165,10 @@ const SignUpHelper = () => {
                 const headers = { 'Content-Type' : 'application/json' }
                 const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formData.email}).then((response) => {
                     if (response.data) {
-                        alert("OTP Sent Successfully on your email!!")
+                        notify_success("OTP Sent Successfully on your email!!")
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -169,10 +177,10 @@ const SignUpHelper = () => {
 
                 const response = await axios.post('http://localhost:9191/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
                     if (response.data) {
-                        alert("OTP Sent Successfully on your email!!")
+                        notify_success("OTP Sent Successfully on your email!!")
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -181,7 +189,7 @@ const SignUpHelper = () => {
 
 
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error: '+ error);
 
         }
     };
@@ -195,13 +203,13 @@ const SignUpHelper = () => {
                 verificationCode = emailOtpValues.join('');
                 const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
                     if (response.data) {
-                        alert("Verified")
+                        notify_success("Verified")
                         document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
                         document.getElementById("email-patient-send-otp").innerText = "Verified";
                         document.getElementById("email-patient-send-otp").style.backgroundColor = "#39c239";
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -213,13 +221,13 @@ const SignUpHelper = () => {
                 const response = await axios.post('http://localhost:9191/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
                     console.log(response.data)
                     if (response.data) {
-                        alert("Verified")
+                        notify_success("Verified")
                         document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
                         document.getElementById("email-hospital-send-otp").innerText = "Verified";
                         document.getElementById("email-hospital-send-otp").style.backgroundColor = "#39c239";
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -228,7 +236,7 @@ const SignUpHelper = () => {
 
 
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error:' + error);
 
         }
 
@@ -324,7 +332,7 @@ const SignUpHelper = () => {
                 return url; // Return the download URL
             })
             .catch((error) => {
-                console.error("Error uploading prescription:", error);
+                notify_error("Error uploading prescription: " + error);
                 throw error; // Propagate the error
             });
     };
@@ -340,22 +348,21 @@ const SignUpHelper = () => {
             try {
 
                 const response = await axios.post('http://localhost:9191/patient/registerPatient', formData).then((response) => {
-                    //const response = await axios.post('http://localhost:9191/api/signUp', formData).then((response) => {
-                    console.log(response.data);
+
                     if (response.data) {
-                        alert("registered successfully !!")
+                        notify_success(response.data)
 
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        alert("Something went wrong !!")
+                        notify_error(response.data)
                     }
 
                 });
             } catch (error) {
-                console.error('Error:', error);
+                notify_error('Error: '+error);
 
             }
 
@@ -367,21 +374,20 @@ const SignUpHelper = () => {
             try {
 
                 const response = await axios.post('http://localhost:9191/hospital/add-hospital', formDataHospital).then((response) => {
-                    //const response = await axios.post('http://localhost:9191/api/hospital/register', formDataHospital).then((response) => {
                     console.log(response.data);
                     if (response.data) {
-                        alert("registered successfully !!")
+                        notify_success(response.data)
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        alert("Something went wrong !!")
+                        notify_error(response.data)
                     }
 
                 });
             } catch (error) {
-                console.error('Error:', error);
+                notify_error('Error: ' + error);
 
             }
         }

@@ -8,10 +8,10 @@ import axios from 'axios';
 import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
 // import {authentication} from '../../firebase/firebaseConfig'
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
-import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
+import {getUserIdFromLocalStorage, saveUserIdToLocalStorage} from "../../resources/userIdManagement";
 import { useAuth } from '../route-guard/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
-import {toast, ToastContainer} from "react-toastify";
+import {Bounce, toast, ToastContainer} from "react-toastify";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -102,68 +102,55 @@ const LoginHelper = () => {
             try {
                 const headers = { 'Content-Type' : 'application/json' }
                 let role;
-                if(loginType == 'patient')
+                if(loginType === 'patient')
                 {
                    role = "PATIENT"
                 }
-                if(loginType == 'doctor')
+                if(loginType === 'doctor')
                 {
                     role = "DOCTOR"
                 }
-                if(loginType == 'admin'){
+                if(loginType === 'admin'){
                     role = "ADMIN"
 
                 }
 
-                const response = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then( async (response) => {
+                const responsew = await axios.post('http://localhost:9191/auth/login', {email, password,role},{headers}).then( async (response) => {
 
+                    console.log(response.data);
+                    // eslint-disable-next-line no-mixed-operators
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
-                        //console.log(response.data)
 
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
-                        // alert("Login Successfully")
                         await notify();
                         if(loginType === 'patient')
                         {
-                            // let path = '/welcome'
-                            // navigate(path);
                             navigate("/welcome",{state:{
                                     patient_id:response.data.id}
                             });
                         }
                         if(loginType === 'doctor')
                         {
-                            // let path = '/dashboard'
-                            // navigate(path);
                             navigate("/dashboard",{state:{
                                     doctor_id:response.data.id}
                             });
                         }
                         if(loginType === 'admin'){
-                            // let path = '/admin'
-                            // navigate(path);
-                            // let path = `/admin/${response.data.id}`
-                            // navigate(path);
-
                             navigate("/admin",{state:{
                                     hospital_id:response.data.id}
                             });
 
-                        };
-
-
-
-
-
+                        }
                     }
                     else {
-                        alert("email and password are incorrect")
+                        await notify2();
                     }
-                    //console.log('Response:', response);
                 });
+
             } catch (error) {
+                await notify2();
                 console.error('Error:', error);
 
             }
@@ -176,12 +163,19 @@ const LoginHelper = () => {
     };
 
     const notify = async () => {
-        toast.success("Login Successful.", { position: "top-center" });
+        toast.success(
+            <div className="notification">Login Successful.</div>
+        );
+    }
+
+    const notify2 = async () => {
+        toast.error(
+            <div className="notification">Invalid Credentials!</div>
+        );
     }
 
     return (
         <div className="wrapper" id="wrap">
-            <ToastContainer autoClose={false}/>
             <div className="title">
                 Login Form
             </div>
@@ -191,27 +185,32 @@ const LoginHelper = () => {
                     onClick={() => handleLoginType('patient')}
                 >
                     <FontAwesomeIcon icon={faUser}/>
-                    <span style={{ color: loginType === 'patient' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('patient')}</span>
+                    <span
+                        style={{color: loginType === 'patient' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('patient')}</span>
                 </div>
                 <div
                     className={`login-option-circle ${loginType === 'doctor' && 'active'}`}
                     onClick={() => handleLoginType('doctor')}
                 >
                     <FontAwesomeIcon icon={faUserMd}/>
-                    <span style={{ color: loginType === 'doctor' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('doctor')}</span>
+                    <span
+                        style={{color: loginType === 'doctor' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('doctor')}</span>
                 </div>
                 <div
                     className={`login-option-circle ${loginType === 'admin' && 'active'}`}
                     onClick={() => handleLoginType('admin')}
                 >
                     <FontAwesomeIcon icon={faUserCog}/>
-                    <span style={{ color: loginType === 'admin' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('admin')}</span>
+                    <span
+                        style={{color: loginType === 'admin' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('admin')}</span>
                 </div>
             </div>
 
             <form onSubmit={handleLogin}>
-                <div className="field" style={{ position: 'relative' }}>
-                    <input type="text" value={loginMethod === 'password' ? email : mobileNumber} onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange} required/>
+                <div className="field" style={{position: 'relative'}}>
+                    <input type="text" value={loginMethod === 'password' ? email : mobileNumber}
+                           onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange}
+                           required/>
                     {loginMethod === 'otp' && !isOtpSent && (
                         <button className="send-otp-btn" type="button" onClick={handleGenerateOtp}>Send OTP</button>
                     )}
@@ -227,9 +226,10 @@ const LoginHelper = () => {
                     <div className="fg">
                         <div className="container-otp">
                             <div id="inputs" className="inputs">
-                                {Array.from({ length: 6 }, (_, index) => (
+                                {Array.from({length: 6}, (_, index) => (
                                     <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
-                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={otp[index] || ''}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1"
+                                           value={otp[index] || ''}
                                            onChange={(e) => handleEmailChange(index, e.target.value)} required/>
                                 ))}
                             </div>
@@ -244,26 +244,24 @@ const LoginHelper = () => {
                 )}
                 <div className="field1">
                     <div className="otp-pass-section" onClick={handleLoginMethodToggle}>
-                        <div className={(loginType === 'admin')? "visually-hidden" : ""}>
-                            Login via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
+                        <div className={(loginType === 'admin') ? "visually-hidden" : ""}>
+                            Login
+                            via <span>{capitalizeFirstLetter(loginMethod === 'password' ? 'OTP' : 'password')}</span>
                         </div>
                     </div>
                     <button type="submit" className="button-background">Login</button>
+
                 </div>
             </form>
 
             <div className="content">
-                {/*<div className="checkbox-style">*/}
-                {/*    <input type="checkbox" id="remember-me"/>*/}
-                {/*    <span className="remember-text">Remember me</span>*/}
-                {/*</div>*/}
                 <div className="pass-link">
                     <a href="#" onClick={handleForgotPassword}>Forgot password?</a>
                 </div>
             </div>
 
-            <div className="signup-link" >
-                <div className={(loginType === 'doctor')? "visually-hidden" : ""}>
+            <div className="signup-link">
+                <div className={(loginType === 'doctor') ? "visually-hidden" : ""}>
                     Not a member? <Link to="/signup">SignUp</Link>
                 </div>
             </div>

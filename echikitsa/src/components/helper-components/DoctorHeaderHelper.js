@@ -7,6 +7,7 @@ import '../../css/helper-components/header-style.css'
 import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 import axios from "axios";
+import {removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
 
 
 
@@ -21,6 +22,7 @@ const DoctorHeaderHelper = (props) => {
     }
     const handleLogout = () =>{
         removeUserIdFromLocalStorage();
+        removeJwtTokenFromLocalStorage()
     }
 
 

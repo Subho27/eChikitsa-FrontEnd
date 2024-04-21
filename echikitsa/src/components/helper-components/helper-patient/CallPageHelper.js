@@ -36,6 +36,33 @@ function CallPageHelper(effect, deps) {
     const [localStream, setLocalStream] = useState(null);
     //endregion
 
+    const liveClock = () => {
+        const start_time = new Date(); // Store start time as a Date object
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [elapsedTime, setElapsedTime] = useState(0); // Initialize elapsed time state
+
+        const updateTime = () => {
+            // Calculate elapsed time in milliseconds
+            const elapsed = new Date() - start_time;
+            setElapsedTime(elapsed); // Update elapsed time state
+        };
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+            // Start updating elapsed time on component mount
+            const intervalId = setInterval(updateTime, 1000);
+
+            // Cleanup interval on component unmount
+            return () => clearInterval(intervalId);
+        }, []); // Empty dependency array ensures the effect runs only on mount
+
+        // Format elapsed time in hours, minutes, seconds
+        // const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+        const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+        return <span className="time-duration">{minutes}m : {seconds}s</span>;
+    };
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
         setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
