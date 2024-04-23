@@ -18,12 +18,13 @@ import MonitorCallDoctor from "./components/doctor-components/MonitorCallDoctor"
 import ForgotPassword from "./components/common-components/ForgotPassword";
 import ProtectedRoute from "./components/route-guard/ProtectedRoute";
 import {AuthProvider} from "./components/route-guard/AuthContext";
-
 import {
     BrowserRouter as Router,
     Switch,
 } from "react-router-dom";
 import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLogin";
+import {ToastContainer} from "react-toastify";
+import React from "react";
 import PageNotFound from "./components/helper-components/PageNotFound";
 
 
