@@ -32,6 +32,7 @@ function DashboardHelper() {
     const [isEmptyQueue, setIsEmptyQueue] = useState(true);
     const [queueSize, setQueueSize] = useState(0);
     const [nextPatients, setNextPatients] = useState([]);
+    const [patientss, setPatientss] = useState([])
     const navigate = useNavigate();
     let notifyCount = 0;
     const token = getJwtTokenFromLocalStorage();
@@ -258,10 +259,24 @@ function DashboardHelper() {
     useEffect(() => {
         axios.get(`https://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
             .then((response) => {
-                // console.log(response);
+                 // console.log(response);
                 setNextPatients(response.data);
             })
     }, [])
+    console.log(nextPatients);
+
+    const getUserData = async (e) => {
+        try {
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+
+            const response = await axios.get(`http://localhost:8083/echikitsa-backend/user/get-user/?id=${nextPatients}`,{headers}).then((response) => {
+                setPatientss(response.data)
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     return (
         <div>

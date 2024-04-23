@@ -214,8 +214,9 @@ function HospitalHelper (props) {
                                 <tr>
                                     <td>Specialisations Available</td>
 
-                                    <td> {hospitalName.specializationss&&hospitalName.specializationss.map((spc, index) => (
-                                        <span key={index}>{spc} {index !== hospitalName.specializationss.length - 1 && ", "} </span>
+                                    <td> {hospitalName.specializationss && hospitalName.specializationss.map((spc, index) => (
+                                        <span
+                                            key={index}>{spc} {index !== hospitalName.specializationss.length - 1 && ", "} </span>
                                     ))}</td>
                                 </tr>
                                 <tr>
@@ -233,51 +234,57 @@ function HospitalHelper (props) {
                                 <option value="junior">Junior Doctor</option>
                                 <option value="senior">Senior Doctor</option>
                             </select>
-                            <select onChange={handleSpecialityChange} className="filter-doctor doctor-speciality-filter">
-                                <option selected hidden>Select Specializations </option>
+                            <select onChange={handleSpecialityChange}
+                                    className="filter-doctor doctor-speciality-filter">
+                                <option selected hidden>Select Specializations</option>
                                 {Array.from(new Set(doctors.map(doctor => doctor.specialization))).map((specialization, index) => (
                                     <option key={index} value={specialization}>{specialization}</option>
                                 ))}
                             </select>
-                            {selectedDoctors.length > 0 &&( <select onChange={handleNameChange} className="filter-doctor doctor-name-filter">
-                                <option selected hidden>Select Doctor</option>
-                                {selectedDoctors.map(doctor => (
-                                    <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
-                                ))}
-                            </select>
+                            {selectedDoctors.length > 0 && (
+                                <select onChange={handleNameChange} className="filter-doctor doctor-name-filter">
+                                    <option selected hidden>Select Doctor</option>
+                                    {selectedDoctors.map(doctor => (
+                                        <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+                                    ))}
+                                </select>
                             )}
                         </div>
-                        <div className="doctors-details">
-                            <div className="doctor-image-section">
-                                <img className="doctors-image"
-                                      src={selectedDoctor && selectedDoctor.image_path } alt="Doctor" />
+                        {(selectedDoctors.length === 0 && !selectedDoctor) ? (
+                            <div className="no-doctors-message">
+                                <h1>No doctors available</h1>
                             </div>
-                            <div className="doctors-details-1">
-                                <table className="hospital-detail-table custom-hdt">
-                                    <tbody>
+                        ) : (
+                            <div className="doctors-details">
+                                <div className="doctor-image-section">
+                                    <img className="doctors-image" src={selectedDoctor.image_path} alt="Doctor"/>
+                                </div>
+                                <div className="doctors-details-1">
+                                    <table className="hospital-detail-table custom-hdt">
+                                        <tbody>
                                         <tr>
                                             <td>Doctor Name</td>
-                                            <td>{selectedDoctor && selectedDoctor.name}</td>
+                                            <td>{selectedDoctor.name}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Gender</td>
-                                            <td>{selectedDoctor && selectedDoctor.gender}</td>
+                                            <td>{selectedDoctor.gender}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Age</td>
-                                            <td>{selectedDoctor  && selectedDoctor.age}</td>
+                                            <td>{selectedDoctor.age}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Specialization</td>
-                                            <td>{selectedDoctor && selectedDoctor.specialization}</td>
+                                            <td>{selectedDoctor.specialization}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Experience</td>
-                                            <td>{selectedDoctor && selectedDoctor.experience}</td>
+                                            <td>{selectedDoctor.experience}</td>
                                         </tr>
                                         <tr>
                                             <td>Doctor Qualifications</td>
-                                            <td>{selectedDoctor && selectedDoctor.qualification}</td>
+                                            <td>{selectedDoctor.qualification}</td>
                                         </tr>
                                         <tr>
                                             <td>Languages Spoken</td>
@@ -285,17 +292,24 @@ function HospitalHelper (props) {
                                         </tr>
                                         <tr>
                                             <td>Doctor Rating</td>
-                                            {/*<td>{selectedDoctor && selectedDoctor.rating}</td>*/}
                                             <td>3</td>
                                         </tr>
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="doctors-details-2">
+                                    <div>
+                                        <button className="consult-button-patient" onClick={consultSD}
+                                                id={selectedDoctor.id}>
+                                            CONSULT
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="doctors-details-2">
-                                <div><button className="consult-button-patient" onClick={consultSD} id={selectedDoctor && selectedDoctor.id}>CONSULT</button></div>
-                            </div>
-                        </div>
+                        )}
                     </div>
+
+
                 </div>
             </div>
         </div>

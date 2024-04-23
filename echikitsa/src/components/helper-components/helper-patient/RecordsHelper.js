@@ -1,20 +1,17 @@
 import React, {useEffect, useMemo} from 'react';
 import {useState} from "react";
 import '../../../css/helper-components/helper-patient/records-style.css'
-import {dummy} from "./dummy";
+// import {dummy} from "./dummy";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import axios from "axios";
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+
 
 function RecordHelper() {
     const [query, setQuery] = useState("");
     const [expandedRows, setExpandedRows] = useState([]);
-    const filteredData = useMemo(() => {
-        return dummy.filter(item =>
-            item.Doctor.toLowerCase().includes(query.toLowerCase()) ||
-            item.Hospital.toLowerCase().includes(query.toLowerCase()) ||
-            item.Date.includes(query) ||
-            item.Reason.toLowerCase().includes(query.toLowerCase()) ||
-            item.NextAppointment.includes(query)
-        );
-    }, [query, dummy]);
+    const [dummy,setDummy] = useState([]);
+    const userId =  getUserIdFromLocalStorage();
     const handleToggleRow = (id) => {
         const isRowExpanded = expandedRows.includes(id);
         setExpandedRows(prevState => {
@@ -25,7 +22,34 @@ function RecordHelper() {
             }
         });
     };
+    useEffect(() => {
+        const getRecordByDoctorId = async () => {
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+            try {
+                const responses = await axios.get(
+                    `http://localhost:8083/echikitsa-backend/ehr/get-record-patient/${userId}`, { headers }
+                );
+                // console.log(responses.data);
+                setDummy(responses.data);
+                // console.log("the value of records"+responses.data);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
 
+        getRecordByDoctorId();
+    }, []); // E
+
+    const filteredData = useMemo(() => {
+        return dummy.filter(item =>
+            item.firstName.toLowerCase() + " " + item.lastName.toLowerCase().includes(query.toLowerCase()) ||
+            item.hospitalName.toLowerCase().includes(query.toLowerCase()) ||
+            item.date.includes(query) ||
+            item.reason.toLowerCase().includes(query.toLowerCase()) ||
+            item.follow_up_date.includes(query)
+        );
+    }, [query, dummy]);
     const isRowExpanded = (id) => {
         return expandedRows.includes(id);
     };
@@ -87,12 +111,21 @@ function RecordHelper() {
                             {currentPosts.map((item) => (
                                 <div key={item.id}>
                                     <div className="table-row-section">
-                                        <div className="table-cell-section">{item.Date}</div>
-                                        <div className="table-cell-section">{item.Hospital}</div>
-                                        <div className="table-cell-section">{item.Doctor}</div>
-                                        <div className="table-cell-section">{item.NextAppointment}</div>
-                                        <div className="table-cell-section">{item.Reason}</div>
-                                        <div className="table-cell-section"><img className="download-icon" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/></div>
+                                        <div className="table-cell-section">{item.date}</div>
+                                        <div className="table-cell-section">{item.hospitalName}</div>
+                                        <div className="table-cell-section">{item.firstName} {item.lastName}</div>
+                                        <div className="table-cell-section">{item.follow_up_date}</div>
+                                        <div className="table-cell-section">{item.reason}</div>
+                                        <div className="table-cell-section"><img
+                                            className="download-icon"
+                                            src={require("../../../images/patient_landing_page/download.png")}
+                                            alt="Download"
+                                            onClick={() => {
+                                                const prescriptionUrl = item.prescription_url;
+                                                window.open(prescriptionUrl, "_blank");
+                                            }}
+                                        />
+                                        </div>
                                     </div>
                                     <hr className="table-row-divider"/>
                                 </div>
@@ -102,7 +135,8 @@ function RecordHelper() {
                             <ul className='pagination custom-pagination'>
                                 {pageNumbers.map(number => (
                                     <li key={number} className='page-item'>
-                                <span onClick={() => paginate(number)} className={`page-link ${currentPage === number ? 'active' : ''}`}>
+                                <span onClick={() => paginate(number)}
+                                      className={`page-link ${currentPage === number ? 'active' : ''}`}>
                                     {number}
                                 </span>
                                     </li>
