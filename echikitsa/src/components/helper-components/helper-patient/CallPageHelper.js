@@ -72,6 +72,20 @@ function CallPageHelper(effect, deps) {
 
         return <span className="time-duration">{minutes}m : {seconds}s</span>;
     };
+
+
+    const generatePdf = async(room) =>{
+        const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
+        stompClient.connect({}, async() => {
+            await stompClient.send('/app/prescription', {
+                patient_id: getUserIdFromLocalStorage(),
+                doctor_id: room
+            });
+        })
+    }
+
+
+
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
         setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
@@ -532,6 +546,7 @@ function CallPageHelper(effect, deps) {
                 track.stop();
             });
         }
+        await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
             doctorId: room

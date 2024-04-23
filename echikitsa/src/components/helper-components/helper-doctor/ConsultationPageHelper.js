@@ -75,12 +75,24 @@ function ConsultationPageHelper(effect, deps) {
             alert("Error in adding record" + error);
         }
     }
+
+    // WebSocket connection setup
+    const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
+    stompClient.connect({}, ()=> {
+        const waiting = `/consult/${getUserIdFromLocalStorage()}`;
+        stompClient.subscribe(waiting,  (message) => {
+            console.log(message);
+            return generatePDF(message);
+
+        })
+    })
+
     // Function to upload PDF file to Firebase Storage
-    const generatePDF = async () => {
+    const generatePDF = async (message) => {
         try {
             const response = await axios.post('http://localhost:9090/prescription/generate_pdf', {
-                patient_id:13,
-                doctor_id:8,
+                patient_id:message.patient_id,
+                doctor_id:message.doctor_id,
                 instructions:prescription,
                 medication:addMedicines,
                 diagnosis:diagnosisSummary,
@@ -619,8 +631,8 @@ function ConsultationPageHelper(effect, deps) {
     //endregion
 
     const handleCallEnd = async () => {
-        await handleClick();
-        await addRecord();
+        //await handleClick();
+        //await addRecord();
         await socket.disconnect();
         await localStream.getTracks().forEach(function(track) {
             track.stop();

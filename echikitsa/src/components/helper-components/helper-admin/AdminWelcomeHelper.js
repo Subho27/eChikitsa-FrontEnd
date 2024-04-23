@@ -304,17 +304,21 @@ function AdminWelcomeHelper(props) {
 
     const handleAddDoctor = async (e) => {
         e.preventDefault();
-        //console.log(formData)
-        await uploadFiles()
+        let res;
+        await uploadFiles();
         try {
+
             const token = getJwtTokenFromLocalStorage();
 
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-            const response = await axios.post(`http://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
+            res = await axios.post(`http://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
+                notify_success(response.data.token);
+
 
             });
         } catch (error) {
-            await notify_error("Error adding Doctor");
+            console.log("error ",res.data);
+            // await notify_error(error);
 
         }
 

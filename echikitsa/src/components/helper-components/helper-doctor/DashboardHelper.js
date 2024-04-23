@@ -264,7 +264,7 @@ function DashboardHelper() {
 
     return (
         <div>
-            <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
+            {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
             <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">

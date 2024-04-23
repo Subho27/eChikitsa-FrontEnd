@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import '../../css/helper-components/login-style.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faUserCog, faUserMd } from "@fortawesome/free-solid-svg-icons";
@@ -8,10 +8,8 @@ import axios from 'axios';
 import {RecaptchaVerifier,signInWithPhoneNumber} from 'firebase/auth'
 // import {authentication} from '../../firebase/firebaseConfig'
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../resources/storageManagement";
-import {getUserIdFromLocalStorage, saveUserIdToLocalStorage} from "../../resources/userIdManagement";
+import {saveUserIdToLocalStorage} from "../../resources/userIdManagement";
 import { useAuth } from '../route-guard/AuthContext';
-import 'react-toastify/dist/ReactToastify.css';
-import {Bounce, toast, ToastContainer} from "react-toastify";
 //import jwt from 'jsonwebtoken';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
@@ -105,16 +103,15 @@ const LoginHelper = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // Logic to handle login based on login method
+
         if (loginMethod === 'password') {
-            //console.log('Logging in with email and password:', email, password);
 
             try {
                 const headers = { 'Content-Type' : 'application/json' }
                 let role;
                 if(loginType === 'patient')
                 {
-                   role = "PATIENT"
+                    role = "PATIENT"
                 }
                 if(loginType === 'doctor')
                 {
@@ -133,8 +130,7 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
-                        // alert("Login Successfully")
-                        await notify();
+                        alert("Login Successfully")
                         if(loginType === 'patient')
                         {
                             let path = '/welcome'
@@ -152,15 +148,19 @@ const LoginHelper = () => {
                             navigate(path);
 
 
-                        }
+                        };
+
+
+
+
+
                     }
                     else {
-                        await notify2();
+                        alert("email and password are incorrect")
                     }
                     //console.log('Response:', response);
                 });
             } catch (error) {
-                await notify2();
                 console.error('Error:', error);
 
             }
@@ -231,7 +231,7 @@ const LoginHelper = () => {
 
     const sendOtp = () => {
 
-         const phoneNumber = "+91"+document.getElementById("phone-number").value;
+        const phoneNumber = "+91"+document.getElementById("phone-number").value;
         console.log(phoneNumber)
         const appVerifier = window.recaptchaVerifier;
         firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
@@ -275,17 +275,6 @@ const LoginHelper = () => {
         }
     };
 
-    const notify = async () => {
-        toast.success(
-            <div className="notification">Login Successful.</div>
-        );
-    }
-
-    const notify2 = async () => {
-        toast.error(
-            <div className="notification">Invalid Credentials!</div>
-        );
-    }
     useEffect(() => {
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -304,32 +293,24 @@ const LoginHelper = () => {
                     onClick={() => handleLoginType('patient')}
                 >
                     <FontAwesomeIcon icon={faUser}/>
-                    <span
-                        style={{color: loginType === 'patient' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('patient')}</span>
+                    <span style={{ color: loginType === 'patient' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('patient')}</span>
                 </div>
                 <div
                     className={`login-option-circle ${loginType === 'doctor' && 'active'}`}
                     onClick={() => handleLoginType('doctor')}
                 >
                     <FontAwesomeIcon icon={faUserMd}/>
-                    <span
-                        style={{color: loginType === 'doctor' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('doctor')}</span>
+                    <span style={{ color: loginType === 'doctor' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('doctor')}</span>
                 </div>
                 <div
                     className={`login-option-circle ${loginType === 'admin' && 'active'}`}
                     onClick={() => handleLoginType('admin')}
                 >
                     <FontAwesomeIcon icon={faUserCog}/>
-                    <span
-                        style={{color: loginType === 'admin' ? '#fff' : '#262626'}}>{capitalizeFirstLetter('admin')}</span>
+                    <span style={{ color: loginType === 'admin' ? '#fff' : '#262626' }}>{capitalizeFirstLetter('admin')}</span>
                 </div>
             </div>
 
-            <form onSubmit={handleLogin}>
-                <div className="field" style={{position: 'relative'}}>
-                    <input type="text" value={loginMethod === 'password' ? email : mobileNumber}
-                           onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange}
-                           required/>
             <form >
                 <div className="field" style={{ position: 'relative' }}>
                     <input type="text" id="phone-number"  value={loginMethod === 'password' ? email : mobileNumber} onChange={loginMethod === 'password' ? (e) => setEmail(e.target.value) : handleMobileNumberChange} required/>
@@ -349,10 +330,9 @@ const LoginHelper = () => {
                     <div className="fg">
                         <div className="container-otp">
                             <div id="inputs" className="inputs">
-                                {Array.from({length: 6}, (_, index) => (
+                                {Array.from({ length: 6 }, (_, index) => (
                                     <input key={index} ref={(ref) => (inputRefs.current[index] = ref)}
-                                           className="input-otp" type="text" inputMode="numeric" maxLength="1"
-                                           value={otp[index] || ''}
+                                           className="input-otp" type="text" inputMode="numeric" maxLength="1" value={otp[index] || ''}
                                            onChange={(e) => handleEmailChange(index, e.target.value)} required/>
                                 ))}
                             </div>
