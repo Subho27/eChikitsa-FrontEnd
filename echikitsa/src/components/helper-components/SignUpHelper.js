@@ -11,6 +11,7 @@ import axios from "axios";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage, firebaseConfig} from "../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import {ValidateField} from "../validation/validation";
 
 
 const SignUpHelper = () => {
@@ -19,6 +20,8 @@ const SignUpHelper = () => {
 
     const [signupType, setSignUpType] = useState('patient');
     const [imageUpload, setImageUpload] = useState(null);
+    const [numberVerified, setNumberVerified] = useState(false);
+    const [emailVerified, setEmailVerified] = useState(false);
     const [imageUrls, setImageUrls] = useState([]);
     const imagesListRef = ref(storage, "images/");
 //******************************************************************************************************
@@ -35,11 +38,11 @@ const SignUpHelper = () => {
         state:'',
         city:'',
         confirmPassword: '',
-        gender: '',
+        gender: 'male',
         img_url:'',
         active:true
-
     });
+
     const [formDataHospital, setFormDataHospital] = useState({
         name: '',
         category: '',
@@ -53,8 +56,20 @@ const SignUpHelper = () => {
         website:'',
         pincode:'',
         imgUrl:''
+    });
 
-
+    const [validationMessage, setValidationMessage] = useState({
+        firstNameMessage: '',
+        lastNameMessage: '',
+        emailMessage: '',
+        phoneNumberMessage: '',
+        passwordMessage: '',
+        ageMessage:'',
+        aadhaarMessage:'',
+        stateMessage:'',
+        cityMessage:'',
+        confirmPasswordMessage: '',
+        genderMessage: ''
     });
 
     const handleInputChangeHospital = (e) => {
@@ -69,7 +84,7 @@ const SignUpHelper = () => {
 
     const [confResult, setConfResult] = useState({});
 
-    const [selectedGender, setSelectedGender] = useState('');
+    const [selectedGender, setSelectedGender] = useState('male');
     const handleSignUpType = (type) => {
         setSignUpType(type.toLowerCase());
     };
@@ -80,7 +95,31 @@ const SignUpHelper = () => {
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
+
+        setValidationMessage(ValidateField(name, value, validationMessage));
     };
+
+    useEffect(() =>{
+        console.log(formData);
+        if(document.getElementById('email-patient-send-otp') !== null) document.getElementById('email-patient-send-otp').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+        if(document.getElementById('phone-patient-send-otp') !== null) document.getElementById('phone-patient-send-otp').disabled = formData.phoneNumber === '' || validationMessage.phoneNumberMessage !== '';
+        if(document.getElementById('hospital-send-email') !== null) document.getElementById('hospital-send-email').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+
+        if(Object.values(formData).every((value) => value !== '') && Object.values(validationMessage).every((message) => message === '')) {
+            if(document.getElementById('register') !== null) document.getElementById('register').disabled = false;
+            if(document.getElementById('register-patient') !== null && numberVerified && emailVerified) document.getElementById('register-patient').disabled = false;
+        } else {
+            if(document.getElementById('register') !== null) document.getElementById('register').disabled = true;
+            if(document.getElementById('register-patient') !== null) document.getElementById('register-patient').disabled = true;
+        }
+
+        if(formData.confirmPassword !== '' && formData.confirmPassword !== formData.password) {
+            setValidationMessage((prevMessages) => ({
+                ...prevMessages,
+                confirmPasswordMessage: "Does not match with Password."
+            }));
+        }
+    }, [formData])
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -415,11 +454,17 @@ const SignUpHelper = () => {
                             <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
                                    required/>
                             <label>First Name</label>
+                            {validationMessage.firstNameMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.firstNameMessage}</span>
+                            )}
                         </div>
                         <div className="field">
                             <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
                                    required/>
                             <label>Last Name</label>
+                            {validationMessage.lastNameMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.lastNameMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg">
@@ -435,6 +480,9 @@ const SignUpHelper = () => {
                                 Send OTP
                             </button>
                             <label>Email</label>
+                            {validationMessage.emailMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.emailMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg visually-hidden" id="patient-email-otp-check">
@@ -467,6 +515,9 @@ const SignUpHelper = () => {
                                 Send OTP
                             </button>
                             <label>Phone Number</label>
+                            {validationMessage.phoneNumberMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.phoneNumberMessage}</span>
+                            )}
                         </div>
                     </div>
                     <div className="fg visually-hidden" id="phone-otp-check-patient">
@@ -491,10 +542,16 @@ const SignUpHelper = () => {
                             <input type="text" name="age" value={formData.age} onChange={handleInputChange}
                                    required/>
                             <label>Age</label>
+                            {validationMessage.ageMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.ageMessage}</span>
+                            )}
                         </div>
                         <div className="field">
                             <input type="text" name="aadhaar" value={formData.aadhaar} onChange={handleInputChange} required/>
                             <label>Aadhaar</label>
+                            {validationMessage.aadhaarMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.aadhaarMessage}</span>
+                            )}
                         </div>
                     </div>
 
@@ -515,11 +572,17 @@ const SignUpHelper = () => {
                             <input type="password" name="password" value={formData.password} onChange={handleInputChange}
                                    required/>
                             <label>Password</label>
+                            {validationMessage.passwordMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.passwordMessage}</span>
+                            )}
                         </div>
                         <div className="field">
                             <input type="password" name="confirmPassword" value={formData.confirmPassword}
                                    onChange={handleInputChange} required/>
                             <label>Confirm Password</label>
+                            {validationMessage.confirmPasswordMessage !== '' && (
+                                <span className="tooltip-message">{validationMessage.confirmPasswordMessage}</span>
+                            )}
                         </div>
                     </div>
 
@@ -550,13 +613,13 @@ const SignUpHelper = () => {
                         <div className="upload-photo-button">
                             <input type="file" name="file" className="file-input" onChange={(event) => {
                                 setImageUpload(event.target.files[0]);
-                            }}/>
+                            }}  accept='image/*' required/>
 
                         </div>
                     </div>
 
                     <div className="field">
-                        <input type="submit" value={`Register`}/>
+                        <input type="submit" value={`Register`} id='register-patient'/>
                     </div>
                 </form>
             )}
