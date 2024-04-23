@@ -144,3 +144,26 @@
 video {
     border-radius: 10px;
 }
+
+button:disabled,
+button[disabled]{
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+input[type="submit"]:disabled{
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tooltip-message {
+    position: absolute;
+    top: calc(100% + 5px); /* Adjust as needed */
+    left: 10%; /* Adjust as needed */
+    background-color: #ffffff;
+    color: #1D2A4D;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 1;
+}
