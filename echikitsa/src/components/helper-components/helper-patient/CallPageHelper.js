@@ -513,14 +513,12 @@ function CallPageHelper(effect, deps) {
                 track.stop();
             });
         }
-        console.log('hello1');
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
             doctorId: parseInt(room)
         }).then(async (response) => {
             const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
             stompClient.connect({}, async () => {
-                console.log('hello');
                 await stompClient.send("/app/reload-position");
                 await stompClient.send(`/app/send-data/${room}`);
                 if(socket !== null) {
