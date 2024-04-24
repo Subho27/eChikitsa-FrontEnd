@@ -123,7 +123,7 @@ const LoginHelper = () => {
 
                 }
 
-                const response = await axios.post('http://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
+                const response = await axios.post('https://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
 
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
 
@@ -131,20 +131,20 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
-                        notify_success("Login Successfully")
+                        notify_success("Login Successfully");
                         if(loginType === 'patient')
                         {
                             let path = '/welcome'
                             navigate(path);
 
                         }
-                        if(loginType === 'doctor')
+                        if(loginType == 'doctor')
                         {
                             let path = '/dashboard'
                             navigate(path);
 
                         }
-                        if(loginType === 'admin'){
+                        if(loginType == 'admin'){
                             let path = '/admin'
                             navigate(path);
 
@@ -183,7 +183,7 @@ const LoginHelper = () => {
                 if (loginType === 'doctor') {
                     role = "DOCTOR"
                 }
-                const response = await axios.post('http://localhost:8083/user-handle/auth/login-using-otp', {
+                const response = await axios.post('https://localhost:8083/user-handle/auth/login-using-otp', {
                     mobileNumber,
                     role
                 }, {headers}).then((response) => {
@@ -232,7 +232,7 @@ const LoginHelper = () => {
 
     const sendOtp = () => {
 
-        const phoneNumber = "+91"+document.getElementById("phone-number").value;
+         const phoneNumber = "+91"+document.getElementById("phone-number").value;
         console.log(phoneNumber)
         const appVerifier = window.recaptchaVerifier;
         firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)

@@ -42,7 +42,7 @@ function TestingWelcome() {
         const getHospitalDetails = async () => {
             try {
                 const response = await axios.get(
-                    "http://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
+                    "https://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
                 );
                 console.log(response.data)
                 setHospitalData(response.data);

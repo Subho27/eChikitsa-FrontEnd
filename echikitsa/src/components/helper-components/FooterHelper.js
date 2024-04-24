@@ -15,7 +15,7 @@ function FooterHelper () {
                             <ul>
                                 <li><Link to="/" className="navigate-links" >{Constant.HOME_STRING}</Link></li>
                                 <li><Link to="/" className="navigate-links" >{Constant.ABOUT_STRING}</Link></li>
-                                <li><Link to="/" className="navigate-links" >{Constant.CONTACT_STRING}</Link></li>
+                                <li><Link to="/ContactUs" className="navigate-links" >{Constant.CONTACT_STRING}</Link></li>
                                 <li><Link to="/" className="navigate-links" >{Constant.POLICY_STRING}</Link></li>
                             </ul>
                         </div>

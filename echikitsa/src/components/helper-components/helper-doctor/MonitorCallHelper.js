@@ -6,6 +6,7 @@ import 'reactjs-popup/dist/index.css';
 import 'firebase/compat/database';
 import {Device} from 'mediasoup-client'
 import io from 'socket.io-client'
+import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 
 function MonitorCallHelper(effect, deps) {
 
@@ -141,8 +142,7 @@ function MonitorCallHelper(effect, deps) {
                 console.log('Middle');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ videoArray[i] +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
-                i = i + 1;
+                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -478,7 +478,7 @@ function MonitorCallHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">Senior Doctor</p>
+                        <p className="tag">{getUserIdFromLocalStorage()}</p>
                         <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
@@ -498,10 +498,10 @@ function MonitorCallHelper(effect, deps) {
                                 {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
                                 {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
-                            <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
-                            </button>
+                            {/*<button className="call-buttons">*/}
+                            {/*    <img className="button-icon"*/}
+                            {/*         src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>*/}
+                            {/*</button>*/}
                         </div>
                     </div>
                 </div>

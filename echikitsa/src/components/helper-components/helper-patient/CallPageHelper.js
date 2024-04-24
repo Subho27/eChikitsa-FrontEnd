@@ -32,7 +32,7 @@ function CallPageHelper(effect, deps) {
 
 
     const navigate = useNavigate();
-    const {state} = useLocation();
+    const location = useLocation();
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
@@ -282,8 +282,7 @@ function CallPageHelper(effect, deps) {
                 console.log('Middle');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ videoArray[i] +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
-                i = i + 1;
+                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -475,10 +474,16 @@ function CallPageHelper(effect, deps) {
     const joinRoom = () => {
         // console.log(socket);
         console.log('Emitting join room');
-        socket.emit('joinRoom', { roomName }, (data) => {
+        const userId = getUserIdFromLocalStorage();
+        socket.emit('joinRoom', { roomName, userId }, (data) => {
             // console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
             // we assign to local variable and will be used when
             // loading the client Device (see createDevice above)
+            if(data.error !== null && data.error === 'room-full') {
+                alert("Room is full. Not able to join. Sorry for inconvenience.");
+                navigate("/welcome");
+            }
+
             rtpCapabilities = data.rtpCapabilities
 
             console.log('Got join room');
@@ -521,7 +526,9 @@ function CallPageHelper(effect, deps) {
     //endregion
 
     const confirmJoin = () => {
-        const room = window.location.pathname.split("/")[2];
+        // const room = window.location.pathname.split("/")[2];
+        const room = location.state.assignedDoctorId.toString();
+        console.log(room);
         if (room === "" || room === undefined) {
             setError("Please add a room name to the URL.");
             return;
@@ -538,8 +545,9 @@ function CallPageHelper(effect, deps) {
 
     const handleCallEnd = async () => {
         let room;
-        if(roomName === "") room = parseInt(window.location.pathname.split("/")[2]);
-        else room = parseInt(roomName);
+        // if(roomName === "") room = parseInt(window.location.pathname.split("/")[2]);
+        if(roomName === "") room = location.state.assignedDoctorId.toString();
+        else room = roomName;
         if(socket !== null) {
             await socket.disconnect();
             await localStream.getTracks().forEach(function(track) {
@@ -549,7 +557,7 @@ function CallPageHelper(effect, deps) {
         await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
-            doctorId: room
+            doctorId: parseInt(room)
         }).then(async (response) => {
             const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
             stompClient.connect({}, async () => {
@@ -792,7 +800,7 @@ function CallPageHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">Patient</p>
+                        <p className="tag">{getUserIdFromLocalStorage()}</p>
                         <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
@@ -812,10 +820,10 @@ function CallPageHelper(effect, deps) {
                                 {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
                                 {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
-                            <button className="call-buttons">
-                                <img className="button-icon"
-                                     src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
-                            </button>
+                            {/*<button className="call-buttons">*/}
+                            {/*    <img className="button-icon"*/}
+                            {/*         src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>*/}
+                            {/*</button>*/}
                             <StyledPopup className="Feedback"
                                 trigger={<button className="call-buttons">
                                     <img className="button-icon"

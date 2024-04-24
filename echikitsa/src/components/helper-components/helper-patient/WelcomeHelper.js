@@ -4,7 +4,7 @@ import "../../../css/helper-components/helper-patient/welcome-style.css"
 import '../../../css/helper-components/header-style.css'
 import {over} from 'stompjs';
 import SockJS from 'sockjs-client';
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {HashLink} from "react-router-hash-link";
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import TestingWelcome from "./TestingWelcome";
@@ -13,7 +13,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from "axios";
 
 function WelcomeHelper(props){
-
     const [assignedDoctorId, setAssignedDoctorId] = useState(null);
     const [stompClient, setStompClient] = useState(null);
     const [firstMember, setFirstMember] = useState(false);
@@ -31,13 +30,13 @@ function WelcomeHelper(props){
 
 
     const handleConsult = async () => {
-        await axios.post("http://localhost:9193/local/add-to-queue", {
+        await axios.post("https://localhost:9193/local/add-to-queue", {
             patientId : getUserIdFromLocalStorage(),
             doctorId : assignedDoctorId
         }).then( async (response) => {
             console.log(response);
             if(response.data !== null) {
-                await axios.get(`http://localhost:9193/local/size/${response.data.user_id}`)
+                await axios.get(`https://localhost:9193/local/size/${response.data.user_id}`)
                     .then( async (response) => {
                         // console.log(response.data == 1);
                         if(response.data == 1) {
@@ -46,7 +45,7 @@ function WelcomeHelper(props){
                     })
                 setAssignedDoctorId(response.data.user_id);
             } else {
-                let sock = new SockJS('http://localhost:9193/ws-endpoint');
+                let sock = new SockJS('https://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 await stompClient.connect({}, () => {
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
@@ -65,13 +64,13 @@ function WelcomeHelper(props){
     }
 
     const quitWaiting = async () => {
-        await axios.post("http://localhost:9193/local/cancel-waiting", {
+        await axios.post("https://localhost:9193/local/cancel-waiting", {
             patientId: getUserIdFromLocalStorage(),
             doctorId: assignedDoctorId
         }).then(async (response) => {
             console.log(response.data);
             if(response.data.toString() === "true") {
-                const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+                const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
                 stompClient.connect({}, async () => {
                     await stompClient.send("/app/reload-position");
                     alert("You chose not to wait for our Doctor. Please try again after some time.");
@@ -84,7 +83,7 @@ function WelcomeHelper(props){
     useEffect(() => {
         if (assignedDoctorId) {
             const initializeWebSocket = () => {
-                let sock = new SockJS('http://localhost:9193/ws-endpoint');
+                let sock = new SockJS('https://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 stompClient.connect({}, () => {
                     setStompClient(stompClient);
@@ -92,7 +91,8 @@ function WelcomeHelper(props){
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
                     if(firstMember) {
                         setFirstMember(false);
-                        navigate(`/call/${assignedDoctorId}`);
+                        // navigate(`/call/${assignedDoctorId}`);
+                        navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                     } else {
                         stompClient.subscribe(waiting, async (message) => {
                             console.log(message);
@@ -102,7 +102,8 @@ function WelcomeHelper(props){
                         stompClient.subscribe(topic, (message) => {
                             console.log(message);
                             if (JSON.parse(message.body).body.body.patientId == getUserIdFromLocalStorage()) {
-                                navigate(`/call/${assignedDoctorId}`);
+                                // navigate(`/call/${assignedDoctorId}`);
+                                  navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                             } else {
                                 setIsWaiting(true);
                             }

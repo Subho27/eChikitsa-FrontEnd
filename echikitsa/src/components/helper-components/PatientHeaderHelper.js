@@ -15,18 +15,16 @@ function PatientHeaderHelper(props) {
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     let userid = getUserIdFromLocalStorage();
-    if (userid !== null)
-    {
-        const fetchUserName = async () => {
-            const response = axios.get(`http://localhost:8083/echikitsa-backend/user/get-user-name/${userid}`,{headers}).then((response) => {
-                //console.log(response)
-                setName(response.data)
+    useEffect(() => {
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
+            console.log(response)
+            setName(response.data.firstName)
 
-            });
+        });
 
-        }
-        fetchUserName()
-    }
+    }, []);
     const handleLogout = () => {
         removeUserIdFromLocalStorage()
         removeJwtTokenFromLocalStorage()
