@@ -4,7 +4,7 @@ import "../../../css/helper-components/helper-patient/welcome-style.css"
 import '../../../css/helper-components/header-style.css'
 import {over} from 'stompjs';
 import SockJS from 'sockjs-client';
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {HashLink} from "react-router-hash-link";
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import TestingWelcome from "./TestingWelcome";
@@ -13,7 +13,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from "axios";
 
 function WelcomeHelper(props){
-
     const [assignedDoctorId, setAssignedDoctorId] = useState(null);
     const [stompClient, setStompClient] = useState(null);
     const [firstMember, setFirstMember] = useState(false);
@@ -92,7 +91,8 @@ function WelcomeHelper(props){
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
                     if(firstMember) {
                         setFirstMember(false);
-                        navigate(`/call/${assignedDoctorId}`);
+                        // navigate(`/call/${assignedDoctorId}`);
+                        navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                     } else {
                         stompClient.subscribe(waiting, async (message) => {
                             console.log(message);
@@ -102,7 +102,8 @@ function WelcomeHelper(props){
                         stompClient.subscribe(topic, (message) => {
                             console.log(message);
                             if (JSON.parse(message.body).body.body.patientId == getUserIdFromLocalStorage()) {
-                                navigate(`/call/${assignedDoctorId}`);
+                                // navigate(`/call/${assignedDoctorId}`);
+                                  navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                             } else {
                                 setIsWaiting(true);
                             }
