@@ -38,7 +38,7 @@ function AdminWelcomeHelper(props) {
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const fetchHospitalName = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-specific-hospitals/${getUserIdFromLocalStorage()}`,{headers})
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/hospital/get-specific-hospitals/${getUserIdFromLocalStorage()}`,{headers})
                     setHospitalName(response.data);
                     const { data } = response;
                     setHospitalData(data);
@@ -48,7 +48,7 @@ function AdminWelcomeHelper(props) {
                     setHospitalAddressValue(data.address);
                     setHospitalWebsiteValue(data.website);
 
-                    const response2 = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-doctors/${getUserIdFromLocalStorage()}`,{headers});
+                    const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/hospital/get-doctors/${getUserIdFromLocalStorage()}`,{headers});
                     setDoctors(response2.data);
 
                 } catch (error) {
@@ -58,7 +58,7 @@ function AdminWelcomeHelper(props) {
 
             const fetchAllDepartments = async () => {
                 try {
-                    const response = await axios.get('http://localhost:8083/echikitsa-backend/department/get-all-departments',{headers});
+                    const response = await axios.get('https://localhost:8083/echikitsa-backend/department/get-all-departments',{headers});
                     setDepartments(response.data);
                 }
                 catch (error) {
@@ -67,7 +67,7 @@ function AdminWelcomeHelper(props) {
             };
             const fetchDoctorDetails = async () => {
                 try {
-                    const response2 = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-doctors/${getUserIdFromLocalStorage()}`,{headers});
+                    const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/hospital/get-doctors/${getUserIdFromLocalStorage()}`,{headers});
                     const doctorsData = response2.data.map(doctor => ({
                         doctorName: doctor.name,
                         specialization: doctor.specialization,
@@ -85,7 +85,7 @@ function AdminWelcomeHelper(props) {
 
             const fetchDepartmentsByHospitalId = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8083/echikitsa-backend/hospital/get-all-departments-by-hospitalId/${getUserIdFromLocalStorage()}`,{headers});
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/hospital/get-all-departments-by-hospitalId/${getUserIdFromLocalStorage()}`,{headers});
                     const departmentsByHospitalId = response.data.map(department => department.department_id);
                     setSelectedValues(departmentsByHospitalId);
                     // console.log(departmentsByHospitalId);
@@ -157,7 +157,30 @@ function AdminWelcomeHelper(props) {
         const token = getJwtTokenFromLocalStorage();
         const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
         try {
-            const response = await axios.put("http://localhost:8083/user-handle/admin/doctor-status-update",id,{headers}).then((response) => {
+            const response = await axios.put("https://localhost:8083/user-handle/admin/doctor-status-update",id,{headers}).then((response) => {
+
+
+            });
+
+        } catch (e) {
+            console.log(e)
+
+        }
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
+    };
+    const handlePromoteDoctor = async (id) => {
+        // setAdminActiveId((prevId) => (prevId === id ? null : id));
+        const updatedDoctors = doctors.map((doctor) => {
+            if (doctor.id === id) {
+                return { ...doctor, seniority_level: "senior"};
+            }
+            return doctor;
+        });
+        setDoctors(updatedDoctors);
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        try {
+            const response = await axios.put("https://localhost:8083/user-handle/admin/promote-doctor",id,{headers}).then((response) => {
 
 
             });
@@ -179,6 +202,7 @@ function AdminWelcomeHelper(props) {
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.specialization.toLowerCase().includes(query.toLowerCase()) ||
         item.email.toLowerCase().includes(query.toLowerCase())
+
         // item.isActive.toLowerCase().includes(query.toLowerCase())
 
     );
@@ -267,7 +291,7 @@ function AdminWelcomeHelper(props) {
                 departments: hospitalData.departments // Preserve existing departments
             };
 
-            const response = await axios.put(`http://localhost:8083/user-handle/admin/updateHospitalDetails/?id=${getUserIdFromLocalStorage()}`, updatedData,{headers}).then((response) => {
+            const response = await axios.put(`https://localhost:8083/user-handle/admin/updateHospitalDetails/?id=${getUserIdFromLocalStorage()}`, updatedData,{headers}).then((response) => {
                 console.log(response.data);
                 if (response.data) {
                     alert(response.data)
@@ -295,7 +319,24 @@ function AdminWelcomeHelper(props) {
             const token = getJwtTokenFromLocalStorage();
 
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-            const response = await axios.post(`http://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
+            const response = await axios.post(`https://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phoneNumber: '',
+                    yearOfExp: '',
+                    role:'DOCTOR',
+                    age:'',
+                    aadhaar:'',
+                    state:'',
+                    city:'',
+                    degree: '',
+                    gender: '',
+                    registrationNumber:'',
+                    specialization:'',
+                    img_url:''
+                });
 
             });
         } catch (error) {
@@ -577,14 +618,26 @@ function AdminWelcomeHelper(props) {
                                         <th>Doctor Type</th>
                                         <th>Specialization</th>
                                         <th>Email</th>
-                                        {/*<th>Active</th>*/}
+                                        <th>Promotion As Senior</th>
                                     </tr>
                                     {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
                                             <td>Please Add This</td>
                                             <td>{item.specialization}</td>
                                             <td>{item.email}</td>
-                                            {/*<td>{item.Active}</td>*/}
+                                            {/*<td>{item.seniority_level}</td>*/}
+                                            <td>
+                                                <div className="ActiveDeactive">
+                                                    <button
+                                                        id="admin-activate-button"
+                                                        onClick={() => handlePromoteDoctor(item.id)}
+                                                        className={item.seniority_level === "junior" ? 'adminInactive' :''}
+                                                    >
+                                                        {item.seniority_level === "junior" ? 'Senior' : 'junior'}
+
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))}
                                     </tbody>

@@ -58,7 +58,7 @@ function ForgotPassword () {
 
         try {
 
-            const response = await axios.post('http://localhost:8083/user-handle/auth/reset-password-otp', {email});
+            const response = await axios.post('https://localhost:8083/user-handle/auth/reset-password-otp', {email});
             setResponseMessage(response.data.message);
         } catch (error) {
             console.error('Error:', error);
@@ -70,7 +70,7 @@ function ForgotPassword () {
         event.preventDefault();
         try {
 
-            const response = await axios.post('http://localhost:8083/user-handle/auth/reset-password', {email,otp,password});
+            const response = await axios.post('https://localhost:8083/user-handle/auth/reset-password', {email,otp,password});
             setResponseMessage(response.data.message);
         } catch (error) {
             console.error('Error:', error);

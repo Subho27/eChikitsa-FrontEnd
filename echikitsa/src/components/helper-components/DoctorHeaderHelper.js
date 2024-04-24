@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
@@ -13,7 +13,7 @@ import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../..
 
 
 const DoctorHeaderHelper = (props) => {
-    const [name, setName] = useState("");
+    const [doctor, setDoctor] = useState("");
     const navigate = useNavigate();
 
     const handleJoinCall = async () => {
@@ -25,18 +25,28 @@ const DoctorHeaderHelper = (props) => {
         removeJwtTokenFromLocalStorage()
     }
 
-
-    const fetchUserName = async () => {
+    useEffect(() => {
         const token = getJwtTokenFromLocalStorage();
         const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-        const response = axios.get(`http://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
-            //console.log(response)
-            setName(response.data)
+        const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
+            console.log(response)
+            setDoctor(response.data)
 
         });
 
-    }
-    fetchUserName()
+    }, []);
+
+    // const fetchUserName = async () => {
+    //     const token = getJwtTokenFromLocalStorage();
+    //     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+    //     const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
+    //         console.log(response)
+    //         setDoctor(response.data)
+    //
+    //     });
+    //
+    // }
+    // fetchUserName()
 
     return (
         <div>
@@ -92,8 +102,13 @@ const DoctorHeaderHelper = (props) => {
                                 {/*<button className="join-call" onClick={handleJoinCall}>JOIN CALL</button>*/}
                                 <Link to="/dashboard" className={`nav-item nav-link ${props.data === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
                                 <Link to="/doctor-records" className={`nav-item nav-link ${props.data === 'records' ? 'active' : ''}`} >Records</Link>
-                                <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>
-                                <Link to="/doctor-profile" style={{ color: 'black' }} className={`nav-item nav-link profile-font ${props.data === 'profile' ? 'active' : ''}`} >{"Dr.  " + name}</Link>
+                                {/*<Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >Monitor</Link>*/}
+                                {doctor.seniorityLevel === "senior" && (
+                                    <Link to="/monitor" className={`nav-item nav-link ${props.data === 'monitor' ? 'active' : ''}`} >
+                                        Monitor
+                                    </Link>
+                                )}
+                                <Link to="/doctor-profile" style={{ color: 'black' }} className={`nav-item nav-link profile-font ${props.data === 'profile' ? 'active' : ''}`} >{"Dr.  " + doctor.firstName}</Link>
                                 <Link to="/"  onClick={handleLogout}className={`nav-item nav-link ${props.data === 'logout' ? 'active' : ''}`} >Logout</Link>
                                 {/*<div className="nav-item dropdown">*/}
                                 {/*    <Link to="/" className={`nav-link dropdown-toggle ${props.data === 'profile' ? 'active' : ''}`} data-bs-toggle="dropdown" id="more">More</Link>*/}

@@ -5,20 +5,17 @@ import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
-// import 'firebase/compat/auth';
-// import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
+
 import axios from 'axios';
 import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-import firebase from "firebase/compat/app";
+
 import {over} from "stompjs";
 import SockJS from "sockjs-client";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
-// Initialize Firebase if it's not already initialized
-// if (!firebase.apps.length) {
-//     firebase.initializeApp(firebaseConfig);
-// }
+
 function ConsultationPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([]);
     const [today, setToday] = useState("");
@@ -33,25 +30,25 @@ function ConsultationPageHelper(effect, deps) {
     const [consentGiven, setConsentGiven] = useState("");
 
     // Function to upload PDF file to Firebase Storage
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     const generatePDF = async () => {
         try {
-            const response = await axios.post('http://localhost:9090/prescription/generate_pdf', {
+            const response = await axios.post('https://localhost:8083/file-handle/prescription/generate_pdf', {
                 patient_id:2,
                 doctor_id:1,
                 instructions:prescription,
                 medication:addMedicines,
                 diagnosis:diagnosisSummary,
                 nextdate:suggestDate
-            }, {
+            }, {headers,
                 responseType: 'blob' // Set response type to blob
             });
 
             // Create a blob URL for the PDF data
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const prescriptionRef = ref(storage, `echikitsa/Patient/2/${"2"+Date.now().toLocaleString()}`);
-            // await uploadBytes(prescriptionRef, blob).then(() => {
-            //     alert("Prescription Uploaded");
-            // });
+
             await uploadBytes(prescriptionRef, blob)
                 .then((snapshot) => {
                     return getDownloadURL(snapshot.ref);
@@ -252,9 +249,7 @@ function ConsultationPageHelper(effect, deps) {
                 return
             }
 
-            // console.log(`Consumer Params ${params}`)
-            // then consume with the local consumer transport
-            // which creates a consumer
+
             const consumer = await consumerTransport.consume({
                 id: params.id,
                 producerId: params.producerId,
@@ -617,7 +612,7 @@ function ConsultationPageHelper(effect, deps) {
 
     const askConsent = async () => {
         setWaitingConsent(true);
-        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             await stompClient.send(`/app/send-consent-request/${getUserIdFromLocalStorage()}`);
         });
@@ -636,7 +631,7 @@ function ConsultationPageHelper(effect, deps) {
     }, [consentGiven]);
 
     useEffect(() => {
-        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
             stompClient.subscribe(waiting, async (message) => {

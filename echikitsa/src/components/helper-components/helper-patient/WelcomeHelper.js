@@ -30,13 +30,13 @@ function WelcomeHelper(props){
 
 
     const handleConsult = async () => {
-        await axios.post("http://localhost:9193/local/add-to-queue", {
+        await axios.post("https://localhost:9193/local/add-to-queue", {
             patientId : getUserIdFromLocalStorage(),
             doctorId : assignedDoctorId
         }).then( async (response) => {
             console.log(response);
             if(response.data !== null) {
-                await axios.get(`http://localhost:9193/local/size/${response.data.user_id}`)
+                await axios.get(`https://localhost:9193/local/size/${response.data.user_id}`)
                     .then( async (response) => {
                         // console.log(response.data == 1);
                         if(response.data == 1) {
@@ -45,7 +45,7 @@ function WelcomeHelper(props){
                     })
                 setAssignedDoctorId(response.data.user_id);
             } else {
-                let sock = new SockJS('http://localhost:9193/ws-endpoint');
+                let sock = new SockJS('https://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 await stompClient.connect({}, () => {
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
@@ -64,13 +64,13 @@ function WelcomeHelper(props){
     }
 
     const quitWaiting = async () => {
-        await axios.post("http://localhost:9193/local/cancel-waiting", {
+        await axios.post("https://localhost:9193/local/cancel-waiting", {
             patientId: getUserIdFromLocalStorage(),
             doctorId: assignedDoctorId
         }).then(async (response) => {
             console.log(response.data);
             if(response.data.toString() === "true") {
-                const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+                const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
                 stompClient.connect({}, async () => {
                     await stompClient.send("/app/reload-position");
                     alert("You chose not to wait for our Doctor. Please try again after some time.");
@@ -83,7 +83,7 @@ function WelcomeHelper(props){
     useEffect(() => {
         if (assignedDoctorId) {
             const initializeWebSocket = () => {
-                let sock = new SockJS('http://localhost:9193/ws-endpoint');
+                let sock = new SockJS('https://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 stompClient.connect({}, () => {
                     setStompClient(stompClient);
