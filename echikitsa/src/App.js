@@ -18,19 +18,17 @@ import MonitorCallDoctor from "./components/doctor-components/MonitorCallDoctor"
 import ForgotPassword from "./components/common-components/ForgotPassword";
 import ProtectedRoute from "./components/route-guard/ProtectedRoute";
 import {AuthProvider} from "./components/route-guard/AuthContext";
-import {
-    BrowserRouter as Router,
-    Switch,
-} from "react-router-dom";
 import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLogin";
-import {ToastContainer} from "react-toastify";
 import React from "react";
 import PageNotFound from "./components/helper-components/PageNotFound";
 import ContactUs from "./components/helper-components/ContactUs";
 
 
+
 function App() {
+
     return (
+
 <AuthProvider>
         <Routes>
 
@@ -60,7 +58,7 @@ function App() {
             <Route path='/monitor-call/*' element={<ProtectedRoute Component={MonitorCallDoctor} role ="DOCTOR" />}/>
 
             {/*Admin Page Routes*/}
-            <Route path='/admin' element={<ProtectedRoute Component={WelcomeAdmin} role ="DOCTOR" />}/>
+            <Route path='/admin' element={<ProtectedRoute Component={WelcomeAdmin} role ="ADMIN" />}/>
 
             <Route path="*" Component={PageNotFound} />
 
