@@ -615,14 +615,12 @@ function AdminWelcomeHelper(props) {
                                     <tbody>
                                     <tr>
                                         <th>Doctor Name</th>
-                                        <th>Doctor Type</th>
                                         <th>Specialization</th>
                                         <th>Email</th>
                                         <th>Promotion As Senior</th>
                                     </tr>
                                     {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
-                                            <td>Please Add This</td>
                                             <td>{item.specialization}</td>
                                             <td>{item.email}</td>
                                             {/*<td>{item.seniority_level}</td>*/}
@@ -631,11 +629,12 @@ function AdminWelcomeHelper(props) {
                                                     <button
                                                         id="admin-activate-button"
                                                         onClick={() => handlePromoteDoctor(item.id)}
-                                                        className={item.seniority_level === "junior" ? 'adminInactive' :''}
+                                                        className={item.seniority_level === "junior" ? 'adminInactive' : ''}
+                                                        disabled={item.seniority_level === "senior"}
                                                     >
-                                                        {item.seniority_level === "junior" ? 'Senior' : 'junior'}
-
+                                                        {item.seniority_level === "junior" ? 'Senior' : 'Junior'}
                                                     </button>
+
                                                 </div>
                                             </td>
                                         </tr>

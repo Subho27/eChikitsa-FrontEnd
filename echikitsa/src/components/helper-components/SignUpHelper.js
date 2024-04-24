@@ -99,27 +99,27 @@ const SignUpHelper = () => {
         setValidationMessage(ValidateField(name, value, validationMessage));
     };
 
-    useEffect(() =>{
-        console.log(formData);
-        if(document.getElementById('email-patient-send-otp') !== null) document.getElementById('email-patient-send-otp').disabled = formData.email === '' || validationMessage.emailMessage !== '';
-        if(document.getElementById('phone-patient-send-otp') !== null) document.getElementById('phone-patient-send-otp').disabled = formData.phoneNumber === '' || validationMessage.phoneNumberMessage !== '';
-        if(document.getElementById('hospital-send-email') !== null) document.getElementById('hospital-send-email').disabled = formData.email === '' || validationMessage.emailMessage !== '';
-
-        if(Object.values(formData).every((value) => value !== '') && Object.values(validationMessage).every((message) => message === '')) {
-            if(document.getElementById('register') !== null) document.getElementById('register').disabled = false;
-            if(document.getElementById('register-patient') !== null && numberVerified && emailVerified) document.getElementById('register-patient').disabled = false;
-        } else {
-            if(document.getElementById('register') !== null) document.getElementById('register').disabled = true;
-            if(document.getElementById('register-patient') !== null) document.getElementById('register-patient').disabled = true;
-        }
-
-        if(formData.confirmPassword !== '' && formData.confirmPassword !== formData.password) {
-            setValidationMessage((prevMessages) => ({
-                ...prevMessages,
-                confirmPasswordMessage: "Does not match with Password."
-            }));
-        }
-    }, [formData])
+    // useEffect(() =>{
+    //     console.log(formData);
+    //     if(document.getElementById('email-patient-send-otp') !== null) document.getElementById('email-patient-send-otp').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+    //     if(document.getElementById('phone-patient-send-otp') !== null) document.getElementById('phone-patient-send-otp').disabled = formData.phoneNumber === '' || validationMessage.phoneNumberMessage !== '';
+    //     if(document.getElementById('hospital-send-email') !== null) document.getElementById('hospital-send-email').disabled = formData.email === '' || validationMessage.emailMessage !== '';
+    //
+    //     if(Object.values(formData).every((value) => value !== '') && Object.values(validationMessage).every((message) => message === '')) {
+    //         if(document.getElementById('register') !== null) document.getElementById('register').disabled = false;
+    //         if(document.getElementById('register-patient') !== null && numberVerified && emailVerified) document.getElementById('register-patient').disabled = false;
+    //     } else {
+    //         if(document.getElementById('register') !== null) document.getElementById('register').disabled = true;
+    //         if(document.getElementById('register-patient') !== null) document.getElementById('register-patient').disabled = true;
+    //     }
+    //
+    //     if(formData.confirmPassword !== '' && formData.confirmPassword !== formData.password) {
+    //         setValidationMessage((prevMessages) => ({
+    //             ...prevMessages,
+    //             confirmPasswordMessage: "Does not match with Password."
+    //         }));
+    //     }
+    // }, [formData])
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -447,7 +447,7 @@ const SignUpHelper = () => {
             </div>
 
             {signupType === 'patient' && (
-                <form onSubmit={handleSignUp}>
+                <form >
                     <div className="fg">
 
                         <div className="field">
@@ -619,13 +619,13 @@ const SignUpHelper = () => {
                     </div>
 
                     <div className="field">
-                        <input type="submit" value={`Register`} id='register-patient'/>
+                        <input type="submit" onClick={handleSignUp} value={`Register`} id='register-patient'/>
                     </div>
                 </form>
             )}
 
             {signupType === 'hospital' && (
-                <form onSubmit={handleSignUp}>
+                <form >
                     <div className="fg">
                         <div className="field">
                             <input type="text" name="name" value={formDataHospital.name}
@@ -721,7 +721,7 @@ const SignUpHelper = () => {
                         </div>
                     </div>
                     <div className="field">
-                        <input type="submit" value={`Register`}/>
+                        <input type="submit"  onClick={handleSignUp} value={`Register`}/>
                     </div>
                 </form>
             )}
