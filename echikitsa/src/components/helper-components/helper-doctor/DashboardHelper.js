@@ -247,7 +247,7 @@ function DashboardHelper() {
     );
 
     const handleJoinCall = async () => {
-        navigate("/consult/"+ getUserIdFromLocalStorage() )
+        navigate("/consult");
     }
 
     const handleJoinLater = async () => {
