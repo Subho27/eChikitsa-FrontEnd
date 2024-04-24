@@ -131,19 +131,19 @@ const LoginHelper = () => {
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
                         alert("Login Successfully")
-                        if(loginType === 'patient')
+                        if(loginType == 'patient')
                         {
                             let path = '/welcome'
                             navigate(path);
 
                         }
-                        if(loginType === 'doctor')
+                        if(loginType == 'doctor')
                         {
                             let path = '/dashboard'
                             navigate(path);
 
                         }
-                        if(loginType === 'admin'){
+                        if(loginType == 'admin'){
                             let path = '/admin'
                             navigate(path);
 

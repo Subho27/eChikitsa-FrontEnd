@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/consultation-page-style.css"
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
@@ -280,8 +280,7 @@ function ConsultationPageHelper(effect, deps) {
                 console.log('Middle');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ videoArray[i] +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
-                i = i + 1;
+                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -473,7 +472,8 @@ function ConsultationPageHelper(effect, deps) {
     const joinRoom = () => {
         // console.log(socket);
         console.log('Emitting join room');
-        socket.emit('joinRoom', { roomName }, (data) => {
+        const userId = getUserIdFromLocalStorage();
+        socket.emit('joinRoom', { roomName, userId }, (data) => {
             // console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
             // we assign to local variable and will be used when
             // loading the client Device (see createDevice above)
@@ -592,7 +592,8 @@ function ConsultationPageHelper(effect, deps) {
 
         //region Connection & Room
         //Handle room name
-        const room = window.location.pathname.split('/')[2];
+        // const room = window.location.pathname.split('/')[2];
+        const room = getUserIdFromLocalStorage().toString();
         console.log(room)
         if (room === "" || room === undefined) {
             setError("Please add a room name to the URL.");
@@ -686,7 +687,7 @@ function ConsultationPageHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section">
                     <div className="video-section">
-                        <p className="tag">Doctor</p>
+                        <p className="tag">{getUserIdFromLocalStorage()}</p>
                         <video className="large-video-call-patient-doctor" id="doctorLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
@@ -706,9 +707,9 @@ function ConsultationPageHelper(effect, deps) {
                                 {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
                                 {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
-                            <button className="call-buttons">
-                                <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>
-                            </button>
+                            {/*<button className="call-buttons">*/}
+                            {/*    <img className="button-icon" src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>*/}
+                            {/*</button>*/}
                             <Link to="/dashboard"><button className="call-buttons" onClick={handleCallEnd}>
                                 <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
                             {/*<Link to="/dashboard"><button className="call-buttons">*/}
