@@ -41,24 +41,25 @@ function DashboardHelper() {
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
+        let docId = getUserIdFromLocalStorage();
         const getNoOfPatient = async () => {
             try {
                 const responses = await axios.get(
-                    "http://localhost:8083/echikitsa-backend/ehr/get-history/10",{headers}
+                    `https://localhost:8083/echikitsa-backend/ehr/get-history/${docId}`,{headers}
 
                 );
                 setData(responses.data);
                 const totalConsulted = await axios.get(
-                    "http://localhost:8083/echikitsa-backend/ehr/get-no-patient/10",{headers}
+                    `https://localhost:8083/echikitsa-backend/ehr/get-no-patient/${docId}`,{headers}
                 );
                 setNoOfPatient(totalConsulted.data);
                 const totalConsulteds = await axios.get(
-                    "http://localhost:8083/echikitsa-backend/ehr/get-no-patient-consulted-today/10",{headers}
+                    `https://localhost:8083/echikitsa-backend/ehr/get-no-patient-consulted-today/${docId}`,{headers}
 
                 );
                 setNoOfPatientToday(totalConsulteds.data);
                 const response = await axios.get(
-                    "http://localhost:8083/echikitsa-backend/ehr/get-freq-patient/10",{headers}
+                    `https://localhost:8083/echikitsa-backend/ehr/get-freq-patient/${docId}`,{headers}
 
                 );
                 setTodayDate(response.data);
@@ -177,7 +178,7 @@ function DashboardHelper() {
 
     useEffect(() => {
         const initializeWebSocket = () => {
-            let sock = new SockJS('http://localhost:9193/ws-endpoint');
+            let sock = new SockJS('https://localhost:9193/ws-endpoint');
             const stompC = over(sock);
             stompC.connect({}, () => {
                 setStompClient(stompC);
@@ -256,7 +257,7 @@ function DashboardHelper() {
     }
 
     useEffect(() => {
-        axios.get(`http://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
+        axios.get(`https://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
             .then((response) => {
                  // console.log(response);
                 setNextPatients(response.data);

@@ -122,7 +122,7 @@ const LoginHelper = () => {
 
                 }
 
-                const response = await axios.post('http://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
+                const response = await axios.post('https://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
 
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
 
@@ -182,7 +182,7 @@ const LoginHelper = () => {
                 if (loginType === 'doctor') {
                     role = "DOCTOR"
                 }
-                const response = await axios.post('http://localhost:8083/user-handle/auth/login-using-otp', {
+                const response = await axios.post('https://localhost:8083/user-handle/auth/login-using-otp', {
                     mobileNumber,
                     role
                 }, {headers}).then((response) => {

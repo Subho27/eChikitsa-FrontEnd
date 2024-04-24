@@ -35,7 +35,7 @@ function DocProfilePage() {
                     const token = getJwtTokenFromLocalStorage();
                     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-                    const response = await axios.get(`http://localhost:8083/echikitsa-backend/doctor/get/${userId}`,{headers}).then((response) => {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/doctor/get/${userId}`,{headers}).then((response) => {
                          console.log(response.data);
                         if (response.data) {
                             setTmp(response.data);
@@ -88,7 +88,7 @@ function DocProfilePage() {
             const updatedData = {
             };
 
-            const response = await axios.put(`http://localhost:8083/user-handle/doctor/update-details/?id=${userId}`, tmp, { headers });
+            const response = await axios.put(`https://localhost:8083/user-handle/doctor/update-details/?id=${userId}`, tmp, { headers });
             console.log(response.data);
             if (response.data) {
                 alert(response.data);

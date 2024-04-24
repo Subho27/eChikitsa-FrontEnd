@@ -505,11 +505,11 @@ function CallPageHelper(effect, deps) {
                 track.stop();
             });
         }
-        await axios.post("http://localhost:9193/local/remove", {
+        await axios.post("https://localhost:9193/local/remove", {
             patientId: null,
             doctorId: room
         }).then(async (response) => {
-            const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+            const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
             stompClient.connect({}, async () => {
                 await stompClient.send("/app/reload-position");
                 await stompClient.send(`/app/send-data/${room}`);
@@ -583,7 +583,7 @@ function CallPageHelper(effect, deps) {
         const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
         setToday(tomorrowFormatted);
 
-        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             const waiting = `/topic/get-consent-request/${getUserIdFromLocalStorage()}`;
             stompClient.subscribe(waiting, async (message) => {
@@ -645,7 +645,7 @@ function CallPageHelper(effect, deps) {
             isHidden.className = "fg visually-hidden";
         }
         const verificationCode = parseInt(emailOtpValues.join(''));
-        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             confResult.confirm(verificationCode).then( (result) => {
                 stompClient.send(`/app/consent-reply/${consentFromDoctor}`, {}, true);
@@ -703,7 +703,7 @@ function CallPageHelper(effect, deps) {
     }, []);
 
     const cancelConsent = () => {
-        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             await stompClient.send(`/app/consent-reply/${consentFromDoctor}`, {}, false);
             setConsentOpen(false);

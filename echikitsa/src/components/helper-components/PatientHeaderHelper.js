@@ -18,7 +18,7 @@ function PatientHeaderHelper(props) {
     if (userid !== null)
     {
         const fetchUserName = async () => {
-            const response = axios.get(`http://localhost:8083/echikitsa-backend/user/get-user-name/${userid}`,{headers}).then((response) => {
+            const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${userid}`,{headers}).then((response) => {
                 //console.log(response)
                 setName(response.data)
 

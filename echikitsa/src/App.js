@@ -26,6 +26,7 @@ import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLo
 import {ToastContainer} from "react-toastify";
 import React from "react";
 import PageNotFound from "./components/helper-components/PageNotFound";
+import ContactUs from "./components/helper-components/ContactUs";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path='/signup' Component={SignUp}   />
             <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
             <Route path='/forgot-password' Component={ForgotPassword}   />
+            <Route path='/ContactUs' Component={ContactUs}   />
 
 
             {/*Patient Page Routes*/}
