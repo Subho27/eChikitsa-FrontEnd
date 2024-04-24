@@ -4,6 +4,7 @@ import FooterHelper from "../helper-components/FooterHelper";
 import '../../css/helper-components/forgot-password-style.css'
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 function ForgotPassword () {
     const [email, setEmail] = useState('');
@@ -61,9 +62,9 @@ function ForgotPassword () {
 
             const response = await axios.post('http://localhost:8083/user-handle/auth/reset-password-otp', {email});
             setResponseMessage(response.data.message);
-            alert("OTP Sent Successfully");
+            await notify_success("OTP Sent Successfully");
         } catch (error) {
-            alert('Error: ' + error);
+            await notify_error('Error: ' + error);
             setResponseMessage('An error occurred. Please try again.');
         }
     };
@@ -74,14 +75,24 @@ function ForgotPassword () {
 
             const response = await axios.post('http://localhost:8083/user-handle/auth/reset-password', {email,otp,password});
             setResponseMessage(response.data.message);
-            alert("Password Changed Successfully");
+            await notify_success("Password Changed Successfully");
             navigate("/login");
         } catch (error) {
-            alert('Error: '+ error);
+            await notify_error('Error: '+ error);
             setResponseMessage('An error occurred. Please try again.');
         }
     };
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
 
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
 
 
 

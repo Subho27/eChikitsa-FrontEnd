@@ -77,7 +77,7 @@ function CallPageHelper(effect, deps) {
     const generatePdf = async(room) =>{
         const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
         stompClient.connect({}, async() => {
-            await stompClient.send('/app/prescription', {
+            await stompClient.send('/app/send-on-call-end', {
                 patient_id: getUserIdFromLocalStorage(),
                 doctor_id: room
             });

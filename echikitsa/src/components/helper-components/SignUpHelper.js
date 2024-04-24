@@ -151,11 +151,15 @@ const SignUpHelper = () => {
     };
 
     const notify_success = async (response) =>{
-        toast.success({response});
+        toast.success(
+            <div>{response}</div>
+        );
     }
 
     const notify_error = async (response) =>{
-        toast.error({response});
+        toast.error(
+            <div>{response}</div>
+        );
     }
     //endregion
 
@@ -332,8 +336,8 @@ const SignUpHelper = () => {
                 return url; // Return the download URL
             })
             .catch((error) => {
-                notify_error("Error uploading prescription: " + error);
-                throw error; // Propagate the error
+                throw notify_error("Error uploading prescription: " + error);
+
             });
     };
 
@@ -343,26 +347,23 @@ const SignUpHelper = () => {
         await uploadFiles()
         // Logic to handle login based on login method
         if (signupType === 'patient') {
-            console.log(formData)
-
             try {
 
                 const response = await axios.post('http://localhost:8083/user-handle/patient/registerPatient', formData).then((response) => {
-                    // console.log(response.data);
-                    if (response.data) {
-                        notify_success(response.data)
+                    if (response.data === "Patient registered successfully") {
+                        notify_success("Patient Register Successfully")
 
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        notify_error(response.data)
+                        notify_error("Patient Already Exist!!")
                     }
 
                 });
             } catch (error) {
-                notify_error('Error: '+error);
+                await notify_error('Error: ' + error);
 
             }
 
@@ -370,24 +371,22 @@ const SignUpHelper = () => {
         }
         else
         {
-            console.log(formDataHospital);
             try {
 
                 const response = await axios.post('http://localhost:8083/user-handle/hospital/add-hospital', formDataHospital).then((response) => {
-                    // console.log(response.data);
-                    if (response.data) {
-                        notify_success(response.data)
+                    if (response.data==="Hospital registered successfully") {
+                        notify_success("Hospital Register Successfully")
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        notify_error(response.data)
+                        notify_error("Hospital Already Exist!!")
                     }
 
                 });
             } catch (error) {
-                notify_error('Error: ' + error);
+                await notify_error('Error: ' + error);
 
             }
         }

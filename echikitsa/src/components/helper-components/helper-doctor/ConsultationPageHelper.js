@@ -76,23 +76,23 @@ function ConsultationPageHelper(effect, deps) {
         }
     }
 
-    // WebSocket connection setup
-    const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
-    stompClient.connect({}, ()=> {
-        const waiting = `/consult/${getUserIdFromLocalStorage()}`;
-        stompClient.subscribe(waiting,  (message) => {
-            console.log(message);
-            return generatePDF(message);
-
-        })
-    })
+    // Prescription WebSocket connection setup
+    // const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+    // stompClient.connect({}, ()=> {
+    //     const waiting = `/topic/send-data-req/${getUserIdFromLocalStorage()}`;
+    //     stompClient.subscribe(waiting,  (message) => {
+    //         console.log(message);
+    //         return generatePDF(message.body);
+    //
+    //     })
+    // })
 
     // Function to upload PDF file to Firebase Storage
     const generatePDF = async (message) => {
         try {
             const response = await axios.post('http://localhost:9090/prescription/generate_pdf', {
-                patient_id:message.patient_id,
-                doctor_id:message.doctor_id,
+                patient_id:parseInt(message),
+                doctor_id:getUserIdFromLocalStorage(),
                 instructions:prescription,
                 medication:addMedicines,
                 diagnosis:diagnosisSummary,
