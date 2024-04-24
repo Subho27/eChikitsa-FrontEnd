@@ -333,11 +333,7 @@ function AdminWelcomeHelper(props) {
         try {
 
             const token = getJwtTokenFromLocalStorage();
-
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-            res = await axios.post(`http://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
-                notify_success(response.data.token);
-
             const response = await axios.post(`https://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
                 setFormData({
                     firstName: '',
@@ -356,7 +352,7 @@ function AdminWelcomeHelper(props) {
                     specialization:'',
                     img_url:''
                 });
-
+                notify_success(response.data.token);
             });
         } catch (error) {
             console.log("error ",res.data);
