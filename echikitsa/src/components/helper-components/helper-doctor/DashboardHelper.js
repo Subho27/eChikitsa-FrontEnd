@@ -91,7 +91,6 @@ function DashboardHelper() {
         let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
         setRating(Number(average.toFixed(1)));
         setPatient(totalPatient);
-
         setPatientsInQueue(patientQueue);
         setLastPatient(nextPatient);
 
@@ -283,7 +282,7 @@ function DashboardHelper() {
 
     // const token = getJwtTokenFromLocalStorage();
 
-    // console.log(nextPatients);
+    console.log(nextPatients[0]);
     useEffect(() => {
         if(nextPatients && nextPatients.length > 0) {
             axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
@@ -296,6 +295,7 @@ function DashboardHelper() {
                         .catch((error) => {
                             console.log(error);
                         })
+                    console.log("end first one")
                 })
                 .catch((error) => {
                     console.log(error);

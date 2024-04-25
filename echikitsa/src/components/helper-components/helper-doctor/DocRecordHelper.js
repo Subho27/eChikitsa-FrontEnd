@@ -195,7 +195,7 @@ const DocRecordHelper = () => {
             const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
             try {
                 const responses = await axios.get(
-                    `http://localhost:8083/echikitsa-backend/ehr/get-record-doctor/10`, { headers }
+                    `https://localhost:8083/echikitsa-backend/ehr/get-record-doctor/10`, { headers }
                 );
                 // console.log(responses.data);
                 setDummyPatientRecords(responses.data);
