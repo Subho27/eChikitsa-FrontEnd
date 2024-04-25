@@ -32,6 +32,21 @@ function DashboardHelper() {
     const [isEmptyQueue, setIsEmptyQueue] = useState(true);
     const [queueSize, setQueueSize] = useState(0);
     const [nextPatients, setNextPatients] = useState([]);
+    const [nextPatient, setNextPatient] = useState({
+        id: 0,
+        firstName:'',
+        lastName:'',
+        bloodGroup:'',
+        height:'',
+        weight:'',
+        gender:'',
+        img_url:'',
+        date:'',
+        // patient_type:''
+    });
+    const [tmp, setTmp] = useState({
+        date:'',
+    });
     const [patientss, setPatientss] = useState([])
     const navigate = useNavigate();
     let notifyCount = 0;
@@ -259,11 +274,44 @@ function DashboardHelper() {
     useEffect(() => {
         axios.get(`https://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
             .then((response) => {
-                 // console.log(response);
+                  console.log(response);
                 setNextPatients(response.data);
             })
     }, [])
-    console.log(nextPatients);
+    // console.log(nextPatients);
+
+    // const token = getJwtTokenFromLocalStorage();
+
+    console.log(nextPatients[0]);
+    useEffect(() => {
+        if(nextPatients !== null) {
+            axios.get(`http://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
+                .then(async (response) => {
+                    setNextPatient(response.data);
+
+                    console.log("hit first one")
+
+                    await axios.get(`http://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
+                        .then((response1) => {
+                            // console.log("hit first two")
+                            // console.log(response1.data[0].date);
+                            // nextPatient.date = response1.data[0].date;
+                            // console.log(nextPatient)
+                            // console.log("end first two")
+                            tmp.date = response1.data[0].date
+                            console.log(tmp)
+
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                    console.log("end first one")
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+        }
+    }, [nextPatients]);
 
     const getUserData = async (e) => {
         try {
@@ -280,7 +328,7 @@ function DashboardHelper() {
 
     return (
         <div>
-            <ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>
+            {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
             <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
@@ -359,25 +407,25 @@ function DashboardHelper() {
                         <table className="custom-table" style={{ textAlign:"center" }}>
                             <tbody>
                                 <tr>
-                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/1.jpg")} alt="Patient" /></td>
-                                    <td>{lastPatient.name}</td>
-                                    <td>{lastPatient.diagnosis}</td>
+                                    <td><img className="patient-photo" src={nextPatient.img_url} alt="Patient" /></td>
+                                    <td>{nextPatient.firstName + " " + nextPatient.lastName}</td>
+                                    <td>{nextPatient.diagnosis}</td>
                                 </tr>
                             </tbody>
                         </table>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    {/*<th>Repeat</th>*/}
                                     <th>Sex</th>
                                     <th>Weight</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{nextPatients.length>0 ? nextPatients.at(0) : "Empty Queue"}</td>
-                                    <td>{lastPatient.sex}</td>
-                                    <td>{lastPatient.weight}</td>
+                                    {/*<td>{nextPatient.patient_type}</td>*/}
+                                    <td>{nextPatient.gender}</td>
+                                    <td>{nextPatient.weight}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -391,9 +439,9 @@ function DashboardHelper() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{lastPatient.last}</td>
-                                    <td>{lastPatient.height}</td>
-                                    <td>{lastPatient.bg}</td>
+                                    <td>{tmp.date}</td>
+                                    <td>{nextPatient.height}</td>
+                                    <td>{nextPatient.bloodGroup}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -442,15 +490,15 @@ const totalTwoStar = 7;
 const totalOneStar = 2;
 
 const patientQueue = [
-    // {"photo": "1.jpg", "name": "Subhodip Rudra", "repeat": "Repeat"},
     {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
     {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
 ];
 
-const nextPatient = {
-    "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",
-    "dob": "01/01/0878", "sex": "Male", "weight": "75 Kg",
-    "last": "02/02/2024", "height": "175 cm", "bg": "B+"
-};
+// const nextPatient = {
+//     "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",
+//     "dob": "01/01/0878", "sex": "Male", "weight": "75 Kg",
+//     "last": "02/02/2024", "height": "175 cm", "bg": "B+"
+// };
+
 
 export default DashboardHelper;

@@ -36,18 +36,6 @@ const DoctorHeaderHelper = (props) => {
 
     }, []);
 
-    // const fetchUserName = async () => {
-    //     const token = getJwtTokenFromLocalStorage();
-    //     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-    //     const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
-    //         console.log(response)
-    //         setDoctor(response.data)
-    //
-    //     });
-    //
-    // }
-    // fetchUserName()
-
     return (
         <div>
             <div className="container-fluid py-2 border-bottom d-none d-lg-block">

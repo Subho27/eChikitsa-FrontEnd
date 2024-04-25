@@ -25,7 +25,8 @@ const ProtectedRouteForLogin = (props) => {
     let role = getRoleFromLocalStorage();
     if("PATIENT" === role)
     {
-        return <WelcomePatient/>
+
+         return <WelcomePatient/>
     }
     else if("DOCTOR" === role)
     {

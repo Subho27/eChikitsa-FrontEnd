@@ -16,6 +16,7 @@ import 'firebase/compat/auth';
 
 import {firebaseConfig} from "../firebase-config/firebaseConfigProfileImages";
 import firebase from "firebase/compat/app";
+import {toast} from "react-toastify";
 
 const LoginHelper = () => {
     const [loginType, setLoginType] = useState('patient'); // Default login type
@@ -111,7 +112,7 @@ const LoginHelper = () => {
                 let role;
                 if(loginType === 'patient')
                 {
-                   role = "PATIENT"
+                    role = "PATIENT"
                 }
                 if(loginType === 'doctor')
                 {
@@ -130,8 +131,8 @@ const LoginHelper = () => {
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id,response.data.role);
 
-                        alert("Login Successfully")
-                        if(loginType == 'patient')
+                        notify_success("Login Successfully");
+                        if(loginType === 'patient')
                         {
                             let path = '/welcome'
                             navigate(path);
@@ -156,12 +157,12 @@ const LoginHelper = () => {
 
                     }
                     else {
-                        alert("email and password are incorrect")
+                        notify_error("Invalid Credentials!!")
                     }
                     //console.log('Response:', response);
                 });
             } catch (error) {
-                console.error('Error:', error);
+                await notify_error("Invalid Credentials!!")
 
             }
             //**********************************************
@@ -190,7 +191,7 @@ const LoginHelper = () => {
                     if (response.data && response.data.role === loginType.toUpperCase()) {
                         saveJwtTokenToLocalStorage(response.data.token);
                         saveUserIdToLocalStorage(response.data.id, response.data.role);
-                        alert("Login Successfully")
+                        notify_success("Login Successfully")
                         if (loginType === 'patient') {
                             let path = '/welcome'
                             navigate(path);
@@ -204,12 +205,12 @@ const LoginHelper = () => {
 
 
                     } else {
-                        alert("email and password are incorrect")
+                        notify_error("Invalid Credentials!!")
                     }
                 });
 
             }).catch((error) => {
-                console.log("Error");
+                notify_error("Invalid Credentials!!");
             });
 
 
@@ -222,10 +223,10 @@ const LoginHelper = () => {
         verificationCode = phoneOtpValues.join('');
         confResult.confirm(verificationCode).then((result) => {
             // console.log("Success");
-            alert("Verified")
+            return notify_success("Verified")
 
         }).catch((error) => {
-            console.log("Error");
+            return notify_error("Error");
         });
     }
 
@@ -280,6 +281,18 @@ const LoginHelper = () => {
             firebase.initializeApp(firebaseConfig);
         }
     }, []);
+
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
+
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
 
     return (
         <div className="wrapper" id="wrap">

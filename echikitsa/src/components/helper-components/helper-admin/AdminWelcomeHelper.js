@@ -12,6 +12,7 @@ import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
 import Select from "react-select";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {toast} from "react-toastify";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -28,6 +29,8 @@ function AdminWelcomeHelper(props) {
     const [hospitalAddressValue, setHospitalAddressValue] = useState("");
     const [hospitalWebsiteValue, setHospitalWebsiteValue] = useState("");
     const [departmentName, setDepartmentName] = useState([])
+
+    const {state}=useLocation();
     const [selectedOption, setSelectedOption] = useState(null);
 
 
@@ -294,11 +297,11 @@ function AdminWelcomeHelper(props) {
             const response = await axios.put(`https://localhost:8083/user-handle/admin/updateHospitalDetails/?id=${getUserIdFromLocalStorage()}`, updatedData,{headers}).then((response) => {
                 console.log(response.data);
                 if (response.data) {
-                    alert(response.data)
+                    notify_success(response.data.token)
 
                 }
                 else {
-                    alert("Something went wrong !!")
+                    notify_error(response.data.token)
                 }
 
             });
@@ -311,13 +314,25 @@ function AdminWelcomeHelper(props) {
 
     };
 
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
+
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
+
     const handleAddDoctor = async (e) => {
         e.preventDefault();
-        //console.log(formData)
-        await uploadFiles()
+        let res;
+        await uploadFiles();
         try {
-            const token = getJwtTokenFromLocalStorage();
 
+            const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const response = await axios.post(`https://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
                 setFormData({
@@ -337,10 +352,11 @@ function AdminWelcomeHelper(props) {
                     specialization:'',
                     img_url:''
                 });
-
+                notify_success(response.data.token);
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log("error ",res.data);
+            // await notify_error(error);
 
         }
 
@@ -615,14 +631,12 @@ function AdminWelcomeHelper(props) {
                                     <tbody>
                                     <tr>
                                         <th>Doctor Name</th>
-                                        <th>Doctor Type</th>
                                         <th>Specialization</th>
                                         <th>Email</th>
                                         <th>Promotion As Senior</th>
                                     </tr>
                                     {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
-                                            <td>Please Add This</td>
                                             <td>{item.specialization}</td>
                                             <td>{item.email}</td>
                                             {/*<td>{item.seniority_level}</td>*/}
@@ -631,11 +645,12 @@ function AdminWelcomeHelper(props) {
                                                     <button
                                                         id="admin-activate-button"
                                                         onClick={() => handlePromoteDoctor(item.id)}
-                                                        className={item.seniority_level === "junior" ? 'adminInactive' :''}
+                                                        className={item.seniority_level === "junior" ? 'adminInactive' : ''}
+                                                        disabled={item.seniority_level === "senior"}
                                                     >
-                                                        {item.seniority_level === "junior" ? 'Senior' : 'junior'}
-
+                                                        {item.seniority_level === "junior" ? 'Senior' : 'Junior'}
                                                     </button>
+
                                                 </div>
                                             </td>
                                         </tr>

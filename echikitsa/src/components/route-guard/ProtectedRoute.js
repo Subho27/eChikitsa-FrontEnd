@@ -12,13 +12,19 @@ const ProtectedRoute = (props) => {
     useEffect(() => {
         let token = getJwtTokenFromLocalStorage()
         let who = getRoleFromLocalStorage()
+        console.log("jhsayfkjsh ",token)
+        console.log("jhsayfkjsh ",role)
+        console.log("jhsayfkjsh ",who)
 
-        if(!token || who !== role)
+        if(token !== null && who === role )
         {
-            navigate('/login')
+            setAuthenticated(true);
+
+
+
         }
      else {
-            setAuthenticated(true);
+            navigate('/login')
     }
     }, [navigate]);
     return authenticated ? <Component /> : null
