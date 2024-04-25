@@ -655,7 +655,7 @@ function AdminWelcomeHelper(props) {
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Email</th>
-                                        <th>Promotion As Senior</th>
+                                        <th>Promote As Senior</th>
                                     </tr>
                                     {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>
