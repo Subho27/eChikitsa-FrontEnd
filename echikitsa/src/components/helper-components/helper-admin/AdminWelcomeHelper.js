@@ -205,9 +205,6 @@ function AdminWelcomeHelper(props) {
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.specialization.toLowerCase().includes(query.toLowerCase()) ||
         item.email.toLowerCase().includes(query.toLowerCase())
-
-        // item.isActive.toLowerCase().includes(query.toLowerCase())
-
     );
     const [formData, setFormData] = useState({
         firstName: '',
@@ -633,7 +630,7 @@ function AdminWelcomeHelper(props) {
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Email</th>
-                                        <th>Promotion As Senior</th>
+                                        <th>Promote As Senior</th>
                                     </tr>
                                     {filteredData.map((item) => (<tr key={item.id} className="terminate-row">
                                             <td>{item.name}</td>

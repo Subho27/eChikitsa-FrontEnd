@@ -329,6 +329,12 @@ function ConsultationPageHelper(effect, deps) {
             console.log('Before');
             const newElem = document.createElement('div')
             newElem.setAttribute('id', `td-${remoteProducerId}`)
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers});
+            console.log(response);
+            let name = "";
+            name =  response.data.firstName + " " + response.data.lastName;
 
             if (params.kind === 'audio') {
                 console.log('Middle');
@@ -338,7 +344,7 @@ function ConsultationPageHelper(effect, deps) {
                 console.log('Middle');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
+                newElem.innerHTML = '<div class="tag">'+ name +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -671,7 +677,7 @@ function ConsultationPageHelper(effect, deps) {
 
     const askConsent = async () => {
         setWaitingConsent(true);
-        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             await stompClient.send(`/app/send-consent-request/${getUserIdFromLocalStorage()}`);
         });
@@ -690,7 +696,7 @@ function ConsultationPageHelper(effect, deps) {
     }, [consentGiven]);
 
     useEffect(() => {
-        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
             stompClient.subscribe(waiting, async (message) => {
@@ -746,7 +752,7 @@ function ConsultationPageHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section">
                     <div className="video-section">
-                        <p className="tag">{getUserIdFromLocalStorage()}</p>
+                        <p className="tag">You</p>
                         <video className="large-video-call-patient-doctor" id="doctorLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
