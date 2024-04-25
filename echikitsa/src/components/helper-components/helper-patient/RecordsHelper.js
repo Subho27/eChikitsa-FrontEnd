@@ -28,7 +28,7 @@ function RecordHelper() {
             const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
             try {
                 const responses = await axios.get(
-                    `http://localhost:8083/echikitsa-backend/ehr/get-record-patient/${userId}`, { headers }
+                    `https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${userId}`, { headers }
                 );
                 // console.log(responses.data);
                 setDummy(responses.data);

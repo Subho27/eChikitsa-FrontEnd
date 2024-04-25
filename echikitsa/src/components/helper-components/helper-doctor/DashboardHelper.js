@@ -270,7 +270,7 @@ function DashboardHelper() {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-            const response = await axios.get(`http://localhost:8083/echikitsa-backend/user/get-user/?id=${nextPatients}`,{headers}).then((response) => {
+            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/?id=${nextPatients}`,{headers}).then((response) => {
                 setPatientss(response.data)
             });
         } catch (error) {
