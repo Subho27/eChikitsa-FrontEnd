@@ -7,6 +7,7 @@ import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import {toast} from "react-toastify";
 
 
 function ProfilePage(props) {
@@ -171,12 +172,12 @@ function ProfilePage(props) {
             const response = await axios.put(`https://localhost:8083/user-handle/patient/update-details/?id=${userId}`, updatedData, { headers });
             console.log(response.data);
             if (response.data) {
-                alert(response.data);
+                await notify_success(response.data);
             } else {
-                alert("Something went wrong !!");
+                await notify_error("Something went wrong !!");
             }
         } catch (error) {
-            console.error('Error:', error);
+            //await notify_error('Error:', error);
         }
     };
     const handlePatientSave1 = async (e) => {
@@ -208,12 +209,12 @@ function ProfilePage(props) {
             const response = await axios.put(`https://localhost:8083/user-handle/patient/update-details/?id=${userId}`, updatedData, { headers });
             console.log(response.data);
             if (response.data) {
-                alert(response.data);
+                await notify_success(response.data);
             } else {
-                alert("Something went wrong !!");
+                await notify_error("Something went wrong !!");
             }
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error:', error);
         }
     };
     const uploadFiles = async (e) => {
@@ -229,12 +230,11 @@ function ProfilePage(props) {
             // Update the documentUrl state with the new URL
             setDocumentUrl(url);
 
-            console.log("Image uploaded successfully. Download URL:", url);
+            await notify_success("Document uploaded successfully.");
             await handlePatientSave(url);
             return url;
         } catch (error) {
-            console.error("Error uploading image:", error);
-            throw error;
+            await notify_error("Error Uploading Document: ", error);
         }
     };
     const handleDownload = (url) => {
@@ -260,7 +260,17 @@ function ProfilePage(props) {
         };
     };
 
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
 
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
 
 
 
