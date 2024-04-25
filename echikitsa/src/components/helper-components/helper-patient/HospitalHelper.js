@@ -75,13 +75,13 @@ function HospitalHelper (props) {
 
     const consultSD = async (e) => {
         const selectedDoctorId = parseInt(e.target.id);
-        await axios.post("https://localhost:9193/local/add-to-queue-sd", {
+        await axios.post("http://localhost:9193/local/add-to-queue-sd", {
             patientId : getUserIdFromLocalStorage(),
             doctorId : selectedDoctorId
         }).then( async (response) => {
             console.log(response);
             if(response.data !== null) {
-                await axios.get(`https://localhost:9193/local/size/${response.data.user_id}`)
+                await axios.get(`http://localhost:9193/local/size/${response.data.user_id}`)
                     .then( async (response) => {
                         // console.log(response.data == 1);
                         if(response.data == 1) {
@@ -91,7 +91,7 @@ function HospitalHelper (props) {
                 // setAssignedDoctorId(response.data.user_id);
                 setAssignedDoctorId(selectedDoctorId)
             } else {
-                let sock = new SockJS('https://localhost:9193/ws-endpoint');
+                let sock = new SockJS('http://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 await stompClient.connect({}, () => {
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
@@ -113,7 +113,7 @@ function HospitalHelper (props) {
     useEffect(() => {
         if (assignedDoctorId) {
             const initializeWebSocket = () => {
-                let sock = new SockJS('https://localhost:9193/ws-endpoint');
+                let sock = new SockJS('http://localhost:9193/ws-endpoint');
                 const stompClient = over(sock);
                 stompClient.connect({}, () => {
                     setStompClient(stompClient);
