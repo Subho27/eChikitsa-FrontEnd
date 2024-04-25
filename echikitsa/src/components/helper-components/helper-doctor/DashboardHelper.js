@@ -193,7 +193,7 @@ function DashboardHelper() {
 
     useEffect(() => {
         const initializeWebSocket = () => {
-            let sock = new SockJS('https://localhost:9193/ws-endpoint');
+            let sock = new SockJS('http://localhost:9193/ws-endpoint');
             const stompC = over(sock);
             stompC.connect({}, () => {
                 setStompClient(stompC);
@@ -272,7 +272,7 @@ function DashboardHelper() {
     }
 
     useEffect(() => {
-        axios.get(`https://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
+        axios.get(`http://localhost:9193/local/queue/next/${getUserIdFromLocalStorage()}`)
             .then((response) => {
                   console.log(response);
                 setNextPatients(response.data);
@@ -285,13 +285,13 @@ function DashboardHelper() {
     console.log(nextPatients[0]);
     useEffect(() => {
         if(nextPatients !== null) {
-            axios.get(`http://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
+            axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
                 .then(async (response) => {
                     setNextPatient(response.data);
 
                     console.log("hit first one")
 
-                    await axios.get(`http://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
+                    await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
                         .then((response1) => {
                             // console.log("hit first two")
                             // console.log(response1.data[0].date);

@@ -15,6 +15,7 @@ import {over} from "stompjs";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import firebase from "firebase/compat/app";
 import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -83,8 +84,6 @@ function CallPageHelper(effect, deps) {
             });
         })
     }
-
-
 
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
@@ -244,7 +243,16 @@ function CallPageHelper(effect, deps) {
             remoteProducerId,
             serverConsumerTransportId,
         }, async ({ params }) => {
+            // console.log("hiiiiiiii",params.userId)
+            // const token = getJwtTokenFromLocalStorage();
+            // const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            // const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers}).then((response) => {
+            //     console.log(response.data.firstName)
+            //     setName(response.data.firstName)
+            //
+            // });
             if (params.error) {
+
                 console.log('Cannot Consume')
                 return
             }
@@ -273,16 +281,21 @@ function CallPageHelper(effect, deps) {
             console.log('Before');
             const newElem = document.createElement('div')
             newElem.setAttribute('id', `td-${remoteProducerId}`)
-
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers});
+            console.log(response);
+            let name = "";
+            name = (response.data.role === 'DOCTOR' ? "Dr. " : "") + response.data.firstName + " " + response.data.lastName;
             if (params.kind === 'audio') {
-                console.log('Middle');
+                console.log('Middle1');
                 //append to the audio container
                 newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>'
             } else {
-                console.log('Middle');
+                console.log('Middle2');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
+                newElem.innerHTML = '<div class="tag">'+ name +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -800,7 +813,7 @@ function CallPageHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">{getUserIdFromLocalStorage()}</p>
+                        <p className="tag">You</p>
                         <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
