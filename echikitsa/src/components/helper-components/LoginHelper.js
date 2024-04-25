@@ -123,7 +123,7 @@ const LoginHelper = () => {
 
                 }
 
-                const response = await axios.post('https://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
+               await axios.post('https://localhost:8083/user-handle/auth/login', {email, password,role},{headers}).then((response) => {
 
                     if (response.data && response.data.role ===loginType.toUpperCase()) {
 

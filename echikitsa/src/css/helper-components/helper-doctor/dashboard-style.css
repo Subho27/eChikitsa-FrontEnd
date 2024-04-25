@@ -120,10 +120,12 @@
     width: 100%;
     text-align: center;
     margin: auto;
+
 }
 
 .custom-table th {
     width: 33.33%;
+    padding: 0 15px;
 }
 
 .custom-table td:first-child {

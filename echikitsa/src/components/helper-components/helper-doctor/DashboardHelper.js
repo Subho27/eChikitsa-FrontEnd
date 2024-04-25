@@ -44,7 +44,7 @@ function DashboardHelper() {
         date:'',
         // patient_type:''
     });
-    const [tmp, setTmp] = useState({
+    const [lastAppointment, setLastAppointment] = useState({
         date:'',
     });
     const [patientss, setPatientss] = useState([])
@@ -284,23 +284,13 @@ function DashboardHelper() {
 
     console.log(nextPatients[0]);
     useEffect(() => {
-        if(nextPatients !== null) {
+        if(nextPatients && nextPatients.length > 0) {
             axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
                 .then(async (response) => {
                     setNextPatient(response.data);
-
-                    console.log("hit first one")
-
                     await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
                         .then((response1) => {
-                            // console.log("hit first two")
-                            // console.log(response1.data[0].date);
-                            // nextPatient.date = response1.data[0].date;
-                            // console.log(nextPatient)
-                            // console.log("end first two")
-                            tmp.date = response1.data[0].date
-                            console.log(tmp)
-
+                            lastAppointment.date = response1.data[0].date
                         })
                         .catch((error) => {
                             console.log(error);
@@ -312,6 +302,26 @@ function DashboardHelper() {
                 })
         }
     }, [nextPatients]);
+
+    // const [patientQueue, setPatientQueue] = useState([]);
+    // useEffect(() => {
+    //
+    //     const fetchData = async () => {
+    //         for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+    //             const id = nextPatients[i];
+    //             try {
+    //                 const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
+    //                 setPatientQueue(prevQueue => [...prevQueue, response.data]);
+    //             } catch (error) {
+    //                 console.error('Error fetching patient data:', error);
+    //             }
+    //         }
+    //     };
+    //
+    //     fetchData();
+    //
+    // }, [nextPatients]);
+    // console.log("the value",patientQueue);
 
     const getUserData = async (e) => {
         try {
@@ -402,49 +412,58 @@ function DashboardHelper() {
                             </tbody>
                         </table>
                     </div>
+
                     <div className="next-patient common-tab-2 poppins">
-                        <span className="bold-font">Next Patient</span>
-                        <table className="custom-table" style={{ textAlign:"center" }}>
-                            <tbody>
+                        {nextPatients && nextPatients.length > 0 ? (
+                        <div>
+                            <span className="bold-font">Next Patient</span>
+                            <table className="custom-table" style={{textAlign: "center"}}>
+                                <tbody>
                                 <tr>
-                                    <td><img className="patient-photo" src={nextPatient.img_url} alt="Patient" /></td>
+                                    <td><img className="patient-photo" src={nextPatient.img_url} alt="Patient"/>
+                                    </td>
                                     <td>{nextPatient.firstName + " " + nextPatient.lastName}</td>
                                     <td>{nextPatient.diagnosis}</td>
                                 </tr>
-                            </tbody>
-                        </table>
-                        <table>
-                            <thead>
+                                </tbody>
+                            </table>
+                            <table>
+                                <thead>
                                 <tr>
                                     {/*<th>Repeat</th>*/}
-                                    <th>Sex</th>
-                                    <th>Weight</th>
+                                    <th>Last Appointment</th>
+                                    <th>Gender</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
                                 <tr>
                                     {/*<td>{nextPatient.patient_type}</td>*/}
-                                    <td>{nextPatient.gender}</td>
-                                    <td>{nextPatient.weight}</td>
+                                    <td>{lastAppointment.date}</td>
+                                    <td>{(nextPatient.gender).toUpperCase()}</td>
+
                                 </tr>
-                            </tbody>
-                        </table>
-                        <table>
-                            <thead>
+                                </tbody>
+                            </table>
+                            <table>
+                                <thead>
                                 <tr>
-                                    <th>Last Appointment</th>
+                                    <th>Weight</th>
                                     <th>Height</th>
                                     <th>Blood Group</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
                                 <tr>
-                                    <td>{tmp.date}</td>
-                                    <td>{nextPatient.height}</td>
+                                    <td>{nextPatient.height}cm</td>
+                                    <td>{nextPatient.weight}Kg</td>
                                     <td>{nextPatient.bloodGroup}</td>
                                 </tr>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
+                        ) : (
+                            <div>No patient available</div>
+                        )}
                     </div>
                 </div>
             </div>
