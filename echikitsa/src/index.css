@@ -1,4 +1,3 @@
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -19,4 +18,12 @@ code {
 
 .bold-font {
   font-weight: bold;
+}
+
+.Toastify__close-button{
+  width: 10%;
+}
+
+.Toastify__toast{
+  margin: auto;
 }

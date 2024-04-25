@@ -24,10 +24,71 @@ function ConsultationPageHelper(effect, deps) {
     const [medicines, setMedicines] = useState([]);
     const [prescription, setPrescription] = useState([]);
     const [addMedicines, setAddMedicines] = useState([]);
+    const [prescriptionUrl, setPrescriptionUrl] = useState("");
+
+
+    const liveClock = () => {
+        const start_time = new Date(); // Store start time as a Date object
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [elapsedTime, setElapsedTime] = useState(0); // Initialize elapsed time state
+
+        const updateTime = () => {
+            // Calculate elapsed time in milliseconds
+            const elapsed = new Date() - start_time;
+            setElapsedTime(elapsed); // Update elapsed time state
+        };
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+            // Start updating elapsed time on component mount
+            const intervalId = setInterval(updateTime, 1000);
+
+            // Cleanup interval on component unmount
+            return () => clearInterval(intervalId);
+        }, []); // Empty dependency array ensures the effect runs only on mount
+
+        // Format elapsed time in hours, minutes, seconds
+        // const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+        const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+        return <span className="time-duration">{minutes}m : {seconds}s</span>;
+    };
     const [prescriptionUpload, setPrescriptionUpload] = useState(null);
     const [hasConsent, setHasConsent] = useState(false);
     const [waitingConsent, setWaitingConsent] = useState(false);
     const [consentGiven, setConsentGiven] = useState("");
+
+
+    const addRecord = async () => {
+        try {
+            await axios.post('http://localhost:9090/ehr/record', {
+                date: "2024-04-11",
+                duration: "PT1H30M",
+                time: "14:30:00",
+                reason: diagnosisSummary,
+                patient_id: 13,
+                doctor_id: 8,
+                follow_up_date: suggestDate,
+                patient_type: "R",
+                prescription_url: prescriptionUrl
+            });
+        }
+        catch(error){
+            alert("Error in adding record" + error);
+        }
+    }
+
+    // Prescription WebSocket connection setup
+    // const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+    // stompClient.connect({}, ()=> {
+    //     const waiting = `/topic/send-data-req/${getUserIdFromLocalStorage()}`;
+    //     stompClient.subscribe(waiting,  (message) => {
+    //         console.log(message);
+    //         return generatePDF(message.body);
+    //
+    //     })
+    // })
 
     // Function to upload PDF file to Firebase Storage
     const token = getJwtTokenFromLocalStorage();
@@ -56,8 +117,8 @@ function ConsultationPageHelper(effect, deps) {
                 .then((url) => {
                     // Optionally, you can also update state or perform other actions here
                     alert("Prescription Uploaded");
-                    console.log("Image uploaded successfully. Download URL:", url);
-                    return url; // Return the download URL
+                    setPrescriptionUrl(url);
+                    return url;
                 })
             const pdfUrl = URL.createObjectURL(blob);
 
@@ -65,7 +126,7 @@ function ConsultationPageHelper(effect, deps) {
             window.open(pdfUrl);
 
         } catch (error) {
-            console.error('Error generating PDF:', error);
+            alert('Error generating PDF:' + error);
             throw error;
         }
     };
@@ -74,12 +135,9 @@ function ConsultationPageHelper(effect, deps) {
         try {
             // Call the generatePDF function
             await generatePDF();
-
-            // Handle successful response (if needed)
-            console.log("PDF generated, uploaded, and data added successfully.");
         } catch (error) {
             // Handle error
-            console.error("Error generating, uploading PDF, and adding data:", error);
+            alert("Error generating, uploading PDF, and adding data:" + error);
         }
     };
 
@@ -574,7 +632,8 @@ function ConsultationPageHelper(effect, deps) {
     //endregion
 
     const handleCallEnd = async () => {
-        await handleClick();
+        //await handleClick();
+        //await addRecord();
         await socket.disconnect();
         await localStream.getTracks().forEach(function(track) {
             track.stop();
@@ -693,7 +752,8 @@ function ConsultationPageHelper(effect, deps) {
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
                     </div>
                     <div className="control-button-section">
-                        <div className="time-duration-section"><span className="time-duration">02:34</span></div>
+                        <div className="time-duration-section">{liveClock()}
+                        </div>
                         <div className="button-section">
                             <button className="call-buttons">
                                 {hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-on-icon.png")} alt="Sound Off" onClick={() => setHasSound(!hasSound)}/>}

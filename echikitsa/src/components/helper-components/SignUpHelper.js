@@ -11,6 +11,7 @@ import axios from "axios";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage, firebaseConfig} from "../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
+import {toast} from "react-toastify";
 import {ValidateField} from "../validation/validation";
 
 
@@ -187,6 +188,18 @@ const SignUpHelper = () => {
         }
         setPhoneOtpValues(newerOtpValues);
     };
+
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        );
+    }
+
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        );
+    }
     //endregion
 
     const onClickSendOtp = async () => {
@@ -196,10 +209,10 @@ const SignUpHelper = () => {
                 const headers = { 'Content-Type' : 'application/json' }
                 const response = await axios.post('https://localhost:8083/user-handle/email/sendEmail', {"email":formData.email}).then((response) => {
                     if (response.data) {
-                        alert("OTP Sent Successfully on your email!!")
+                        notify_success("OTP Sent Successfully on your email!!")
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -208,10 +221,10 @@ const SignUpHelper = () => {
 
                 const response = await axios.post('https://localhost:8083/user-handle/email/sendEmail', {"email":formDataHospital.email}).then((response) => {
                     if (response.data) {
-                        alert("OTP Sent Successfully on your email!!")
+                        notify_success("OTP Sent Successfully on your email!!")
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -220,7 +233,7 @@ const SignUpHelper = () => {
 
 
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error: '+ error);
 
         }
     };
@@ -234,13 +247,13 @@ const SignUpHelper = () => {
                 verificationCode = emailOtpValues.join('');
                 const response = await axios.post('https://localhost:8083/user-handle/email/valOtp', {"email": formData.email, "generatedOTP":verificationCode}).then((response) => {
                     if (response.data) {
-                        alert("Verified")
+                        notify_success("Verified")
                         document.getElementById("patient-email-otp-check").className = "fg visually-hidden";
                         document.getElementById("email-patient-send-otp").innerText = "Verified";
                         document.getElementById("email-patient-send-otp").style.backgroundColor = "#39c239";
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -251,13 +264,13 @@ const SignUpHelper = () => {
                 const response = await axios.post('https://localhost:8083/user-handle/email/valOtp', {"email": formDataHospital.email,"generatedOTP":verificationCode}).then((response) => {
                     console.log(response.data)
                     if (response.data) {
-                        // alert("Verified")
+                        notify_success("Verified")
                         document.getElementById("email-otp-check-Hospital").className = "fg visually-hidden";
                         document.getElementById("email-hospital-send-otp").innerText = "Verified";
                         document.getElementById("email-hospital-send-otp").style.backgroundColor = "#39c239";
 
                     } else {
-                        alert("Something went wrong !!")
+                        notify_error("Something went wrong !!")
                     }
 
                 });
@@ -266,7 +279,7 @@ const SignUpHelper = () => {
 
 
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error:' + error);
 
         }
 
@@ -362,8 +375,8 @@ const SignUpHelper = () => {
                 return url; // Return the download URL
             })
             .catch((error) => {
-                console.error("Error uploading prescription:", error);
-                throw error; // Propagate the error
+                throw notify_error("Error uploading prescription: " + error);
+
             });
     };
 
@@ -373,26 +386,23 @@ const SignUpHelper = () => {
         await uploadFiles()
         // Logic to handle login based on login method
         if (signupType === 'patient') {
-            console.log(formData)
-
             try {
 
                 const response = await axios.post('https://localhost:8083/user-handle/patient/registerPatient', formData).then((response) => {
-                    // console.log(response.data);
-                    if (response.data) {
-                        alert("registered successfully !!")
+                    if (response.data === "Patient registered successfully") {
+                        notify_success("Patient Register Successfully")
 
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        alert("Something went wrong !!")
+                        notify_error("Patient Already Exist!!")
                     }
 
                 });
             } catch (error) {
-                console.error('Error:', error);
+                await notify_error('Error: ' + error);
 
             }
 
@@ -400,24 +410,22 @@ const SignUpHelper = () => {
         }
         else
         {
-            console.log(formDataHospital);
             try {
 
                 const response = await axios.post('https://localhost:8083/user-handle/hospital/add-hospital', formDataHospital).then((response) => {
-                    // console.log(response.data);
-                    if (response.data) {
-                        alert("registered successfully !!")
+                    if (response.data==="Hospital registered successfully") {
+                        notify_success("Hospital Register Successfully")
                         let path = '/login'
                         navigate(path);
 
                     }
                     else {
-                        alert("Something went wrong !!")
+                        notify_error("Hospital Already Exist!!")
                     }
 
                 });
             } catch (error) {
-                console.error('Error:', error);
+                await notify_error('Error: ' + error);
 
             }
         }
