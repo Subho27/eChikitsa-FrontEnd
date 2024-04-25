@@ -7,6 +7,11 @@ import "slick-carousel/slick/slick-theme.css";
 import {Link} from "react-router-dom";
 import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Chatbot from 'react-chatbot-kit'
+import 'react-chatbot-kit/build/main.css'
+import config from "./chatbot-component/config/config";
+import MessageParser from "./chatbot-component/chatbot/MessageParser";
+import ActionProvider from "./chatbot-component/chatbot/ActionProvider";
 
 const CustomPrevArrow = (props) => {
     const { className, onClick } = props;
@@ -41,6 +46,18 @@ function homeHelper() {
 
     return (
         <div>
+            <div className="chat-bot-box">
+                <Chatbot
+                    config={config}
+                    messageParser={MessageParser}
+                    actionProvider={ActionProvider}
+                    headerText="Talk to our Chikitsa Bot!"
+                />
+                <button className='chat-box-button'>
+                    <img className="join-later-image" src={require('../../images/landing_body_img/chatbot.png')} alt="Chat Bot"/>
+                </button>
+            </div>
+
             {/*---------------------*/}
             <div className="container-fluid bg-primary py-5 mb-5 hero-header">
                 <div className="container py-5">
