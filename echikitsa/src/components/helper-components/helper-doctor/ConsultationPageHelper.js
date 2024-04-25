@@ -671,7 +671,7 @@ function ConsultationPageHelper(effect, deps) {
 
     const askConsent = async () => {
         setWaitingConsent(true);
-        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             await stompClient.send(`/app/send-consent-request/${getUserIdFromLocalStorage()}`);
         });
@@ -690,7 +690,7 @@ function ConsultationPageHelper(effect, deps) {
     }, [consentGiven]);
 
     useEffect(() => {
-        const stompClient = over(new SockJS('https://localhost:9193/ws-endpoint'));
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
             stompClient.subscribe(waiting, async (message) => {

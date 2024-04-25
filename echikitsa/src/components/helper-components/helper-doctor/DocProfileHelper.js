@@ -4,6 +4,7 @@ import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement"
 import axios from "axios";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {number} from "sockjs-client/lib/utils/random";
+import {toast} from "react-toastify";
 
 
 function DocProfilePage() {
@@ -39,44 +40,20 @@ function DocProfilePage() {
                          console.log(response.data);
                         if (response.data) {
                             setTmp(response.data);
-
-                            // setProfile(response.data)
-                            // const { data } = response
-                            // setFirstName(data.firstName);
-                            // setLastName(data.lastName);
-                            // setPhoneNumber(data.phoneNumber);
-                            // setExperiences(data.yearOfExp );
-                            // setEmail(data.email);
-                            // setAadhaar(data.aadhaar);
-                            // setState(data.state);
-                            // setCity(data.city);
-                            // setPassword(data.password);
-                            // setImgUrl(data.img_url);
-                            // setRole(data.role);
-                            // setAge(56);
-                            // setGender(data.gender);
-                            // setActive(data.active);
-                            // setRegistrationNumber(data.registrationNumber);
-                            // setDegree(data.degree);
-                            //
-                            // setSpecialization(data.specialization);
-
-
                         }
                         else {
-                            alert("Something went wrong !!")
+                           notify_error("Something went wrong !!")
                         }
 
                     });
                 } catch (error) {
-                    console.error('Error:', error);
+                    await notify_error('Error: ', error);
 
                 }
 
 
 
             };
-
             getUserData();
         }
     }, [])
@@ -89,14 +66,13 @@ function DocProfilePage() {
             };
 
             const response = await axios.put(`https://localhost:8083/user-handle/doctor/update-details/?id=${userId}`, tmp, { headers });
-            console.log(response.data);
             if (response.data) {
-                alert(response.data);
+                await notify_success(response.data);
             } else {
-                alert("Something went wrong !!");
+                await notify_error("Something went wrong !!");
             }
         } catch (error) {
-            console.error('Error:', error);
+            await notify_error('Error: ', error);
         }
     };
 
@@ -157,6 +133,19 @@ function DocProfilePage() {
     const off = () => {
         document.getElementById("overlay-patient-profile").style.display = "none";
     }
+
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        )
+    }
+
+    const notify_error = async (response) =>{
+        toast.error(
+            <div>{response}</div>
+        )
+    }
+
     return (
         <div>
             <div id="overlay-patient-profile" onClick={off}>
