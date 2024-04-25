@@ -131,7 +131,8 @@ function HospitalHelper (props) {
                         stompClient.subscribe(topic, (message) => {
                             // console.log(message);
                             if (JSON.parse(message.body).body.body.patientId == getUserIdFromLocalStorage()) {
-                                navigate(`/call/${assignedDoctorId}`);
+                                // navigate(`/call/${assignedDoctorId}`);
+                                navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                             } else {
                                 setIsWaiting(true);
                             }
