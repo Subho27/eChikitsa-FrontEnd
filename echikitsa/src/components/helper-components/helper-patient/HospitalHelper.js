@@ -86,6 +86,8 @@ function HospitalHelper (props) {
                         // console.log(response.data == 1);
                         if(response.data == 1) {
                             setFirstMember(true);
+                        } else {
+                            setIsWaiting(true);
                         }
                     })
                 // setAssignedDoctorId(response.data.user_id);
@@ -121,7 +123,7 @@ function HospitalHelper (props) {
                     const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
                     if(firstMember) {
                         setFirstMember(false);
-                        navigate(`/call/${assignedDoctorId}`);
+                        navigate(`/call`, { replace: true, state : {assignedDoctorId} });
                     } else {
                         stompClient.subscribe(waiting, async (message) => {
                             // console.log(message);
@@ -133,11 +135,12 @@ function HospitalHelper (props) {
                             if (JSON.parse(message.body).body.body.patientId == getUserIdFromLocalStorage()) {
                                 // navigate(`/call/${assignedDoctorId}`);
                                 navigate(`/call`, { replace: true, state : {assignedDoctorId} });
-                            } else {
-                                setIsWaiting(true);
                             }
+                            // else {
+                            //     setIsWaiting(true);
+                            // }
                         });
-                        setIsWaiting(true);
+                        // setIsWaiting(true);
                     }
                 });
             };
@@ -164,6 +167,27 @@ function HospitalHelper (props) {
 
     }, [selectedSpeciality, selectedType]);
 
+    const quitWaiting = async () => {
+        await axios.post("http://localhost:9193/local/cancel-waiting", {
+            patientId: getUserIdFromLocalStorage(),
+            doctorId: assignedDoctorId
+        }).then(async (response) => {
+            console.log(response.data);
+            if(response.data.toString() === "true") {
+                const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+                stompClient.connect({}, async () => {
+                    const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
+                    const topic = `/topic/next-id/${assignedDoctorId}`;
+                    await stompClient.unsubscribe(waiting);
+                    await stompClient.unsubscribe(topic);
+                    await stompClient.send("/app/reload-position");
+                    alert("You chose not to wait for our Doctor. Please try again after some time.");
+                    setIsWaiting(false);
+                });
+            }
+        })
+    }
+
     return (
         <div>
             {isWaiting && (<div id="overlay-waiting">
@@ -173,7 +197,7 @@ function HospitalHelper (props) {
                     {!havePosition && <p className="queue-text">Note : Getting your position...</p>}
                     {havePosition && <p className="queue-text">Note : You are currently in position <span className="queue-position">{position.toString().padStart(2, "0")}</span></p>}
                     <img className="queue-image" src={require("../../../images/patient_landing_page/queue.jpg")} alt="queue"/>
-                    <button className="quit-waiting">QUIT WAITING</button>
+                    <button className="quit-waiting" onClick={quitWaiting}>QUIT WAITING</button>
                 </div>
             </div>)}
             <div className="mainDiv">
