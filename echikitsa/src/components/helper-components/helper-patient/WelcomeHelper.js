@@ -12,6 +12,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from "axios";
 
+
 function WelcomeHelper(props){
     const [assignedDoctorId, setAssignedDoctorId] = useState(null);
     const [stompClient, setStompClient] = useState(null);
@@ -165,3 +166,4 @@ function WelcomeHelper(props){
 }
 
 export default WelcomeHelper;
+// export default withTokenExpirationCheck(WelcomeHelper);

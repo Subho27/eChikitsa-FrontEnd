@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import SockJS from "sockjs-client";
 import {over} from "stompjs";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {isTokenExpired} from "../../route-guard/utility";
 
 function DashboardHelper() {
     const [rating, setRating] = useState(0)
@@ -56,6 +57,11 @@ function DashboardHelper() {
 
     // Stacked Bar graph & Pie Graph - Non-repeat vs Repeat
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         let docId = getUserIdFromLocalStorage();
         const getNoOfPatient = async () => {
             try {
@@ -80,7 +86,7 @@ function DashboardHelper() {
                 setTodayDate(response.data);
 
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.log("Error fetching data:", error);
             }
         };
 
@@ -332,7 +338,7 @@ function DashboardHelper() {
                 setPatientss(response.data)
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
         }
     }
 
