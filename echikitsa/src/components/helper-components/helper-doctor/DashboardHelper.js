@@ -433,9 +433,9 @@ function DashboardHelper() {
                             <tbody>
                             {patientsInQueue.map((patient, index) => (
                                 <tr key={index}>
-                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/"+(index+2)+".jpg")} alt="Patient" /></td>
-                                    <td>{patient.name}</td>
-                                    <td>{patient.repeat}</td>
+                                    <td><img className="patient-photo" src={patientQueue[index].img_url} alt="Patient" /></td>
+                                    <td>{patientQueue[index].firstName + " " + patientQueue[index].lastName}</td>
+                                    <td>{repeatQueue[index]}</td>
                                 </tr>
                             ))}
                             </tbody>
@@ -537,10 +537,10 @@ const totalThreeStar = 11;
 const totalTwoStar = 7;
 const totalOneStar = 2;
 
-const patientQueue = [
-    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
-    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
-];
+// const patientQueue = [
+//     {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
+//     {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
+// ];
 
 // const nextPatient = {
 //     "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",

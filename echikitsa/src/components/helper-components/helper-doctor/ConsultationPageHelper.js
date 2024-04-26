@@ -6,7 +6,7 @@ import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
 
-import axios from 'axios';
+import axios, {get} from 'axios';
 import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 
@@ -58,21 +58,66 @@ function ConsultationPageHelper(effect, deps) {
     const [hasConsent, setHasConsent] = useState(false);
     const [waitingConsent, setWaitingConsent] = useState(false);
     const [consentGiven, setConsentGiven] = useState("");
+    const [patientId, setPatientId] = useState("");
 
+    let currDate = new Date().toLocaleDateString();
+    let startTime = new Date().toLocaleTimeString();
 
+    function getDuration(startTime) {
+        // Parse start time string into Date object
+        const start = new Date(startTime);
+
+        // Initialize end time as the current time
+        const end = new Date();
+
+        // Calculate the difference in milliseconds between end and start
+        const durationMs = end.getTime() - start.getTime();
+
+        // Convert milliseconds to hours, minutes, and seconds
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+
+        // Construct the duration string in the format PT{hours}H{minutes}M{seconds}S
+        return `PT${hours}H${minutes}M${seconds}S`;
+    }
+
+    let record;
+    let recordId;
     const addRecord = async () => {
         try {
-            await axios.post('http://localhost:9090/ehr/record', {
-                date: "2024-04-11",
-                duration: "PT1H30M",
-                time: "14:30:00",
+            record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
+                date: currDate,
+                duration: "",
+                time: startTime,
                 reason: diagnosisSummary,
                 patient_id: 13,
-                doctor_id: 8,
+                doctor_id: getUserIdFromLocalStorage(),
                 follow_up_date: suggestDate,
                 patient_type: "R",
                 prescription_url: prescriptionUrl
-            });
+            },{headers});
+            recordId = record.ehr_id;
+        }
+        catch(error){
+            alert("Error in adding record" + error);
+        }
+    }
+
+    const addDuration = async() =>{
+        try {
+            await axios.put('https://localhost:8083/file-handle/ehr/add-duration', {
+                ehr_id: recordId,
+                date: currDate,
+                duration: getDuration(startTime),
+                time: startTime,
+                reason: diagnosisSummary,
+                patient_id: 13,
+                doctor_id: getUserIdFromLocalStorage(),
+                follow_up_date: suggestDate,
+                patient_type: "R",
+                prescription_url: prescriptionUrl
+            },{headers});
         }
         catch(error){
             alert("Error in adding record" + error);
@@ -302,6 +347,7 @@ function ConsultationPageHelper(effect, deps) {
             remoteProducerId,
             serverConsumerTransportId,
         }, async ({ params }) => {
+            setPatientId(params.userId);
             if (params.error) {
                 console.log('Cannot Consume')
                 return
@@ -646,9 +692,25 @@ function ConsultationPageHelper(effect, deps) {
         });
         navigate("/dashboard");
     }
+    const getRecordByDoctorId = async () => {
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        try {
+            console.log("record fetched afte consent",patientId);
+            const responses = await axios.get(
+                `https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${patientId}`, { headers }
+            );
+             console.log("record fetched afte consent",responses.data);
+            // setDummy(responses.data);
+            setPrevRecords(responses.data)
+            // console.log("the value of records"+responses.data);
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    };
 
     useEffect(() => {
-        setPrevRecords(askRecord);
+        // setPrevRecords(askRecord);
         const today = new Date();
         const tomorrow = new Date();
         tomorrow.setDate(today.getDate() + 1);
@@ -690,6 +752,7 @@ function ConsultationPageHelper(effect, deps) {
             }
             else {
                 setWaitingConsent(false);
+                getRecordByDoctorId(params.user)
                 setHasConsent(true);
             }
         }
@@ -808,8 +871,8 @@ function ConsultationPageHelper(effect, deps) {
                                         {prevRecords.map((record, index) => (
                                             <tr key={index}>
                                                 <td>{new Date(record.date).toLocaleDateString()}</td>
-                                                <td>{record.doctor_name}</td>
-                                                <td><a href={record.download_link} target="_blank" rel="noopener noreferrer">
+                                                <td>{record.firstName} {record.lastName} </td>
+                                                <td><a href={record.prescription_url} target="_blank" rel="noopener noreferrer">
                                                     <img className="download-prescription" src={require("../../../images/patient_landing_page/download.png")} alt="Download"/>
                                                 </a></td>
                                             </tr>

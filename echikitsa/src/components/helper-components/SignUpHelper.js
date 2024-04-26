@@ -25,6 +25,8 @@ const SignUpHelper = () => {
     const [emailVerified, setEmailVerified] = useState(false);
     const [imageUrls, setImageUrls] = useState([]);
     const imagesListRef = ref(storage, "images/");
+    const [passwordFieldType1, setPasswordFieldType1] = useState(true);
+    const [passwordFieldType2, setPasswordFieldType2] = useState(true);
 //******************************************************************************************************
 
     const [formData, setFormData] = useState({
@@ -577,16 +579,18 @@ const SignUpHelper = () => {
 
                     <div className="fg">
                         <div className="field">
-                            <input type="password" name="password" value={formData.password} onChange={handleInputChange}
+                            <input type={passwordFieldType1 ? "password" : "text"}  name="password" value={formData.password} onChange={handleInputChange}
                                    required/>
+                            <i className={`${passwordFieldType1 ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType1(!passwordFieldType1)}}></i>
                             <label>Password</label>
                             {validationMessage.passwordMessage !== '' && (
                                 <span className="tooltip-message">{validationMessage.passwordMessage}</span>
                             )}
                         </div>
                         <div className="field">
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword}
+                            <input type={passwordFieldType2 ? "password" : "text"}  name="confirmPassword" value={formData.confirmPassword}
                                    onChange={handleInputChange} required/>
+                            <i className={`${passwordFieldType2 ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType2(!passwordFieldType2)}}></i>
                             <label>Confirm Password</label>
                             {validationMessage.confirmPasswordMessage !== '' && (
                                 <span className="tooltip-message">{validationMessage.confirmPasswordMessage}</span>
@@ -705,11 +709,13 @@ const SignUpHelper = () => {
                     </div>
                     <div className="fg">
                         <div className="field">
-                            <input type="password" name="password" value={formDataHospital.password} onChange={handleInputChangeHospital} required/>
+                            <input type={passwordFieldType1 ? "password" : "text"}  name="password" value={formDataHospital.password} onChange={handleInputChangeHospital} required/>
+                            <i className={`${passwordFieldType1 ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType1(!passwordFieldType1)}}></i>
                             <label>Password</label>
                         </div>
                         <div className="field">
-                            <input type="password" name="confirmPassword" value={formDataHospital.confirmPassword} onChange={handleInputChangeHospital} required/>
+                            <input type={passwordFieldType2 ? "password" : "text"} name="confirmPassword" value={formDataHospital.confirmPassword} onChange={handleInputChangeHospital} required/>
+                            <i className={`${passwordFieldType2 ? "fa fa-eye-slash" : "fa fa-eye"} toggle-password`} onClick={() => {setPasswordFieldType2(!passwordFieldType2)}}></i>
                             <label>Confirm Password</label>
                         </div>
                     </div>
