@@ -41,6 +41,8 @@ function WelcomeHelper(props){
                         // console.log(response.data == 1);
                         if(response.data == 1) {
                             setFirstMember(true);
+                        } else {
+                            setIsWaiting(true);
                         }
                     })
                 setAssignedDoctorId(response.data.user_id);
@@ -72,6 +74,10 @@ function WelcomeHelper(props){
             if(response.data.toString() === "true") {
                 const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
                 stompClient.connect({}, async () => {
+                    const waiting = `/topic/get-position/${getUserIdFromLocalStorage()}`;
+                    const topic = `/topic/next-id/${assignedDoctorId}`;
+                    await stompClient.unsubscribe(waiting);
+                    await stompClient.unsubscribe(topic);
                     await stompClient.send("/app/reload-position");
                     alert("You chose not to wait for our Doctor. Please try again after some time.");
                     setIsWaiting(false);
@@ -98,17 +104,21 @@ function WelcomeHelper(props){
                             console.log(message);
                             setPosition(parseInt(JSON.parse(message.body).position));
                             setHavePosition(true);
+                            if(JSON.parse(message.body).doctorId !== null) {
+                                setAssignedDoctorId(JSON.parse(message.body).doctorId);
+                            }
                         });
                         stompClient.subscribe(topic, (message) => {
                             console.log(message);
                             if (JSON.parse(message.body).body.body.patientId == getUserIdFromLocalStorage()) {
                                 // navigate(`/call/${assignedDoctorId}`);
                                   navigate(`/call`, { replace: true, state : {assignedDoctorId} });
-                            } else {
-                                setIsWaiting(true);
                             }
+                            // else {
+                            //     setIsWaiting(true);
+                            // }
                         });
-                        setIsWaiting(true);
+                        // setIsWaiting(true);
                     }
                 });
             };

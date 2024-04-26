@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../../css/helper-components/home-style.css'
 import Slider from "react-slick";
@@ -31,7 +31,7 @@ const CustomNextArrow = (props) => {
     );
 };
 
-function homeHelper() {
+const HomeHelper = () => {
 
     const settings = {
         dots: true,
@@ -44,16 +44,18 @@ function homeHelper() {
         nextArrow: <CustomNextArrow />
     };
 
+    const [isChatOpen, setIsChatOpen] = useState(false);
+
     return (
         <div>
             <div className="chat-bot-box">
-                <Chatbot
+                {isChatOpen && <Chatbot
                     config={config}
                     messageParser={MessageParser}
                     actionProvider={ActionProvider}
                     headerText="Talk to our Chikitsa Bot!"
-                />
-                <button className='chat-box-button'>
+                />}
+                <button className='chat-box-button' onClick={() => setIsChatOpen(!isChatOpen)}>
                     <img className="join-later-image" src={require('../../images/landing_body_img/chatbot.png')} alt="Chat Bot"/>
                 </button>
             </div>
@@ -218,4 +220,4 @@ const data = [
 
 ];
 
-export default homeHelper;
+export default HomeHelper;
