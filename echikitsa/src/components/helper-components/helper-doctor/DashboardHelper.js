@@ -291,7 +291,7 @@ function DashboardHelper() {
     console.log(nextPatients[0]);
     useEffect(() => {
         if(nextPatients && nextPatients.length > 0) {
-            axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
+            axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${nextPatients[0]}`,{headers})
                 .then(async (response) => {
                     setNextPatient(response.data);
                     await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
@@ -309,25 +309,48 @@ function DashboardHelper() {
         }
     }, [nextPatients]);
 
-    // const [patientQueue, setPatientQueue] = useState([]);
+    const [patientQueue, setPatientQueue] = useState([]);
+    useEffect(() => {
+
+        const fetchData = async () => {
+            for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+                const id = nextPatients[i];
+                try {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
+                    setPatientQueue(prevQueue => [...prevQueue, response.data]);
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                }
+            }
+        };
+
+        fetchData();
+
+    }, [nextPatients]);
+
+    // const [repeatQueue, setRepeatQueue] = useState([]);
     // useEffect(() => {
     //
-    //     const fetchData = async () => {
+    //     const fetchRepeat = async () => {
     //         for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
     //             const id = nextPatients[i];
     //             try {
-    //                 const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
-    //                 setPatientQueue(prevQueue => [...prevQueue, response.data]);
+    //                 const response = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-repeated-patient/${id}/${getUserIdFromLocalStorage()}`, { headers });
+    //                 let repeat = "";
+    //                 if(response.data === true)
+    //                     repeat = "Yes";
+    //                 else
+    //                     repeat = "No";
+    //                 setRepeatQueue(prevQueue => [...prevQueue, repeat]);
     //             } catch (error) {
     //                 console.error('Error fetching patient data:', error);
     //             }
     //         }
     //     };
     //
-    //     fetchData();
+    //     fetchRepeat();
     //
     // }, [nextPatients]);
-    // console.log("the value",patientQueue);
 
     const getUserData = async (e) => {
         try {
