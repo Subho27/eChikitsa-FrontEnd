@@ -5,171 +5,10 @@ import Select from "react-select";
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {isTokenExpired} from "../../route-guard/utility";
+import {useNavigate} from "react-router-dom";
 
-// Dummy patient records
-// const dummyPatientRecords = [
-//     {
-//         id: 1,
-//         firstName: "John",
-//         lastName: "Doe",
-//         gender: "Male",
-//         age: 35,
-//         blood: "O+",
-//         repeatPatient: "n",
-//         date: "2024-02-21",
-//         dob: "1989-05-15",
-//         weight: 70,
-//         lastAppointment: "2023-12-10",
-//         height: "6'1",
-//         registrationDate: "2023-12-01",
-//         patientHistory: ["Asthma", "Hypertension"]
-//     },
-//     {
-//         id: 2,
-//         firstName: "Jane",
-//         lastName: "Smith",
-//         gender: "Female",
-//         age: 28,
-//         blood: "AB+",
-//         repeatPatient: "r",
-//         date: "2024-02-20",
-//         dob: "1996-09-20",
-//         weight: 55,
-//         lastAppointment: "2023-11-25",
-//         height: "5'5",
-//         registrationDate: "2023-11-20",
-//         patientHistory: ["Fever", "Headache"]
-//     },
-//     // Create 8 more records with similar structure
-//     {
-//         id: 3,
-//         firstName: "David",
-//         lastName: "Brown",
-//         gender: "Male",
-//         age: 45,
-//         blood: "A-",
-//         repeatPatient: "n",
-//         date: "2024-02-19",
-//         dob: "1979-03-10",
-//         weight: 80,
-//         lastAppointment: "2023-10-15",
-//         height: "5'11",
-//         registrationDate: "2023-10-01",
-//         patientHistory: ["Diabetes", "High Cholesterol"]
-//     },
-//     {
-//         id: 4,
-//         firstName: "Emily",
-//         lastName: "Johnson",
-//         gender: "Female",
-//         age: 42,
-//         blood: "B+",
-//         repeatPatient: "r",
-//         date: "2024-02-18",
-//         dob: "1982-07-05",
-//         weight: 65,
-//         lastAppointment: "2023-09-20",
-//         height: "5'6",
-//         registrationDate: "2023-09-01",
-//         patientHistory: ["Allergy", "Migraine"]
-//     },
-//     {
-//         id: 5,
-//         firstName: "Michael",
-//         lastName: "Williams",
-//         gender: "Male",
-//         age: 50,
-//         blood: "O-",
-//         repeatPatient: "n",
-//         date: "2024-02-17",
-//         dob: "1974-12-30",
-//         weight: 85,
-//         lastAppointment: "2023-08-15",
-//         height: "6'0",
-//         registrationDate: "2023-08-01",
-//         patientHistory: ["Arthritis", "Obesity"]
-//     },
-//     {
-//         id: 6,
-//         firstName: "Emma",
-//         lastName: "Brown",
-//         gender: "Female",
-//         age: 32,
-//         blood: "AB-",
-//         repeatPatient: "r",
-//         date: "2024-02-16",
-//         dob: "1992-04-12",
-//         weight: 58,
-//         lastAppointment: "2023-07-10",
-//         height: "5'4",
-//         registrationDate: "2023-07-01",
-//         patientHistory: ["Anxiety", "Depression"]
-//     },
-//     {
-//         id: 7,
-//         firstName: "Daniel",
-//         lastName: "Jones",
-//         gender: "Male",
-//         age: 38,
-//         blood: "A+",
-//         repeatPatient: "n",
-//         date: "2024-02-15",
-//         dob: "1986-08-20",
-//         weight: 75,
-//         lastAppointment: "2023-06-05",
-//         height: "5'9",
-//         registrationDate: "2023-06-01",
-//         patientHistory: ["Asthma", "Diabetes"]
-//     },
-//     {
-//         id: 8,
-//         firstName: "Olivia",
-//         lastName: "Davis",
-//         gender: "Female",
-//         age: 25,
-//         blood: "B-",
-//         repeatPatient: "r",
-//         date: "2024-02-14",
-//         dob: "1999-01-25",
-//         weight: 50,
-//         lastAppointment: "2023-05-25",
-//         height: "5'3",
-//         registrationDate: "2023-05-01",
-//         patientHistory: ["Hypertension", "Thyroid Disorder"]
-//     },
-//     {
-//         id: 9,
-//         firstName: "James",
-//         lastName: "Miller",
-//         gender: "Male",
-//         age: 40,
-//         blood: "AB+",
-//         repeatPatient: "n",
-//         date: "2024-02-21",
-//         dob: "1984-11-15",
-//         weight: 72,
-//         lastAppointment: "2023-04-20",
-//         height: "5'10",
-//         registrationDate: "2023-04-01",
-//         patientHistory: ["Heart Disease", "Stroke"]
-//     },
-//     {
-//         id: 10,
-//         firstName: "Sophia",
-//         lastName: "Wilson",
-//         gender: "Female",
-//         age: 30,
-//         blood: "O+",
-//         repeatPatient: "r",
-//         date: "2024-02-12",
-//         dob: "1994-06-05",
-//         weight: 60,
-//         lastAppointment: "2023-03-15",
-//         height: "5'7",
-//         registrationDate: "2023-03-01",
-//         patientHistory: ["Allergy", "Rheumatoid Arthritis"]
-//     }
-// ];
+
 
 const DocRecordHelper = () => {
     const [expandedRecordId, setExpandedRecordId] = useState(null);
@@ -180,7 +19,7 @@ const DocRecordHelper = () => {
     const [selectedOption, setSelectedOption] = useState(null);
     const userId =  getUserIdFromLocalStorage();
     const[dummyPatientRecords, setDummyPatientRecords] = useState([]);
-
+    const navigate = useNavigate();
     const toggleExpandedRecord = (recordId) => {
         setExpandedRecordId(expandedRecordId === recordId ? null : recordId);
     };
@@ -190,6 +29,11 @@ const DocRecordHelper = () => {
     };
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const getRecordByDoctorId = async () => {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };

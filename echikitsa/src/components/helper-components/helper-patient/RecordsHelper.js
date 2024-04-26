@@ -5,6 +5,8 @@ import '../../../css/helper-components/helper-patient/records-style.css'
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import axios from "axios";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {isTokenExpired} from "../../route-guard/utility";
+import {useNavigate} from "react-router-dom";
 
 
 function RecordHelper() {
@@ -12,6 +14,7 @@ function RecordHelper() {
     const [expandedRows, setExpandedRows] = useState([]);
     const [dummy,setDummy] = useState([]);
     const userId =  getUserIdFromLocalStorage();
+    const navigate = useNavigate();
     const handleToggleRow = (id) => {
         const isRowExpanded = expandedRows.includes(id);
         setExpandedRows(prevState => {
@@ -23,6 +26,11 @@ function RecordHelper() {
         });
     };
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const getRecordByDoctorId = async () => {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };

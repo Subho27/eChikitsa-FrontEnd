@@ -13,6 +13,7 @@ import {v4} from "uuid";
 import Select from "react-select";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {toast} from "react-toastify";
+import {isTokenExpired} from "../../route-guard/utility";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -36,6 +37,11 @@ function AdminWelcomeHelper(props) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         if (getUserIdFromLocalStorage()) {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
@@ -150,6 +156,11 @@ function AdminWelcomeHelper(props) {
 
     const handleDoctorStatus = async (id) => {
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const updatedDoctors = doctors.map((doctor) => {
             if (doctor.id === id) {
                 return { ...doctor, active: !doctor.active};
@@ -172,6 +183,11 @@ function AdminWelcomeHelper(props) {
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
     };
     const handlePromoteDoctor = async (id) => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
         const updatedDoctors = doctors.map((doctor) => {
             if (doctor.id === id) {
@@ -295,6 +311,11 @@ function AdminWelcomeHelper(props) {
 
     const handleUpdateHospitalDetails = async (e) => {
         e.preventDefault();
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
@@ -347,6 +368,11 @@ function AdminWelcomeHelper(props) {
 
     const handleAddDoctor = async (e) => {
         e.preventDefault();
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         let res;
         await uploadFiles();
         try {

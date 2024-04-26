@@ -3,6 +3,7 @@ import "../../../css/helper-components/helper-patient/testing-welcome.css"
 import {useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {isTokenExpired} from "../../route-guard/utility";
 
 function TestingWelcome() {
     const [query, setQuery] = useState("");
@@ -39,6 +40,11 @@ function TestingWelcome() {
     };
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const getHospitalDetails = () => {
             axios.get(
                 "https://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
@@ -49,6 +55,9 @@ function TestingWelcome() {
         };
         getHospitalDetails();
     }, []);
+
+
+
     const handleLocationCheckboxChange = (event) => {
         const { value, checked } = event.target;
         let updatedLocations = [...selectedLocations];

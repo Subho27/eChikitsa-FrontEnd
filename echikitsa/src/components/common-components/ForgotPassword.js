@@ -104,7 +104,7 @@ function ForgotPassword () {
                 <hr className="hor-line-xx"/>
 
                 <div className="text-content-xx">
-                    <p className="text-xx">Forgotten your password? Enter your e-mail address below, and we'll send you an OTP.</p>
+                    <p className="text-xxx">Forgotten your password? Enter your e-mail address below, and we'll send you an OTP.</p>
                 </div>
                 <div className= "inputDiv-xx">
                     <input className="input-xx" placeholder={"E-mail address"} value={email} name="email"

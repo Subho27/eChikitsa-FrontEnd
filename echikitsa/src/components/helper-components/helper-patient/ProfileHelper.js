@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import '../../../css/helper-components/helper-patient/profile-style.css';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {v4} from "uuid";
 import {toast} from "react-toastify";
+import {isTokenExpired} from "../../route-guard/utility";
 
 
 function ProfilePage(props) {
@@ -33,6 +34,7 @@ function ProfilePage(props) {
     const [password, setPassword] = useState('');
     const [imgUrl, setImgUrl] = useState('');
     const [active, setActive] = useState('');
+    const navigate = useNavigate();
     const handleChange = (e) => {
         const { name, value } = e.target;
         setProfile({
@@ -95,13 +97,19 @@ function ProfilePage(props) {
     }, []);
 
     useEffect(() => {
+
         if (userId) {
+            // if (isTokenExpired()) {
+            //     // Token has expired, handle accordingly (e.g., redirect to login)
+            //     navigate("/login")
+            //     return;
+            // }
             const getUserData = async (e) => {
                 try {
                     const token = getJwtTokenFromLocalStorage();
                     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${userId}`,{headers}).then((response) => {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${userId}`,{headers}).then((response) => {
                         console.log(response.data);
                         if (response.data) {
                             setProfile(response.data)
