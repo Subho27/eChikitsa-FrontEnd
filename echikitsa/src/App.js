@@ -25,6 +25,7 @@ import ContactUs from "./components/helper-components/ContactUs";
 
 
 
+
 function App() {
 
     return (
@@ -35,13 +36,16 @@ function App() {
             {/*Common Page Routes*/}
             <Route path='/' Component={ Home}  />
             <Route path='/signup' Component={SignUp}   />
-            <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
+            {/*<Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />*/}
+            <Route path='/login' Component={Login}   />
             <Route path='/forgot-password' Component={ForgotPassword}   />
             <Route path='/ContactUs' Component={ContactUs}   />
 
 
             {/*Patient Page Routes*/}
             <Route path="/welcome" element={<ProtectedRoute Component={WelcomePatient} role ="PATIENT" /> } />
+
+
             <Route path='/patient-profile/*' element={<ProtectedRoute Component={ProfilePatient} role ="PATIENT" />}/>
             <Route path='/patient-records' element={<ProtectedRoute Component={RecordsPatient} role ="PATIENT" />}/>
             <Route path='/hospital' element={ <ProtectedRoute Component={HospitalDetailPatient} role ="PATIENT" /> } />

@@ -5,6 +5,8 @@ import axios from "axios";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {number} from "sockjs-client/lib/utils/random";
 import {toast} from "react-toastify";
+import {isTokenExpired} from "../../route-guard/utility";
+import {useNavigate} from "react-router-dom";
 
 
 function DocProfilePage() {
@@ -29,8 +31,14 @@ function DocProfilePage() {
     // const [load, setLoad] = useState(false);
     const [tmp, setTmp] = useState({});
     const userId =  getUserIdFromLocalStorage();
+    const navigate = useNavigate();
     useEffect(() => {
         if (userId) {
+            if (isTokenExpired()) {
+                // Token has expired, handle accordingly (e.g., redirect to login)
+                navigate("/login")
+                return;
+            }
             const getUserData = async (e) => {
                 try {
                     const token = getJwtTokenFromLocalStorage();
@@ -54,6 +62,7 @@ function DocProfilePage() {
 
 
             };
+
             getUserData();
         }
     }, [])

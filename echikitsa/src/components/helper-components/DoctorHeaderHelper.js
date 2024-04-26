@@ -8,6 +8,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 import axios from "axios";
 import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
+import {isTokenExpired} from "../route-guard/utility";
 
 
 
@@ -26,6 +27,11 @@ const DoctorHeaderHelper = (props) => {
     }
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const token = getJwtTokenFromLocalStorage();
         const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
         const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {

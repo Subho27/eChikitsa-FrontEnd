@@ -13,6 +13,7 @@ import {v4} from "uuid";
 import Select from "react-select";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {toast} from "react-toastify";
+import {isTokenExpired} from "../../route-guard/utility";
 
 function AdminWelcomeHelper(props) {
     const [signupType, setSignUpType] = useState('patient');
@@ -36,6 +37,11 @@ function AdminWelcomeHelper(props) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         if (getUserIdFromLocalStorage()) {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
@@ -55,7 +61,7 @@ function AdminWelcomeHelper(props) {
                     setDoctors(response2.data);
 
                 } catch (error) {
-                    console.error('Error fetching hospital name:', error);
+                    console.log('Error fetching hospital name:', error);
                 }
             };
 
@@ -65,7 +71,7 @@ function AdminWelcomeHelper(props) {
                     setDepartments(response.data);
                 }
                 catch (error) {
-                    console.error('Error fetching all departments:', error);
+                    console.log('Error fetching all departments:', error);
                 }
             };
             const fetchDoctorDetails = async () => {
@@ -81,7 +87,7 @@ function AdminWelcomeHelper(props) {
                     setDoctors(doctorsData);
                 }
                 catch (error) {
-                    console.error('Error fetching all doctors:', error);
+                    console.log('Error fetching all doctors:', error);
                 }
             };
 
@@ -101,7 +107,7 @@ function AdminWelcomeHelper(props) {
                     }));
                     setDepartmentName(options);
                 } catch (error) {
-                    console.error('Error fetching departments by hospital ID:', error);
+                    console.log('Error fetching departments by hospital ID:', error);
                 }
             };
             console.log(departmentName);
@@ -150,6 +156,11 @@ function AdminWelcomeHelper(props) {
 
     const handleDoctorStatus = async (id) => {
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         const updatedDoctors = doctors.map((doctor) => {
             if (doctor.id === id) {
                 return { ...doctor, active: !doctor.active};
@@ -172,6 +183,11 @@ function AdminWelcomeHelper(props) {
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
     };
     const handlePromoteDoctor = async (id) => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
         const updatedDoctors = doctors.map((doctor) => {
             if (doctor.id === id) {
@@ -260,7 +276,7 @@ function AdminWelcomeHelper(props) {
                 return url; // Return the download URL
             })
             .catch((error) => {
-                console.error("Error uploading image:", error);
+                console.log("Error uploading image:", error);
                 throw error; // Propagate the error
             });
     };
@@ -289,13 +305,17 @@ function AdminWelcomeHelper(props) {
         }));
     };
 
-    console.log("doctors", doctors);
 
 
 
 
     const handleUpdateHospitalDetails = async (e) => {
         e.preventDefault();
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
@@ -348,6 +368,11 @@ function AdminWelcomeHelper(props) {
 
     const handleAddDoctor = async (e) => {
         e.preventDefault();
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         let res;
         await uploadFiles();
         try {
@@ -355,7 +380,6 @@ function AdminWelcomeHelper(props) {
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const response = await axios.post(`https://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
-
                 setFormData({
                     firstName: '',
                     lastName: '',
@@ -375,7 +399,6 @@ function AdminWelcomeHelper(props) {
                     seniorityLevel:'junior'
                 });
                 notify_success(response.data.token);
-
             });
         } catch (error) {
             await notify_error("Error: ",error);

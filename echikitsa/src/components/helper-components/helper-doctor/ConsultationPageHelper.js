@@ -397,7 +397,7 @@ function ConsultationPageHelper(effect, deps) {
             if (videoContainer) {
                 videoContainer.appendChild(newElem);
             } else {
-                console.error('videoContainer element not found');
+                console.log('videoContainer element not found');
                 return;
             }
 

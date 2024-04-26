@@ -7,6 +7,7 @@ import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import SockJS from "sockjs-client";
 import {over} from "stompjs";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {isTokenExpired} from "../../route-guard/utility";
 
 function HospitalHelper (props) {
     const {state}=useLocation();
@@ -31,6 +32,11 @@ function HospitalHelper (props) {
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
     useEffect(() => {
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
         if (state.hospital_ids) {
             const fetchHospitalName = async () => {
                 try {
@@ -44,7 +50,7 @@ function HospitalHelper (props) {
                      console.log(response2.data);
 
                 } catch (error) {
-                    console.error('Error fetching hospital name:', error);
+                    console.log('Error fetching hospital name:', error);
                 }
             };
 
