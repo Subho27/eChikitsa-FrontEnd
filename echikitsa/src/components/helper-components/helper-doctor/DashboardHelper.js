@@ -309,25 +309,49 @@ function DashboardHelper() {
         }
     }, [nextPatients]);
 
-    // const [patientQueue, setPatientQueue] = useState([]);
-    // useEffect(() => {
-    //
-    //     const fetchData = async () => {
-    //         for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
-    //             const id = nextPatients[i];
-    //             try {
-    //                 const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
-    //                 setPatientQueue(prevQueue => [...prevQueue, response.data]);
-    //             } catch (error) {
-    //                 console.error('Error fetching patient data:', error);
-    //             }
-    //         }
-    //     };
-    //
-    //     fetchData();
-    //
-    // }, [nextPatients]);
-    // console.log("the value",patientQueue);
+    const [patientQueue, setPatientQueue] = useState([]);
+    useEffect(() => {
+
+        const fetchData = async () => {
+            for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+                const id = nextPatients[i];
+                try {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
+                    setPatientQueue(prevQueue => [...prevQueue, response.data]);
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                }
+            }
+        };
+
+        fetchData();
+
+    }, [nextPatients]);
+
+    const [repeatQueue, setRepeatQueue] = useState([]);
+    useEffect(() => {
+
+        const fetchRepeat = async () => {
+            for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+                const id = nextPatients[i];
+                try {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-repeated-patient/${id}/${getUserIdFromLocalStorage()}`, { headers });
+                    let repeat = "";
+                    if(response.data === true)
+                        repeat = "Yes";
+                    else
+                        repeat = "No";
+                    setRepeatQueue(prevQueue => [...prevQueue, repeat]);
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                }
+            }
+        };
+
+        fetchRepeat();
+
+    }, [nextPatients]);
+    console.log("the value",patientQueue);
 
     const getUserData = async (e) => {
         try {
@@ -410,9 +434,9 @@ function DashboardHelper() {
                             <tbody>
                             {patientsInQueue.map((patient, index) => (
                                 <tr key={index}>
-                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/"+(index+2)+".jpg")} alt="Patient" /></td>
-                                    <td>{patient.name}</td>
-                                    <td>{patient.repeat}</td>
+                                    <td><img className="patient-photo" src={patientQueue[index].img_url} alt="Patient" /></td>
+                                    <td>{patientQueue[index].firstName + " " + patientQueue[index].lastName}</td>
+                                    <td>{repeatQueue[index]}</td>
                                 </tr>
                             ))}
                             </tbody>
@@ -514,10 +538,10 @@ const totalThreeStar = 11;
 const totalTwoStar = 7;
 const totalOneStar = 2;
 
-const patientQueue = [
-    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
-    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
-];
+// const patientQueue = [
+//     {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
+//     {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
+// ];
 
 // const nextPatient = {
 //     "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",

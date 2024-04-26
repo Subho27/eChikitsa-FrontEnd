@@ -6,7 +6,7 @@ import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
 
-import axios from 'axios';
+import axios, {get} from 'axios';
 import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 
@@ -60,20 +60,64 @@ function ConsultationPageHelper(effect, deps) {
     const [consentGiven, setConsentGiven] = useState("");
     const [patientId, setPatientId] = useState("");
 
+    let currDate = new Date().toLocaleDateString();
+    let startTime = new Date().toLocaleTimeString();
 
+    function getDuration(startTime) {
+        // Parse start time string into Date object
+        const start = new Date(startTime);
+
+        // Initialize end time as the current time
+        const end = new Date();
+
+        // Calculate the difference in milliseconds between end and start
+        const durationMs = end.getTime() - start.getTime();
+
+        // Convert milliseconds to hours, minutes, and seconds
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+
+        // Construct the duration string in the format PT{hours}H{minutes}M{seconds}S
+        return `PT${hours}H${minutes}M${seconds}S`;
+    }
+
+    let record;
+    let recordId;
     const addRecord = async () => {
         try {
-            await axios.post('http://localhost:9090/ehr/record', {
-                date: "2024-04-11",
-                duration: "PT1H30M",
-                time: "14:30:00",
+            record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
+                date: currDate,
+                duration: "",
+                time: startTime,
                 reason: diagnosisSummary,
                 patient_id: 13,
-                doctor_id: 8,
+                doctor_id: getUserIdFromLocalStorage(),
                 follow_up_date: suggestDate,
                 patient_type: "R",
                 prescription_url: prescriptionUrl
-            });
+            },{headers});
+            recordId = record.ehr_id;
+        }
+        catch(error){
+            alert("Error in adding record" + error);
+        }
+    }
+
+    const addDuration = async() =>{
+        try {
+            await axios.put('https://localhost:8083/file-handle/ehr/add-duration', {
+                ehr_id: recordId,
+                date: currDate,
+                duration: getDuration(startTime),
+                time: startTime,
+                reason: diagnosisSummary,
+                patient_id: 13,
+                doctor_id: getUserIdFromLocalStorage(),
+                follow_up_date: suggestDate,
+                patient_type: "R",
+                prescription_url: prescriptionUrl
+            },{headers});
         }
         catch(error){
             alert("Error in adding record" + error);
