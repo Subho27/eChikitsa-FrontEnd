@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import '../../../css/helper-components/helper-admin/welcome-page-style.css'
 import '../../../css/helper-components/helper-patient/profile-style.css'
 import 'bootstrap/dist/css/bootstrap.css';
-import {useLocation, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import axios from "axios";
 import {getJwtTokenFromLocalStorage, saveJwtTokenToLocalStorage} from "../../../resources/storageManagement";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
@@ -33,7 +33,7 @@ function AdminWelcomeHelper(props) {
     const {state}=useLocation();
     const [selectedOption, setSelectedOption] = useState(null);
 
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (getUserIdFromLocalStorage()) {
@@ -161,12 +161,12 @@ function AdminWelcomeHelper(props) {
         const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
         try {
             const response = await axios.put("https://localhost:8083/user-handle/admin/doctor-status-update",id,{headers}).then((response) => {
-
+            notify_success(response.data.token);
 
             });
 
         } catch (e) {
-            console.log(e)
+            await notify_error("Error: ", e);
 
         }
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
@@ -184,12 +184,12 @@ function AdminWelcomeHelper(props) {
         const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
         try {
             const response = await axios.put("https://localhost:8083/user-handle/admin/promote-doctor",id,{headers}).then((response) => {
-
+            notify_success("Doctor Promoted Successfully");
 
             });
 
         } catch (e) {
-            console.log(e)
+            await notify_error("Error");
 
         }
         // setAdminActiveId((prevId) => (prevId === id ? null : id));
@@ -201,11 +201,28 @@ function AdminWelcomeHelper(props) {
         setQuery(e.target.value.toLowerCase());
 
     };
-    const filteredData = doctors.filter(item =>
-        item.name.toLowerCase().includes(query.toLowerCase()) ||
-        item.specialization.toLowerCase().includes(query.toLowerCase()) ||
-        item.email.toLowerCase().includes(query.toLowerCase())
-    );
+    const [filteredData, setFilteredData] = useState([]);
+    // let filteredData = doctors.filter(item =>
+    //     item.name.toLowerCase().includes(query.toLowerCase()) ||
+    //     item.specialization.toLowerCase().includes(query.toLowerCase()) ||
+    //     item.email.toLowerCase().includes(query.toLowerCase())
+    // );
+
+    useEffect(() => {
+        if (doctors && doctors.length  > 0 ) {
+            if(query === "") {
+                setFilteredData(doctors);
+            }
+            else {
+                setFilteredData(doctors.filter(item =>
+                    item.name.toLowerCase().includes(query.toLowerCase()) ||
+                    item.specialization.toLowerCase().includes(query.toLowerCase()) ||
+                    item.email.toLowerCase().includes(query.toLowerCase())
+                ));
+            }
+        }
+    }, [doctors, query]);
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -221,8 +238,8 @@ function AdminWelcomeHelper(props) {
         gender: '',
         registrationNumber:'',
         specialization:'',
-        img_url:''
-
+        img_url:'',
+        seniorityLevel:'junior'
     });
 
 
@@ -281,9 +298,9 @@ function AdminWelcomeHelper(props) {
         //console.log(hospitalData);
         try {
             const token = getJwtTokenFromLocalStorage();
-             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const updatedData = {
-                name: hospitalNameValue,
+                hospital_name: hospitalNameValue,
                 email: hospitalEmailValue,
                 phoneNumber: hospitalPhoneNumberValue,
                 address: hospitalAddressValue,
@@ -295,6 +312,11 @@ function AdminWelcomeHelper(props) {
                 console.log(response.data);
                 if (response.data) {
                     notify_success(response.data.token)
+                    setHospitalName(prevState => ({
+                        ...prevState,
+                        ...updatedData
+                    }));
+                    hospitalName.specializationss  = updatedData.departments.map(department => department.department_name);
 
                 }
                 else {
@@ -303,7 +325,7 @@ function AdminWelcomeHelper(props) {
 
             });
         } catch (error) {
-            console.log('Error:', error);
+            await notify_error('Error: ', error);
 
         }
 
@@ -328,7 +350,7 @@ function AdminWelcomeHelper(props) {
         let res;
         await uploadFiles();
         try {
-
+            setDoctors(d => [...d, formData]);
             const token = getJwtTokenFromLocalStorage();
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const response = await axios.post(`https://localhost:8083/user-handle/admin/addDoctor/?id=${getUserIdFromLocalStorage()}`,formData,{headers}).then((response) => {
@@ -347,13 +369,13 @@ function AdminWelcomeHelper(props) {
                     gender: '',
                     registrationNumber:'',
                     specialization:'',
-                    img_url:''
+                    img_url:'',
+                    seniorityLevel:'junior'
                 });
                 notify_success(response.data.token);
             });
         } catch (error) {
-            console.log("error ",res.data);
-            // await notify_error(error);
+            await notify_error("Error: ",error);
 
         }
 

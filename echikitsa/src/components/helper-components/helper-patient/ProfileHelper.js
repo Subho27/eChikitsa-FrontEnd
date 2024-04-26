@@ -101,7 +101,7 @@ function ProfilePage(props) {
                     const token = getJwtTokenFromLocalStorage();
                     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/?id=${userId}`,{headers}).then((response) => {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${userId}`,{headers}).then((response) => {
                         console.log(response.data);
                         if (response.data) {
                             setProfile(response.data)
