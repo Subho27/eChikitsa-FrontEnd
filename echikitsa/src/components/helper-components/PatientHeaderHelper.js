@@ -4,25 +4,37 @@ import 'bootstrap/dist/js/bootstrap.bundle.min'
 import 'font-awesome/css/font-awesome.min.css'
 import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
 import axios from "axios";
 import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
 import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
+import {isTokenExpired} from "../route-guard/utility";
 
 function PatientHeaderHelper(props) {
     const [name, setName] = useState("");
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     let userid = getUserIdFromLocalStorage();
+    const navigate = useNavigate();
     useEffect(() => {
-        const token = getJwtTokenFromLocalStorage();
-        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-        const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
-            console.log(response)
-            setName(response.data.firstName)
+        if (isTokenExpired()) {
+            // Token has expired, handle accordingly (e.g., redirect to login)
+            navigate("/login")
+            return;
+        }
+        try{
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
+                console.log(response)
+                setName(response.data.firstName)
+            });
+        }
+        catch(error) {
+            console.log(error.response.data)
 
-        });
+        }
 
     }, []);
     const handleLogout = () => {

@@ -35,7 +35,7 @@ function ContactUs() {
                 message: ''
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
             setResponseMessage('An error occurred. Please try again.');
             alert('An error occurred. Please try again.')
         }
@@ -132,7 +132,7 @@ function ContactUs() {
                                                 <div className="icon d-flex align-items-center justify-content-center">
                                                     <span className="fa fa-map-marker"></span>
                                                 </div>
-                                                <div className="text-xx">
+                                                <div className="text-xxx">
                                                     <p><span>Address:</span>  Shanders Alta Vista, Veer Sandra, Electronic City, Bengaluru, Karnataka 560100</p>
                                                 </div>
                                             </div>
@@ -140,7 +140,7 @@ function ContactUs() {
                                                 <div className="icon d-flex align-items-center justify-content-center">
                                                     <span className="fa fa-phone"></span>
                                                 </div>
-                                                <div className="text-xx">
+                                                <div className="text-xxx">
                                                     <p><span>Phone:</span>+91 7014717219</p>
                                                 </div>
                                             </div>
@@ -148,7 +148,7 @@ function ContactUs() {
                                                 <div className="icon d-flex align-items-center justify-content-center">
                                                     <span className="fa fa-paper-plane"></span>
                                                 </div>
-                                                <div className="text-xx">
+                                                <div className="text-xxx">
                                                     <p><span>Email:</span> eChikitsaapp@gmail.com</p>
                                                 </div>
                                             </div>
