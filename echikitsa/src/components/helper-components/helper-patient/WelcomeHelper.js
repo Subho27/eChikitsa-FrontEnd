@@ -11,6 +11,7 @@ import TestingWelcome from "./TestingWelcome";
 import 'font-awesome/css/font-awesome.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from "axios";
+import withTokenExpirationCheck from "../../route-guard/TokenExpirationHandler";
 
 function WelcomeHelper(props){
     const [assignedDoctorId, setAssignedDoctorId] = useState(null);
@@ -154,4 +155,5 @@ function WelcomeHelper(props){
 
 }
 
-export default WelcomeHelper;
+// export default WelcomeHelper;
+export default withTokenExpirationCheck(WelcomeHelper);

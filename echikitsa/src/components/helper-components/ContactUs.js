@@ -35,7 +35,7 @@ function ContactUs() {
                 message: ''
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
             setResponseMessage('An error occurred. Please try again.');
             alert('An error occurred. Please try again.')
         }

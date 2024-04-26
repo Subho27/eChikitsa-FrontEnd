@@ -80,7 +80,7 @@ function DashboardHelper() {
                 setTodayDate(response.data);
 
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.log("Error fetching data:", error);
             }
         };
 
@@ -322,7 +322,7 @@ function DashboardHelper() {
                 setPatientss(response.data)
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
         }
     }
 

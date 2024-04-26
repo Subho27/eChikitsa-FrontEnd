@@ -22,6 +22,7 @@ import ProtectedRouteForLogin from "./components/route-guard/ProtectedRouteForLo
 import React from "react";
 import PageNotFound from "./components/helper-components/PageNotFound";
 import ContactUs from "./components/helper-components/ContactUs";
+import TokenExpirationHandler from "./components/route-guard/TokenExpirationHandler";
 
 
 
@@ -35,13 +36,16 @@ function App() {
             {/*Common Page Routes*/}
             <Route path='/' Component={ Home}  />
             <Route path='/signup' Component={SignUp}   />
-            <Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />
+            {/*<Route path='/login' element={ <ProtectedRouteForLogin Component={Login}  /> } />*/}
+            <Route path='/login' Component={Login}   />
             <Route path='/forgot-password' Component={ForgotPassword}   />
             <Route path='/ContactUs' Component={ContactUs}   />
 
 
             {/*Patient Page Routes*/}
             <Route path="/welcome" element={<ProtectedRoute Component={WelcomePatient} role ="PATIENT" /> } />
+
+
             <Route path='/patient-profile/*' element={<ProtectedRoute Component={ProfilePatient} role ="PATIENT" />}/>
             <Route path='/patient-records' element={<ProtectedRoute Component={RecordsPatient} role ="PATIENT" />}/>
             <Route path='/hospital' element={ <ProtectedRoute Component={HospitalDetailPatient} role ="PATIENT" /> } />

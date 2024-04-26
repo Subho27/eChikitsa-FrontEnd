@@ -44,7 +44,7 @@ function HospitalHelper (props) {
                      console.log(response2.data);
 
                 } catch (error) {
-                    console.error('Error fetching hospital name:', error);
+                    console.log('Error fetching hospital name:', error);
                 }
             };
 

@@ -69,7 +69,7 @@ function DocProfilePage() {
 
                     });
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.log('Error:', error);
 
                 }
 
@@ -96,7 +96,7 @@ function DocProfilePage() {
                 alert("Something went wrong !!");
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
         }
     };
 

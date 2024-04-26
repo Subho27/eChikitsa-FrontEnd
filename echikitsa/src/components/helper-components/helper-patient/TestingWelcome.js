@@ -39,18 +39,14 @@ function TestingWelcome() {
     };
 
     useEffect(() => {
-        const getHospitalDetails = async () => {
-            try {
-                const response = await axios.get(
-                    "https://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
-                );
+        const getHospitalDetails = () => {
+            axios.get(
+                "https://localhost:8083/echikitsa-backend/hospital/get-hospitals-landing",{headers}
+            ).then((response) => {
                 console.log(response.data)
                 setHospitalData(response.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
+            }).catch(err => { const mute = err });
         };
-
         getHospitalDetails();
     }, []);
     const handleLocationCheckboxChange = (event) => {

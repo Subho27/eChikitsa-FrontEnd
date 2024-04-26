@@ -34,7 +34,7 @@ function RecordHelper() {
                 setDummy(responses.data);
                 // console.log("the value of records"+responses.data);
             } catch (error) {
-                console.error("Error:", error);
+                console.log("Error:", error);
             }
         };
 

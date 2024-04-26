@@ -55,7 +55,7 @@ function AdminWelcomeHelper(props) {
                     setDoctors(response2.data);
 
                 } catch (error) {
-                    console.error('Error fetching hospital name:', error);
+                    console.log('Error fetching hospital name:', error);
                 }
             };
 
@@ -65,7 +65,7 @@ function AdminWelcomeHelper(props) {
                     setDepartments(response.data);
                 }
                 catch (error) {
-                    console.error('Error fetching all departments:', error);
+                    console.log('Error fetching all departments:', error);
                 }
             };
             const fetchDoctorDetails = async () => {
@@ -81,7 +81,7 @@ function AdminWelcomeHelper(props) {
                     setDoctors(doctorsData);
                 }
                 catch (error) {
-                    console.error('Error fetching all doctors:', error);
+                    console.log('Error fetching all doctors:', error);
                 }
             };
 
@@ -101,7 +101,7 @@ function AdminWelcomeHelper(props) {
                     }));
                     setDepartmentName(options);
                 } catch (error) {
-                    console.error('Error fetching departments by hospital ID:', error);
+                    console.log('Error fetching departments by hospital ID:', error);
                 }
             };
             console.log(departmentName);
@@ -243,7 +243,7 @@ function AdminWelcomeHelper(props) {
                 return url; // Return the download URL
             })
             .catch((error) => {
-                console.error("Error uploading image:", error);
+                console.log("Error uploading image:", error);
                 throw error; // Propagate the error
             });
     };
@@ -303,7 +303,7 @@ function AdminWelcomeHelper(props) {
 
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
 
         }
 
