@@ -164,7 +164,7 @@ function DocProfilePage() {
                 <div className="leftSideContents">
                     <img className="profile-picture" src={tmp.img_url} alt="Profile"/>
                     <div>
-                        <p className="profile-info">{((tmp.yearOfExp > 15 ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
+                        <p className="profile-info">{((tmp.seniority_level === 'senior' ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
                         <p className="address-info">{tmp.city +", "+ tmp.state}</p>
                         {/*<p className="address-info">{profile.hospital}</p>*/}
                         <p className="address-info">{tmp.age}</p>

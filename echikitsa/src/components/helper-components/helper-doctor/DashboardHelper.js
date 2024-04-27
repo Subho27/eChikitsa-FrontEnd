@@ -284,25 +284,20 @@ function DashboardHelper() {
                 setNextPatients(response.data);
             })
     }, [])
-    // console.log(nextPatients);
-
-    // const token = getJwtTokenFromLocalStorage();
-
-    console.log(nextPatients[0]);
     useEffect(() => {
         if(nextPatients && nextPatients.length > 0) {
             axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
-                .then(async (response) => {
-                    setNextPatient(response.data);
-                    await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
-                        .then((response1) => {
-                            lastAppointment.date = response1.data[0].date
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        })
-                    console.log("end first one")
+        .then(async (response) => {
+                setNextPatient(response.data);
+                await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
+            .then((response1) => {
+                    lastAppointment.date = response1.data[0].date
                 })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                console.log("end first one")
+            })
                 .catch((error) => {
                     console.log(error);
                 })
@@ -312,11 +307,13 @@ function DashboardHelper() {
     const [patientQueue, setPatientQueue] = useState([]);
     useEffect(() => {
 
+
         const fetchData = async () => {
             for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
                 const id = nextPatients[i];
+
                 try {
-                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${id}`, { headers });
                     setPatientQueue(prevQueue => [...prevQueue, response.data]);
                 } catch (error) {
                     console.error('Error fetching patient data:', error);
@@ -331,7 +328,9 @@ function DashboardHelper() {
     const [repeatQueue, setRepeatQueue] = useState([]);
     useEffect(() => {
 
+
         const fetchRepeat = async () => {
+
             for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
                 const id = nextPatients[i];
                 try {
@@ -351,21 +350,6 @@ function DashboardHelper() {
         fetchRepeat();
 
     }, [nextPatients]);
-    console.log("the value",patientQueue);
-
-    const getUserData = async (e) => {
-        try {
-            const token = getJwtTokenFromLocalStorage();
-            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-
-            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/?id=${nextPatients}`,{headers}).then((response) => {
-                setPatientss(response.data)
-            });
-        } catch (error) {
-            console.log('Error:', error);
-        }
-    }
-
     return (
         <div>
             {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
@@ -435,7 +419,7 @@ function DashboardHelper() {
                             {patientsInQueue.map((patient, index) => (
                                 <tr key={index}>
                                     <td><img className="patient-photo" src={patientQueue[index].img_url} alt="Patient" /></td>
-                                    <td>{patientQueue[index].firstName + " " + patientQueue[index].lastName}</td>
+                                    <td>{patientQueue[index].firstName+" "+ patientQueue[index].lastName}</td>
                                     <td>{repeatQueue[index]}</td>
                                 </tr>
                             ))}
@@ -538,10 +522,10 @@ const totalThreeStar = 11;
 const totalTwoStar = 7;
 const totalOneStar = 2;
 
-// const patientQueue = [
-//     {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
-//     {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
-// ];
+const patientQueue = [
+    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
+    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
+];
 
 // const nextPatient = {
 //     "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",
