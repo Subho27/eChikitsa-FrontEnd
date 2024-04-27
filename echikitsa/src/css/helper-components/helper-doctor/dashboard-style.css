@@ -119,7 +119,6 @@
 .custom-table {
     width: 100%;
     text-align: center;
-    margin: auto;
 
 }
 
@@ -142,6 +141,11 @@
 
 .custom-table tr {
     line-height: 60px;
+}
+
+.custom-table-2 {
+    width: 100%;
+    text-align: center;
 }
 
 .patient-photo {

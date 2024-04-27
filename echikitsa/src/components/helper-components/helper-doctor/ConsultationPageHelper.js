@@ -700,7 +700,7 @@ function ConsultationPageHelper(effect, deps) {
             const responses = await axios.get(
                 `https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${patientId}`, { headers }
             );
-             console.log("record fetched afte consent",responses.data);
+             console.log("record fetched after consent",responses.data);
             // setDummy(responses.data);
             setPrevRecords(responses.data)
             // console.log("the value of records"+responses.data);
@@ -762,9 +762,15 @@ function ConsultationPageHelper(effect, deps) {
         const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
         stompClient.connect({}, async () => {
             const waiting = `/topic/get-consent-reply/${getUserIdFromLocalStorage()}`;
+            const getPrescriptionRequest = `/topic/get-prescription-request/${getUserIdFromLocalStorage()}`;
             stompClient.subscribe(waiting, async (message) => {
                 setConsentGiven(message.body);
             });
+            stompClient.subscribe(getPrescriptionRequest, async (message) => {
+                // Here put methods Like creating prescription & clearing fields
+                // Here you will also get EHR Id
+                console.log(message);
+            })
         });
     }, [])
 
