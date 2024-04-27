@@ -90,17 +90,6 @@ function CallPageHelper(effect, deps) {
         }
     }, []);
 
-
-    const generatePdf = async(room) =>{
-        const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
-        stompClient.connect({}, async() => {
-            await stompClient.send('/app/send-on-call-end', {
-                patient_id: getUserIdFromLocalStorage(),
-                doctor_id: room
-            });
-        })
-    }
-
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
         setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
@@ -554,10 +543,53 @@ function CallPageHelper(effect, deps) {
     }
     //endregion
 
+    let currDate = new Date().toLocaleDateString();
+    let startTime = new Date().toLocaleTimeString();
+
+    function getDuration(startTime) {
+        // Parse start time string into Date object
+        const start = new Date(startTime);
+
+        // Initialize end time as the current time
+        const end = new Date();
+
+        // Calculate the difference in milliseconds between end and start
+        const durationMs = end.getTime() - start.getTime();
+
+        // Convert milliseconds to hours, minutes, and seconds
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+
+        // Construct the duration string in the format PT{hours}H{minutes}M{seconds}S
+        return `PT${hours}H${minutes}M${seconds}S`;
+    }
+
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
     const confirmJoin = () => {
 
         // Put record in EHR Table
-
+        const addRecord = async () => {
+            try {
+                const record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
+                    date: currDate,
+                    duration: "",
+                    time: startTime,
+                    reason: "",
+                    patient_id: getUserIdFromLocalStorage(),
+                    doctor_id: location.state.assignedDoctorId,
+                    follow_up_date: "",
+                    patient_type: "",
+                    prescription_url: ""
+                },{headers});
+                setEhrId(record.ehr_id);
+            }
+            catch(error){
+                console.log("Error in adding record" + error);
+            }
+        }
+        awaddRecord();
         // const room = window.location.pathname.split("/")[2];
         const room = location.state.assignedDoctorId.toString();
         console.log(room);
@@ -586,7 +618,6 @@ function CallPageHelper(effect, deps) {
                 track.stop();
             });
         }
-        await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
             doctorId: parseInt(room),
@@ -862,6 +893,7 @@ function CallPageHelper(effect, deps) {
                                 trigger={<button className="call-buttons">
                                     <img className="button-icon"
                                          src={require("../../../images/doctor-page-images/call-end-icon.png")}
+                                         onClick={addDuration}
                                          alt="End"/>
                                 </button>}
                                 modal
