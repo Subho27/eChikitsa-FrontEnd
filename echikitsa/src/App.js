@@ -44,22 +44,20 @@ function App() {
 
             {/*Patient Page Routes*/}
             <Route path="/welcome" element={<ProtectedRoute Component={WelcomePatient} role ="PATIENT" /> } />
-
-
             <Route path='/patient-profile/*' element={<ProtectedRoute Component={ProfilePatient} role ="PATIENT" />}/>
             <Route path='/patient-records' element={<ProtectedRoute Component={RecordsPatient} role ="PATIENT" />}/>
             <Route path='/hospital' element={ <ProtectedRoute Component={HospitalDetailPatient} role ="PATIENT" /> } />
-            <Route path='/call/*' element={ <ProtectedRoute Component={CallPagePatient} role ="PATIENT" /> } />
+            <Route path='/call' element={ <ProtectedRoute Component={CallPagePatient} role ="PATIENT" /> } />
 
             {/*Doctor Page Routes*/}
             <Route path='/dashboard' element={<ProtectedRoute Component={DashboardDoctor} role ="DOCTOR" />}/>
-            <Route path='/consult/*' element={<ProtectedRoute Component={ConsultationPageDoctor} role ="DOCTOR" />}/>
+            <Route path='/consult' element={<ProtectedRoute Component={ConsultationPageDoctor} role ="DOCTOR" />}/>
             <Route path='/doctor-profile' element={<ProtectedRoute Component={ProfileDoctor} role ="DOCTOR" />}/>
             <Route path='/doctor-records' element={<ProtectedRoute Component={RecordsDoctor} role ="DOCTOR" />}/>
 
             {/*Senior Doctor Page Routes*/}
             <Route path='/monitor' element={<ProtectedRoute Component={MonitorDoctor} role ="DOCTOR" />}/>
-            <Route path='/monitor-call/*' element={<ProtectedRoute Component={MonitorCallDoctor} role ="DOCTOR" />}/>
+            <Route path='/monitor-call' element={<ProtectedRoute Component={MonitorCallDoctor} role ="DOCTOR" />}/>
 
             {/*Admin Page Routes*/}
             <Route path='/admin' element={<ProtectedRoute Component={WelcomeAdmin} role ="ADMIN" />}/>
