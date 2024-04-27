@@ -213,7 +213,7 @@ function DashboardHelper() {
                 });
                 const nextTopic = `/topic/next-patients/${getUserIdFromLocalStorage()}`;
                 stompC.subscribe(nextTopic, async (message) => {
-                    // console.log(message);
+                    console.log(message);
                     setNextPatients(JSON.parse(message.body));
                 });
             });
@@ -284,64 +284,82 @@ function DashboardHelper() {
                 setNextPatients(response.data);
             })
     }, [])
-    // console.log(nextPatients);
 
-    // const token = getJwtTokenFromLocalStorage();
+    console.log(nextPatients);
 
-    console.log(nextPatients[0]);
     useEffect(() => {
         if(nextPatients && nextPatients.length > 0) {
             axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
-                .then(async (response) => {
-                    setNextPatient(response.data);
-                    await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
-                        .then((response1) => {
-                            lastAppointment.date = response1.data[0].date
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        })
-                    console.log("end first one")
+        .then(async (response) => {
+                setNextPatient(response.data);
+                await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
+            .then((response1) => {
+                    lastAppointment.date = response1.data[0].date // Appointment not getting printed
                 })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                console.log("end first one")
+            })
                 .catch((error) => {
                     console.log(error);
                 })
         }
     }, [nextPatients]);
 
-    // const [patientQueue, setPatientQueue] = useState([]);
-    // useEffect(() => {
-    //
-    //     const fetchData = async () => {
-    //         for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
-    //             const id = nextPatients[i];
-    //             try {
-    //                 const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${id}`, { headers });
-    //                 setPatientQueue(prevQueue => [...prevQueue, response.data]);
-    //             } catch (error) {
-    //                 console.error('Error fetching patient data:', error);
-    //             }
-    //         }
-    //     };
-    //
-    //     fetchData();
-    //
-    // }, [nextPatients]);
-    // console.log("the value",patientQueue);
-
-    const getUserData = async (e) => {
-        try {
-            const token = getJwtTokenFromLocalStorage();
-            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-
-            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/?id=${nextPatients}`,{headers}).then((response) => {
-                setPatientss(response.data)
-            });
-        } catch (error) {
-            console.log('Error:', error);
+    const [patientQueue, setPatientQueue] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            let patientDetails = [];
+            for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+                const id = nextPatients[i];
+                try {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${id}`, { headers });
+                    console.log(response.data);
+                    patientDetails.push(response.data);
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                }
+            }
+            setPatientQueue(patientDetails);
+        };
+        if(nextPatients && nextPatients.length > 1) {
+            console.log("Inside patient Data fetch");
+            fetchData();
         }
-    }
+        else {
+            setPatientQueue([]);
+        }
+    }, [nextPatients]);
 
+    const [repeatQueue, setRepeatQueue] = useState([]);
+    useEffect(() => {
+        const fetchRepeat = async () => {
+            let repeated = [];
+            for (let i = 1; i < nextPatients.length && i<=2; i++) { // Start loop from index 1
+                const id = nextPatients[i];
+                try {
+                    const response = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-repeated-patient/${id}/${getUserIdFromLocalStorage()}`, { headers }); // 404 Not Found
+                    let repeat = "";
+                    if(response.data === true)
+                        repeat = "Yes";
+                    else
+                        repeat = "No";
+                    repeated.push(repeat);
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                }
+            }
+            setRepeatQueue(repeated);
+        };
+        if(nextPatients && nextPatients.length > 1) {
+            console.log("Inside patient repeat fetch");
+            fetchRepeat();
+        }
+        else {
+            setRepeatQueue([]);
+        }
+    }, [nextPatients]);
     return (
         <div>
             {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
@@ -408,11 +426,11 @@ function DashboardHelper() {
                                 </tr>
                             </thead>
                             <tbody>
-                            {patientsInQueue.map((patient, index) => (
+                            {patientQueue && patientQueue.length>0 && patientQueue.map((patient, index) => (
                                 <tr key={index}>
-                                    <td><img className="patient-photo" src={require("../../../images/doctor-page-images/"+(index+2)+".jpg")} alt="Patient" /></td>
-                                    <td>{patient.name}</td>
-                                    <td>{patient.repeat}</td>
+                                    <td><img className="patient-photo" src={patient.img_url} alt="Patient" /></td>
+                                    <td>{patient.firstName+" "+ patient.lastName}</td>
+                                    {/*<td>{patient}</td>*/}
                                 </tr>
                             ))}
                             </tbody>
@@ -433,7 +451,7 @@ function DashboardHelper() {
                                 </tr>
                                 </tbody>
                             </table>
-                            <table>
+                            <table className="custom-table-2">
                                 <thead>
                                 <tr>
                                     {/*<th>Repeat</th>*/}
@@ -450,7 +468,7 @@ function DashboardHelper() {
                                 </tr>
                                 </tbody>
                             </table>
-                            <table>
+                            <table className="custom-table-2">
                                 <thead>
                                 <tr>
                                     <th>Weight</th>

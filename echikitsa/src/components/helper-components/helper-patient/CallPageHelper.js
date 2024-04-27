@@ -29,6 +29,7 @@ function CallPageHelper(effect, deps) {
     const [consentOpen, setConsentOpen] = useState(false);
     const [confResult, setConfResult] = useState({});
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
+    const [ehrId, setEhrId] = useState(0);
     let i = 0;
 
 
@@ -44,6 +45,7 @@ function CallPageHelper(effect, deps) {
     const [hasSound, setHasSound] = useState(true);
     const [hasVideo, setHasVideo] = useState(true);
     const [mediaStream, setMediaStream] = useState(null);
+    const [phonenumber, setphoneNumber] = useState("");
     //endregion
 
     const liveClock = () => {
@@ -73,6 +75,20 @@ function CallPageHelper(effect, deps) {
 
         return <span className="time-duration">{minutes}m : {seconds}s</span>;
     };
+    useEffect(() => {
+        try{
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${getUserIdFromLocalStorage()}`,{headers}).then((response) => {
+                console.log(response)
+                setphoneNumber(response.data.phoneNumber)
+            });
+        }
+        catch(error) {
+            console.log(error.response.data)
+
+        }
+    }, []);
 
 
     const generatePdf = async(room) =>{
@@ -539,6 +555,9 @@ function CallPageHelper(effect, deps) {
     //endregion
 
     const confirmJoin = () => {
+
+        // Put record in EHR Table
+
         // const room = window.location.pathname.split("/")[2];
         const room = location.state.assignedDoctorId.toString();
         console.log(room);
@@ -570,7 +589,8 @@ function CallPageHelper(effect, deps) {
         await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
-            doctorId: parseInt(room)
+            doctorId: parseInt(room),
+            ehrId : ehrId
         }).then(async (response) => {
             const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
             stompClient.connect({}, async () => {
@@ -720,7 +740,7 @@ function CallPageHelper(effect, deps) {
     }
 
     const sendOtp = () => {
-        const phoneNumber = "+91"+document.getElementById("phone-number").value; //---------- Patient Phone Number
+        const phoneNumber = "+91" + phonenumber; //---------- Patient Phone Number
         const appVerifier = window.recaptchaVerifier;
         firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
             .then((confirmationResult) => {
@@ -750,6 +770,7 @@ function CallPageHelper(effect, deps) {
                     }
                 });
                 window.recaptchaVerifier.render().then(() =>{
+                    console.log("before otp");
                     sendOtp();
                 });
             }
