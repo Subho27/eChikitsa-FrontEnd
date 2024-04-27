@@ -131,7 +131,9 @@ const DocMonitorHelper = () => {
                                         <div className="column-super-call">
                                             <div className="table-cell-call">{item.reason}</div>
                                             <div className={`table-cell-call ${(item.callStatus  ==="ongoing")?`present`:`past`}`}>{item.callStatus}</div>
-                                            <div className="table-cell-call">{item.callStatus === "ongoing" && <button className="monitor-call-now">JOIN CALL</button>}</div>
+                                            {/*<div className="table-cell-call">{item.callStatus === "ongoing" && <button className="monitor-call-now">JOIN CALL</button>}</div>*/}
+                                            {/*<div className="table-cell-call"> <button className="monitor-call-now">JOIN CALL</button></div>*/}
+
                                         </div>
                                     </div>
                                     <hr className="monitor-table-row-divider"/>

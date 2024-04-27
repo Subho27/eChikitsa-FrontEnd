@@ -7,6 +7,8 @@ import 'firebase/compat/database';
 import {Device} from 'mediasoup-client'
 import io from 'socket.io-client'
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
+import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import axios from "axios";
 
 function MonitorCallHelper(effect, deps) {
 
@@ -459,6 +461,7 @@ function MonitorCallHelper(effect, deps) {
             audioElementList.forEach(audioElement => audioElement.muted = !hasSound);
         }
     }, [hasSound]);
+    let doc_id = getUserIdFromLocalStorage();
 
     useEffect(() => {
         if(mediaStream) {
@@ -471,6 +474,33 @@ function MonitorCallHelper(effect, deps) {
             mediaStream.getVideoTracks()[0].enabled = hasVideo;
         }
     }, [hasVideo]);
+
+    const [doctorData, setDoctorData] = useState({});
+    const [patientData, setPatientData] = useState({});
+
+    useEffect(() => {
+        const getDoctorDataAndPatientData = async () => {
+            try {
+                const token = getJwtTokenFromLocalStorage();
+                const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
+
+                const response1 = await axios.get(`https://localhost:8083/echikitsa-backend/doctor/get/${doc_id}`, {headers});
+                setDoctorData(response1.data);
+
+                const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/9`, {headers});
+                setPatientData(response2.data);
+
+                console.log("the value is", doctorData);
+            } catch (error) {
+                console.error('Error: ', error);
+            }
+        };
+
+        getDoctorDataAndPatientData();
+    }, []);
+
+
+
 
     return (
 
@@ -515,31 +545,31 @@ function MonitorCallHelper(effect, deps) {
                             <tbody>
                                 <tr>
                                     <td>Doctor Name</td>
-                                    <td>Dr. Rishav Chandel</td>
+                                    <td>Dr   {doctorData.firstName + " " + doctorData.lastName}</td>
                                 </tr>
                                 <tr>
                                     <td>Specialization</td>
-                                    <td>Orthopaedics</td>
+                                    <td>{doctorData.specialization}</td>
                                 </tr>
                                 <tr>
                                     <td>Degree</td>
-                                    <td>MBBS(Kolkata), MD</td>
+                                    <td>{doctorData.degree}</td>
                                 </tr>
                                 <tr>
                                     <td>Email ID</td>
-                                    <td>rishav.chandel@gmail.com</td>
+                                    <td>{doctorData.email}</td>
                                 </tr>
                                 <tr>
                                     <td>Experience</td>
-                                    <td>10 Years</td>
+                                    <td>{doctorData.yearOfExp}</td>
                                 </tr>
                                 <tr>
                                     <td>Age</td>
-                                    <td>30 Years</td>
+                                    <td>{doctorData.age} Years</td>
                                 </tr>
                                 <tr>
                                     <td>Rating</td>
-                                    <td>4.3/5</td>
+                                    <td>{doctorData.rating}/5</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -553,35 +583,35 @@ function MonitorCallHelper(effect, deps) {
                             <tbody>
                                 <tr>
                                     <td>Patient Name</td>
-                                    <td>Suraj Subedi</td>
+                                    <td>{patientData.firstName + " " + patientData.lastName}</td>
                                 </tr>
                                 <tr>
                                     <td>Email ID</td>
-                                    <td>suraj.subedi@gmail.com</td>
+                                    <td>{patientData.email}</td>
                                 </tr>
                                 <tr>
                                     <td>Age</td>
-                                    <td>36 Years</td>
+                                    <td>{patientData.age} Years</td>
                                 </tr>
-                                <tr>
-                                    <td>Diagnosis</td>
-                                    <td>Asthma</td>
-                                </tr>
-                                <tr>
-                                    <td>Repeat Patient</td>
-                                    <td>No</td>
-                                </tr>
+                                {/*<tr>*/}
+                                {/*    <td>Diagnosis</td>*/}
+                                {/*    <td>Asthma</td>*/}
+                                {/*</tr>*/}
+                                {/*<tr>*/}
+                                {/*    <td>Repeat Patient</td>*/}
+                                {/*    <td>No</td>*/}
+                                {/*</tr>*/}
                                 <tr>
                                     <td>Height</td>
-                                    <td>170 cm</td>
+                                    <td>{patientData.height} cm</td>
                                 </tr>
                                 <tr>
                                     <td>Weight</td>
-                                    <td>68 kg</td>
+                                    <td>{patientData.weight} kg</td>
                                 </tr>
                                 <tr>
                                     <td>Blood Group</td>
-                                    <td>O+</td>
+                                    <td>{patientData.bloodGroup}</td>
                                 </tr>
                             </tbody>
                         </table>
