@@ -29,6 +29,7 @@ function CallPageHelper(effect, deps) {
     const [consentOpen, setConsentOpen] = useState(false);
     const [confResult, setConfResult] = useState({});
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
+    const [ehrId, setEhrId] = useState(0);
     let i = 0;
 
 
@@ -554,6 +555,9 @@ function CallPageHelper(effect, deps) {
     //endregion
 
     const confirmJoin = () => {
+
+        // Put record in EHR Table
+
         // const room = window.location.pathname.split("/")[2];
         const room = location.state.assignedDoctorId.toString();
         console.log(room);
@@ -585,7 +589,8 @@ function CallPageHelper(effect, deps) {
         await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
-            doctorId: parseInt(room)
+            doctorId: parseInt(room),
+            ehrId : ehrId
         }).then(async (response) => {
             const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
             stompClient.connect({}, async () => {
