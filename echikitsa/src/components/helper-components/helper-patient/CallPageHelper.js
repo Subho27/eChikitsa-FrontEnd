@@ -581,7 +581,7 @@ function CallPageHelper(effect, deps) {
             setSocket(sock);
         }
     }
-
+    let rating1 = 0;
     const handleCallEnd = async () => {
         let room;
         // if(roomName === "") room = parseInt(window.location.pathname.split("/")[2]);
@@ -592,7 +592,11 @@ function CallPageHelper(effect, deps) {
             await localStream.getTracks().forEach(function(track) {
                 track.stop();
             });
+
         }
+        const token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const response = axios.put(`https://localhost:8083/user-handle/feedback/update-feedback/${location.state.assignedDoctorId}`,rating1,{headers})
         await generatePdf(room);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
@@ -701,11 +705,16 @@ function CallPageHelper(effect, deps) {
     `;
 
     const StarRating = ({ totalStars }) => {
-        const [rating, setRating] = useState(0);
+         const [rating, setRating] = useState(0);
+
+
 
         const handleStarClick = (star) => {
             setRating(star);
+            rating1 = star;
+
         };
+        console.log("the value of rating",rating);
 
         return (
             <div>
