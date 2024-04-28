@@ -380,7 +380,7 @@ function ConsultationPageHelper(effect, deps) {
             const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers});
             console.log(response);
             let name = "";
-            name =  response.data.firstName + " " + response.data.lastName;
+            name = (response.data.role === 'DOCTOR' ? "SDr. " : "") + response.data.firstName + " " + response.data.lastName;
 
             if (params.kind === 'audio') {
                 console.log('Middle');
@@ -686,10 +686,12 @@ function ConsultationPageHelper(effect, deps) {
     const handleCallEnd = async () => {
         //await handleClick();
         //await addRecord();
-        await socket.disconnect();
-        await localStream.getTracks().forEach(function(track) {
-            track.stop();
-        });
+        if(socket !== null) {
+            await socket.disconnect();
+            await localStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
         navigate("/dashboard");
     }
     const getRecordByDoctorId = async () => {

@@ -9,17 +9,24 @@ import io from 'socket.io-client'
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 import axios from "axios";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import {over} from "stompjs";
+import SockJS from "sockjs-client";
 
 function MonitorCallHelper(effect, deps) {
 
     const [videoArray, setVideoArray] = useState(["Patient", "Doctor"]);
     let i = 0;
+    const location = useLocation();
+    const [docId, setDocId] = useState(null);
+    const [patId, setPatId] = useState(null);
 
     //region Call constants
     const [roomName, setRoomName] = useState("");
     const [error, setError] = useState("");
     const [socket, setSocket] = useState(null);
     const [isMuted, setIsMuted] = useState(true);
+    const [localStream, setLocalStream] = useState(null);
     const [hasSound, setHasSound] = useState(true);
     const [hasVideo, setHasVideo] = useState(true);
     const [mediaStream, setMediaStream] = useState(null);
@@ -136,6 +143,13 @@ function MonitorCallHelper(effect, deps) {
             console.log('Before');
             const newElem = document.createElement('div')
             newElem.setAttribute('id', `td-${remoteProducerId}`)
+            const token = getJwtTokenFromLocalStorage();
+            const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+            const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers});
+            console.log(response);
+            let name = "";
+            name = (response.data.role === 'DOCTOR' ? "Dr. " : "") + response.data.firstName + " " + response.data.lastName;
+
             if (params.kind === 'audio') {
                 console.log('Middle');
                 //append to the audio container
@@ -144,7 +158,7 @@ function MonitorCallHelper(effect, deps) {
                 console.log('Middle');
                 //append to the video container
                 newElem.setAttribute('class', 'remoteVideo')
-                newElem.innerHTML = '<div class="tag">'+ params.userId +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
+                newElem.innerHTML = '<div class="tag">'+ name +'</div><video id="' + remoteProducerId + '" autoplay class="video" ></video>'
             }
 
             console.log('After');
@@ -336,7 +350,8 @@ function MonitorCallHelper(effect, deps) {
     const joinRoom = () => {
         // console.log(socket);
         console.log('Emitting join room');
-        socket.emit('joinRoom', { roomName }, (data) => {
+        const userId = getUserIdFromLocalStorage();
+        socket.emit('joinRoom', { roomName, userId }, (data) => {
             // console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
             // we assign to local variable and will be used when
             // loading the client Device (see createDevice above)
@@ -352,6 +367,7 @@ function MonitorCallHelper(effect, deps) {
         const localVideo = document.querySelector('video#patientLocalStream');
         localVideo.srcObject = stream
         setMediaStream(stream);
+        setLocalStream(stream);
         audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
         videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -388,8 +404,10 @@ function MonitorCallHelper(effect, deps) {
             // server notification is received when a producer is closed
             // we need to close the client-side consumer and associated transport
             const producerToClose = consumerTransports.find(transportData => transportData.producerId === remoteProducerId);
-            producerToClose.consumerTransport.close();
-            producerToClose.consumer.close();
+            if(producerToClose != null) {
+                producerToClose.consumerTransport.close();
+                producerToClose.consumer.close();
+            }
 
             // remove the consumer transport from the list
             consumerTransports = consumerTransports.filter(transportData => transportData.producerId !== remoteProducerId);
@@ -436,7 +454,10 @@ function MonitorCallHelper(effect, deps) {
 
         //region Connection & Room
         //Handle room name
-        const room = window.location.pathname.split('/')[2];
+        setDocId(location.state.assignedDoctorId);
+        setPatId(location.state.callPatientId);
+        const room = location.state.assignedDoctorId.toString();
+        // const room = window.location.pathname.split('/')[2];
         console.log(room)
         if (room === "" || room === undefined) {
             setError("Please add a room name to the URL.");
@@ -461,7 +482,6 @@ function MonitorCallHelper(effect, deps) {
             audioElementList.forEach(audioElement => audioElement.muted = !hasSound);
         }
     }, [hasSound]);
-    let doc_id = getUserIdFromLocalStorage();
 
     useEffect(() => {
         if(mediaStream) {
@@ -484,10 +504,10 @@ function MonitorCallHelper(effect, deps) {
                 const token = getJwtTokenFromLocalStorage();
                 const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
 
-                const response1 = await axios.get(`https://localhost:8083/echikitsa-backend/doctor/get/${doc_id}`, {headers});
+                const response1 = await axios.get(`https://localhost:8083/echikitsa-backend/doctor/get/${docId}`, {headers});
                 setDoctorData(response1.data);
 
-                const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/9`, {headers});
+                const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${patId}`, {headers});
                 setPatientData(response2.data);
 
                 console.log("the value is", doctorData);
@@ -496,11 +516,21 @@ function MonitorCallHelper(effect, deps) {
             }
         };
 
-        getDoctorDataAndPatientData();
-    }, []);
+        if(docId !== null && patId !== null) {
+            getDoctorDataAndPatientData();
+        }
+    }, [docId, patId]);
 
-
-
+    const navigate = useNavigate();
+    const handleCallEnd = async () => {
+        if(socket !== null) {
+            await socket.disconnect();
+            await localStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        navigate("/monitor");
+    }
 
     return (
 
@@ -508,13 +538,13 @@ function MonitorCallHelper(effect, deps) {
             <div className="call-container">
                 <div className="video-call-section-patient">
                     <div className="video-section">
-                        <p className="tag">{getUserIdFromLocalStorage()}</p>
+                        <p className="tag">You</p>
                         <video className="large-video-call-patient" id="patientLocalStream" name="switch-call-patient" autoPlay muted />
                         <div id="videoContainer" className="small-video-call"></div>
                         {/*<video className="small-video-call" id="patientRemoteStream" name="switch-call-patient" autoPlay muted onClick={switchView}/>*/}
                     </div>
                     <div className="control-button-section">
-                        <div className="time-duration-section"><span className="time-duration">02:34</span></div>
+                        {/*<div className="time-duration-section"><span className="time-duration">02:34</span></div>*/}
                         <div className="button-section">
                             <button className="call-buttons">
                                 {hasSound && <img className="button-icon" src={require("../../../images/doctor-page-images/sound-on-icon.png")} alt="Sound Off" onClick={() => setHasSound(!hasSound)}/>}
@@ -528,10 +558,9 @@ function MonitorCallHelper(effect, deps) {
                                 {hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video-icon.png")} alt="Video Off" onClick={() => {setHasVideo(!hasVideo)}}/>}
                                 {!hasVideo && <img className="button-icon" src={require("../../../images/doctor-page-images/video_off.png")} alt="Video On" onClick={() => {setHasVideo(!hasVideo)}}/>}
                             </button>
-                            {/*<button className="call-buttons">*/}
-                            {/*    <img className="button-icon"*/}
-                            {/*         src={require("../../../images/doctor-page-images/more-icon.png")} alt="More"/>*/}
-                            {/*</button>*/}
+                            <Link to="/dashboard"><button className="call-buttons" onClick={handleCallEnd}>
+                                <img className="button-icon" src={require("../../../images/doctor-page-images/call-end-icon.png")} alt="End"/>
+                            </button></Link>
                         </div>
                     </div>
                 </div>
@@ -539,13 +568,13 @@ function MonitorCallHelper(effect, deps) {
                     <div className="monitor-doctor-details">
                         <div className="monitor-head">
                             <p className="activity-tag">Doctor</p>
-                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                            <img className="monitor-photo" src={doctorData.img_url} alt="Doctor"/>
                         </div>
                         <table className="monitor-detail">
                             <tbody>
                                 <tr>
                                     <td>Doctor Name</td>
-                                    <td>Dr   {doctorData.firstName + " " + doctorData.lastName}</td>
+                                    <td>Dr.   {doctorData.firstName + " " + doctorData.lastName}</td>
                                 </tr>
                                 <tr>
                                     <td>Specialization</td>
@@ -577,7 +606,7 @@ function MonitorCallHelper(effect, deps) {
                     <div className="monitor-patient-style">
                         <div className="monitor-head">
                             <p className="activity-tag">Patient</p>
-                            <img className="monitor-photo" src={require('../../../images/patient_landing_page/doctor9.jpg')} alt="Doctor"/>
+                            <img className="monitor-photo" src={patientData.img_url} alt="Doctor"/>
                         </div>
                         <table className="monitor-detail">
                             <tbody>
