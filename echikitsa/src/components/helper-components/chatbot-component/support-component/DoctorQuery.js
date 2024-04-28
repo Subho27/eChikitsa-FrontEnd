@@ -16,22 +16,22 @@ const DoctorQuery = (props) => {
         },
         {
             text: "Consultation",
-            handler: () => {},
+            handler: props.actionProvider.handleConsultationSubQuery,
             id: 3
         },
         {
             text: "Prescription",
-            handler: () => {},
+            handler: props.actionProvider.handlePrescriptionSubQuery,
             id: 4,
         },
         {
             text: "Data Privacy",
-            handler: () => {},
+            handler: props.actionProvider.handleDocDataPrivacySubQuery,
             id: 5
         },
         {
             text: "Report Scam",
-            handler: () => {},
+            handler: props.actionProvider.handleReportScamAnswer,
             id: 6
         }
     ];

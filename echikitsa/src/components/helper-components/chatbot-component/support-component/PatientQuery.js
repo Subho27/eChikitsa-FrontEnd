@@ -6,37 +6,32 @@ const PatientQuery = (props) => {
     const options = [
         {
             text: "Registration",
-            handler: () => {},
+            handler: props.actionProvider.handleRegistrationPatientSubQuery,
             id: 1,
         },
         {
             text: "Profile",
-            handler: () => {},
+            handler: props.actionProvider.handleProfilePatientSubQuery,
             id: 2
         },
         {
             text: "Consultation",
-            handler: () => {},
+            handler: props.actionProvider.handleConsultationPatientSubQuery,
             id: 3
         },
         {
             text: "Prescription",
-            handler: () => {},
+            handler: props.actionProvider.handlePrescriptionPatientSubQuery,
             id: 4,
         },
         {
-            text: "Billing",
-            handler: () => {},
-            id: 5
-        },
-        {
             text: "Data Privacy",
-            handler: () => {},
+            handler: props.actionProvider.handlePatDataPrivacySubQuery,
             id: 6
         },
         {
             text: "Report Scam",
-            handler: () => {},
+            handler: props.actionProvider.handleReportScamAnswer,
             id: 7
         }
     ];

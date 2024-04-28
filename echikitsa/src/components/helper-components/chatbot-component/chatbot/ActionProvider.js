@@ -4,7 +4,7 @@ class ActionProvider {
         this.setState = setStateFunc;
     }
 
-    // Queries
+    //region All Roles' Query
     handleHospitalQuery = () => {
         const message = this.createChatBotMessage(
             "Fantastic, Could you please specify what you'd like me to assist you with?",
@@ -34,8 +34,9 @@ class ActionProvider {
         );
         this.updateChatbotState(message);
     };
+    //endregion
 
-    // Sub-queries
+    //region Hospital Sub Query
     handleRegistrationSubQuery = () => {
         const message = this.createChatBotMessage(
             "Certainly, could you please specify which aspect of the process you would like me to explain further?",
@@ -85,7 +86,9 @@ class ActionProvider {
         );
         this.updateChatbotState(message);
     };
+    //endregion
 
+    //region Doctor Sub Query
     handleRegistrationDoctorSubQuery = () => {
         const message = this.createChatBotMessage(
             "Certainly, could you please specify which aspect of the process you would like me to explain further?",
@@ -106,37 +109,103 @@ class ActionProvider {
         this.updateChatbotState(message);
     };
 
-    handleManageDoctorSubQuery = () => {
+    handleConsultationSubQuery = () => {
         const message = this.createChatBotMessage(
             "Certainly, could you please specify which aspect of the process you would like me to explain further?",
             {
-                widget: "manageDoctorSubQuery",
+                widget: "consultationSubQuery",
             }
         );
         this.updateChatbotState(message);
     };
 
-    handleBillingSubQuery = () => {
+    handlePrescriptionSubQuery = () => {
         const message = this.createChatBotMessage(
             "Certainly, could you please specify which aspect of the process you would like me to explain further?",
             {
-                widget: "billingSubQuery",
+                widget: "prescriptionSubQuery",
             }
         );
         this.updateChatbotState(message);
     };
 
-    handleDataPrivacySubQuery = () => {
+    handleDocDataPrivacySubQuery = () => {
         const message = this.createChatBotMessage(
             "Certainly, could you please specify which aspect of the process you would like me to explain further?",
             {
-                widget: "dataPrivacySubQuery",
+                widget: "doctorDataPrivacySubQuery",
+            }
+        );
+        this.updateChatbotState(message);
+    };
+    //endregion
+
+    //region Patient Sub Query
+    handleRegistrationPatientSubQuery = () => {
+        const message = this.createChatBotMessage(
+            "Certainly, could you please specify which aspect of the process you would like me to explain further?",
+            {
+                widget: "registrationPatientSubQuery",
             }
         );
         this.updateChatbotState(message);
     };
 
-    //Query-answer
+    handleProfilePatientSubQuery = () => {
+        const message = this.createChatBotMessage(
+            "Certainly, could you please specify which aspect of the process you would like me to explain further?",
+            {
+                widget: "profilePatientSubQuery",
+            }
+        );
+        this.updateChatbotState(message);
+    };
+
+    handleConsultationPatientSubQuery = () => {
+        const message = this.createChatBotMessage(
+            "Certainly, could you please specify which aspect of the process you would like me to explain further?",
+            {
+                widget: "consultationPatientSubQuery",
+            }
+        );
+        this.updateChatbotState(message);
+    };
+
+    handlePrescriptionPatientSubQuery = () => {
+        const message = this.createChatBotMessage(
+            "Certainly, could you please specify which aspect of the process you would like me to explain further?",
+            {
+                widget: "prescriptionPatientSubQuery",
+            }
+        );
+        this.updateChatbotState(message);
+    };
+
+    handlePatDataPrivacySubQuery = () => {
+        const message = this.createChatBotMessage(
+            "Certainly, could you please specify which aspect of the process you would like me to explain further?",
+            {
+                widget: "patientDataPrivacySubQuery",
+            }
+        );
+        this.updateChatbotState(message);
+    };
+    //endregion
+
+    handleReportScamAnswer = () => {
+        const message = this.createChatBotMessage(
+            "If you become aware of any fraudulent activity or notice any scams, " +
+            "please notify us by emailing echikitsa@gmail.com.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "roleOptions",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    //region Hospital Sub Query Answer
     handleRegistrationProcessAnswer = () => {
         const message = this.createChatBotMessage(
             "To register your hospital on our platform, navigate to the homepage " +
@@ -147,19 +216,6 @@ class ActionProvider {
             "Could you please specify what you'd like me to assist you with?",
             {
                 widget: "hospitalQueries",
-            }
-        );
-        this.updateChatbotState(message);
-    }
-
-    handleRegistrationDoctorAnswer = () => {
-        const message = this.createChatBotMessage(
-            "Doctors do not need to register individually; they should advise their hospital " +
-            "to complete the registration process.\n" +
-            "Thank you.\n\n" +
-            "Could you please specify what you'd like me to assist you with?",
-            {
-                widget: "doctorQueries",
             }
         );
         this.updateChatbotState(message);
@@ -176,22 +232,6 @@ class ActionProvider {
             "Could you please specify what you'd like me to assist you with?",
             {
                 widget: "hospitalQueries",
-            }
-        );
-        this.updateChatbotState(message);
-    }
-
-    handleVerifyDocCredentialsAnswer = () => {
-        const message = this.createChatBotMessage(
-            "In regards to the verification process, we will proceed as follows:\n" +
-            "1. Kindly verify your email address.\n" +
-            "2. We will also verify your Registration ID.\n" +
-            "Please note: In case of any discrepancies from your end, we reserve the " +
-            "right to remove you from the platform and may take legal action in serious cases.\n" +
-            "Thank you.\n\n" +
-            "Could you please specify what you'd like me to assist you with?",
-            {
-                widget: "doctorQueries",
             }
         );
         this.updateChatbotState(message);
@@ -235,48 +275,6 @@ class ActionProvider {
             "Could you please specify what you'd like me to assist you with?",
             {
                 widget: "hospitalQueries",
-            }
-        );
-        this.updateChatbotState(message);
-    }
-
-    handleAccessDoctorAnswer = () => {
-        const message = this.createChatBotMessage(
-            "In this scenario, you may provide the email address and password you received in mail" +
-            "after registration completion by your organization.\n" +
-            "Thank you.\n\n" +
-            "Could you please specify what you'd like me to assist you with?",
-            {
-                widget: "doctorQueries",
-            }
-        );
-        this.updateChatbotState(message);
-    }
-
-    handleViewDocDetailsAnswer = () => {
-        const message = this.createChatBotMessage(
-            "To access your profile details as a doctor, " +
-            "please direct your attention to the top-right side of your screen .\n" +
-            "where your name is showing, click that to see your details.\n" +
-            "Thank you.\n\n" +
-            "Could you please specify what you'd like me to assist you with?",
-            {
-                widget: "doctorQueries",
-            }
-        );
-        this.updateChatbotState(message);
-    }
-
-    handleUpdateDocDetailsAnswer = () => {
-        const message = this.createChatBotMessage(
-
-            "To modify your profile-related information, log in " +
-            "and navigate to the profile page. From there, you can make " +
-            "the necessary updates.\n" +
-            "Thank you.\n\n" +
-            "Could you please specify what you'd like me to assist you with?",
-            {
-                widget: "doctorQueries",
             }
         );
         this.updateChatbotState(message);
@@ -423,20 +421,364 @@ class ActionProvider {
         );
         this.updateChatbotState(message);
     }
+    //endregion
 
-    handleReportScamAnswer = () => {
+    //region Doctor Sub Query Answer
+    handleRegistrationDoctorAnswer = () => {
         const message = this.createChatBotMessage(
-            "If you become aware of any fraudulent activity or notice any scams, " +
-            "please notify us by emailing echikitsa@gmail.com.\n" +
+            "Doctors do not need to register individually; they should advise their hospital " +
+            "to complete the registration process.\n" +
             "Thank you.\n\n" +
             "Could you please specify what you'd like me to assist you with?",
             {
-                widget: "hospitalQueries",
+                widget: "doctorQueries",
             }
         );
         this.updateChatbotState(message);
     }
 
+    handleVerifyDocCredentialsAnswer = () => {
+        const message = this.createChatBotMessage(
+            "In regards to the verification process, we will proceed as follows:\n" +
+            "1. Kindly verify your email address.\n" +
+            "2. We will also verify your Registration ID.\n" +
+            "Please note: In case of any discrepancies from your end, we reserve the " +
+            "right to remove you from the platform and may take legal action in serious cases.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleAccessDoctorAnswer = () => {
+        const message = this.createChatBotMessage(
+            "In this scenario, you may provide the email address and password you received in mail " +
+            "after registration completion by your organization, or you can use your mobile number for otp based login.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleViewDocDetailsAnswer = () => {
+        const message = this.createChatBotMessage(
+            "To access your profile details as a doctor, " +
+            "please direct your attention to the top-right side of your screen .\n" +
+            "where your name is showing, click that to see your details.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleUpdateDocDetailsAnswer = () => {
+        const message = this.createChatBotMessage(
+
+            "To modify your profile-related information, log in " +
+            "and navigate to the profile page. From there, you can make " +
+            "the necessary updates.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationProcessAnswer = () => {
+        const message = this.createChatBotMessage(
+            "After logging in as a doctor, you'll receive notifications for incoming calls " +
+            "and queued patients. To join, simply click the 'Call' button at the bottom right " +
+            "corner and begin the consultation.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationFeeDocAnswer = () => {
+        const message = this.createChatBotMessage(
+            "If you're interested in charging consultation fees, we'll soon provide an update to " +
+            "enable that functionality. However, the decision to implement this feature will be at " +
+            "the discretion of your hospital. Therefore, please confirm with your hospital before " +
+            "proceeding.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleMonitorConsultationAnswer = () => {
+        const message = this.createChatBotMessage(
+            "Senior Doctors within your hospital have the authority to monitor ongoing " +
+            "consultations conducted by junior doctors. You'll find the 'Monitor' option " +
+            "in the navigation bar. Click on it and select the ongoing call you wish to " +
+            "monitor.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationDataDocAnswer = () => {
+        const message = this.createChatBotMessage(
+
+            "You can access all past consultation records on the 'Records' " +
+            "page. Simply click 'Records' in the top navigation bar to reach it\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleAskingConsentDocAnswer = () => {
+        const message = this.createChatBotMessage(
+            "As a doctor during a consultation, you can request consent to access " +
+            "a patient's previous medical history. If the patient grants permission, " +
+            "you will then be able to view their past records.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleWritePrescriptionAnswer = () => {
+        const message = this.createChatBotMessage(
+            "As a doctor during the call, you can input the details you wish to include " +
+            "in the prescription using the form next to the call screen. At the conclusion " +
+            "of the call, the prescription will be generated and sent to the patient. You can " +
+            "also review it in the past records.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handlePrescriptionFieldsAnswer = () => {
+        const message = this.createChatBotMessage(
+            "The prescription form includes fields for a list of commonly available medicines " +
+            "in India, a message box for writing instructions, dosage details for medications, and " +
+            "a diagnosis message.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleDoctorsDataAnswer = () => {
+        const message = this.createChatBotMessage(
+            "The security of doctor data in our platform is paramount, with robust measures " +
+            "in place to ensure its confidentiality, integrity, and protection against unauthorized " +
+            "access or breaches, safeguarding sensitive information throughout its lifecycle.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "doctorQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+    //endregion
+
+    //region Patient Sub Query Answer
+    handleRegistrationPatientAnswer = () => {
+        const message = this.createChatBotMessage(
+            "To register yourself as patient on our platform, navigate to the homepage " +
+            "and click 'Sign Up.' Then, on the signup page, select the patient icon, " +
+            "fill in all required information, verify your official email ID & phone number, and click " +
+            "'Register'.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleVerifyPatCredentialsAnswer = () => {
+        const message = this.createChatBotMessage(
+            "In regards to the verification process, we will proceed as follows:\n" +
+            "1. Kindly verify your email address.\n" +
+            "2. We will also verify your phone number.\n" +
+            "Please note: In case of any discrepancies from your end, we reserve the " +
+            "right to remove you from the platform and may take legal action in serious cases.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleAccessPatientAnswer = () => {
+        const message = this.createChatBotMessage(
+            "In this scenario, you may provide the email address and password you entered while " +
+            "registration, or you can use your mobile number for otp based login.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleViewPatDetailsAnswer = () => {
+        const message = this.createChatBotMessage(
+            "To access your profile details as a patient, " +
+            "please direct your attention to the top-right side of your screen .\n" +
+            "where your name is showing, click that to see your details.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleUpdatePatDetailsAnswer = () => {
+        const message = this.createChatBotMessage(
+
+            "To modify your profile-related information, log in " +
+            "and navigate to the profile page. From there, you can make " +
+            "the necessary updates.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationPatProcessAnswer = () => {
+        const message = this.createChatBotMessage(
+            "Upon logging in as a patient, you have the option to either click " +
+            "'Consult' for our platform to randomly assign a doctor, or you can " +
+            "search for a hospital or doctor and select a specific doctor for " +
+            "consultation.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationFeePatAnswer = () => {
+        const message = this.createChatBotMessage(
+            "As of now our platform provides FREE consultation.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsentAnswer = () => {
+        const message = this.createChatBotMessage(
+            "During the consultation, if the doctor requests your consent to access your " +
+            "previous medical history, you have the option to choose either 'Allow' or 'Reject' " +
+            "as your consent reply.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationDataPatAnswer = () => {
+        const message = this.createChatBotMessage(
+            "You can access all past consultation records on the 'Records' " +
+            "page. Simply click 'Records' in the top navigation bar to reach it\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleGetPrescriptionAnswer = () => {
+        const message = this.createChatBotMessage(
+            "You can access any of your past consultations' prescriptions at any time on the 'Records' page.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handlePatientsDataAnswer = () => {
+        const message = this.createChatBotMessage(
+            "The security of patient data in our platform is paramount, with robust measures " +
+            "in place to ensure its confidentiality, integrity, and protection against unauthorized " +
+            "access or breaches, safeguarding sensitive information throughout its lifecycle.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+
+    handleConsultationPatDataAnswer = () => {
+        const message = this.createChatBotMessage(
+            "The security of consultation data in our platform is paramount, with robust measures " +
+            "in place to ensure its confidentiality, integrity, and protection against unauthorized " +
+            "access or breaches, safeguarding sensitive information throughout its lifecycle.\n" +
+            "Thank you.\n\n" +
+            "Could you please specify what you'd like me to assist you with?",
+            {
+                widget: "patientQueries",
+            }
+        );
+        this.updateChatbotState(message);
+    }
+    //endregion
 
     updateChatbotState(message) {
         // NOTICE: This function is set in the constructor, and is passed in from the top level Chatbot component. The setState function here actually manipulates the top level state of the Chatbot, so it's important that we make sure that we preserve the previous state.

@@ -1,22 +1,12 @@
 import React from "react";
 import "../role-options.css";
 
-const DataPrivacy = (props) => {
+const DoctorDataPrivacy = (props) => {
     const options = [
         {
-            text: "Hospital Data",
-            handler: props.actionProvider.handleHospitalDataAnswer,
+            text: "Doctor Data",
+            handler: props.actionProvider.handleDoctorsDataAnswer,
             id: 1,
-        },
-        {
-            text: "Doctors' Data",
-            handler: props.actionProvider.handleDoctorDataAnswer,
-            id: 2
-        },
-        {
-            text: "Consultation Data",
-            handler: props.actionProvider.handleConsultationDataAnswer,
-            id: 3
         }
     ];
 
@@ -33,4 +23,4 @@ const DataPrivacy = (props) => {
     return <div className="role-options-container">{optionsMarkup}</div>;
 };
 
-export default DataPrivacy;
+export default DoctorDataPrivacy;

@@ -1,31 +1,26 @@
 import React from "react";
 import "../role-options.css";
 
-const Consultation = (props) => {
+const ConsultationPatient = (props) => {
     const options = [
         {
             text: "Consultation Process",
-            handler: props.actionProvider.handleConsultationProcessAnswer,
+            handler: props.actionProvider.handleConsultationPatProcessAnswer,
             id: 1,
         },
         {
             text: "Consultation Fee",
-            handler: props.actionProvider.handleConsultationFeeDocAnswer,
+            handler: props.actionProvider.handleConsultationFeePatAnswer,
             id: 2
         },
         {
-            text: "Monitor Consultation",
-            handler: props.actionProvider.handleMonitorConsultationAnswer,
+            text: "Giving Consent",
+            handler: props.actionProvider.handleConsentAnswer,
             id: 3
         },
         {
             text: "Consultation Data",
-            handler: props.actionProvider.handleConsultationDataDocAnswer,
-            id: 4
-        },
-        {
-            text: "Asking Consent",
-            handler: props.actionProvider.handleAskingConsentDocAnswer,
+            handler: props.actionProvider.handleConsultationDataPatAnswer,
             id: 4
         }
     ];
@@ -43,4 +38,4 @@ const Consultation = (props) => {
     return <div className="role-options-container">{optionsMarkup}</div>;
 };
 
-export default Consultation;
+export default ConsultationPatient;

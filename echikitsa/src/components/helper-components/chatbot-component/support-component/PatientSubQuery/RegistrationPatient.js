@@ -1,16 +1,16 @@
 import React from "react";
 import "../role-options.css";
 
-const Prescription = (props) => {
+const RegistrationPatient = (props) => {
     const options = [
         {
-            text: "Write a Prescription",
-            handler: props.actionProvider.handleWritePrescriptionAnswer,
+            text: "Registration Process",
+            handler: props.actionProvider.handleRegistrationPatientAnswer,
             id: 1,
         },
         {
-            text: "Prescription Fields",
-            handler: props.actionProvider.handlePrescriptionFieldsAnswer,
+            text: "Verifying Credentials",
+            handler: props.actionProvider.handleVerifyPatCredentialsAnswer,
             id: 2
         }
     ];
@@ -28,4 +28,4 @@ const Prescription = (props) => {
     return <div className="role-options-container">{optionsMarkup}</div>;
 };
 
-export default Prescription;
+export default RegistrationPatient;
