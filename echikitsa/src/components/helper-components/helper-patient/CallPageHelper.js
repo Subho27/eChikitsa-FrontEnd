@@ -16,6 +16,7 @@ import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import firebase from "firebase/compat/app";
 import {firebaseConfig} from "../../firebase-config/firebaseConfigProfileImages";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import {toast} from "react-toastify";
 
 function CallPageHelper(effect, deps) {
     const [prevRecords, setPrevRecords] = useState([])
@@ -30,6 +31,7 @@ function CallPageHelper(effect, deps) {
     const [confResult, setConfResult] = useState({});
     const [videoArray, setVideoArray] = useState(["Doctor", "Senior Doctor"]);
     const [ehrId, setEhrId] = useState(0);
+    let callDuration = "";
     let i = 0;
 
 
@@ -89,17 +91,6 @@ function CallPageHelper(effect, deps) {
 
         }
     }, []);
-
-
-    const generatePdf = async(room) =>{
-        const stompClient = over(new SockJS('http://localhost:9090/ws-endpoints'));
-        stompClient.connect({}, async() => {
-            await stompClient.send('/app/send-on-call-end', {
-                patient_id: getUserIdFromLocalStorage(),
-                doctor_id: room
-            });
-        })
-    }
 
     const writePrescription = () => {
         const newPrescribe = document.getElementById("chat-field").value;
@@ -561,9 +552,81 @@ function CallPageHelper(effect, deps) {
     }
     //endregion
 
+    const date = new Date();
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+// Concatenate year, month, and day with "-" separator to form "YYYY-MM-DD" format
+    const currDate = `${year}-${month}-${day}`;
+
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    let startTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    let callStartTime = new Date();
+
+    function getDuration() {
+        // Parse start time string into Date object
+        const start = new Date(callStartTime);
+
+        // Initialize end time as the current time
+        const end = new Date();
+
+        // Calculate the difference in milliseconds between end and start
+        const durationMs = end.getTime() - start.getTime();
+
+        // Convert milliseconds to hours, minutes, and seconds
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+
+        // Construct the duration string in the format PT{hours}H{minutes}M{seconds}S
+        callDuration = `PT${hours}H${minutes}M${seconds}S`;
+        return `PT${hours}H${minutes}M${seconds}S`;
+    }
+
+    const token = getJwtTokenFromLocalStorage();
+    const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+    // const addRecord = async () => {
+    //
+    // }
+
+    const addDuration = async() =>{
+        try {
+            await axios.put('https://localhost:8083/file-handle/ehr/add-duration', {
+                ehr_id: ehrId,
+                duration: callDuration
+            },{headers});
+        }
+        catch(error){
+            alert("Error in adding record" + error);
+        }
+    }
     const confirmJoin = () => {
 
-        // Put record in EHR Table
+
+        try {
+            axios.post('https://localhost:8083/file-handle/ehr/record', {
+                date: currDate,
+                duration: "",
+                time: startTime,
+                reason: "",
+                patient_id: getUserIdFromLocalStorage(),
+                doctor_id: location.state.assignedDoctorId,
+                follow_up_date: "",
+                patient_type: "",
+                prescription_url: ""
+            },{headers} ).then(async (response) =>{
+                console.log(response);
+                setEhrId(response.data.ehr_id);
+            });
+        }
+        catch(error){
+            console.log("Error in adding record" + error);
+        }
+
 
         // const room = window.location.pathname.split("/")[2];
         const room = location.state.assignedDoctorId.toString();
@@ -593,7 +656,11 @@ function CallPageHelper(effect, deps) {
                 track.stop();
             });
         }
-        await generatePdf(room);
+        getDuration();
+        await addDuration().then(r => {
+            console.log("Duration added");
+        })
+        console.log("Record ID",ehrId);
         await axios.post("http://localhost:9193/local/remove", {
             patientId: null,
             doctorId: parseInt(room),
@@ -603,13 +670,21 @@ function CallPageHelper(effect, deps) {
             stompClient.connect({}, async () => {
                 await stompClient.send("/app/reload-position");
                 await stompClient.send(`/app/send-data/${room}`);
-                if(socket !== null) {
-                    alert("call ended successfully");
-                }
+                // if(socket !== null) {
+                //     alert("call ended successfully");
+                // }
                 navigate("/welcome");
             });
         })
+        await notify_success()
     }
+
+    const notify_success = async () => {
+        toast.success("You can download prescription from last consultation in Records", {
+            position: "top-center",
+            autoClose: 3000
+        });
+    };
 
     //region Call Use Effects
     useEffect(() => {
@@ -869,6 +944,7 @@ function CallPageHelper(effect, deps) {
                                 trigger={<button className="call-buttons">
                                     <img className="button-icon"
                                          src={require("../../../images/doctor-page-images/call-end-icon.png")}
+                                         // onClick={addDuration}
                                          alt="End"/>
                                 </button>}
                                 modal

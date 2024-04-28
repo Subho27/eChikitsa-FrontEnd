@@ -45,9 +45,8 @@ function DashboardHelper() {
         date:'',
         // patient_type:''
     });
-    const [lastAppointment, setLastAppointment] = useState({
-        date:'',
-    });
+    const [lastAppointment, setLastAppointment] = useState("");
+    const [repeat, setRepeat] = useState("");
     const [patientss, setPatientss] = useState([])
     const navigate = useNavigate();
     let notifyCount = 0;
@@ -288,24 +287,34 @@ function DashboardHelper() {
     console.log(nextPatients);
 
     useEffect(() => {
-        if(nextPatients && nextPatients.length > 0) {
-            axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`,{headers})
-        .then(async (response) => {
-                setNextPatient(response.data);
-                await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-record-patient/${nextPatients[0]}`, {headers})
-            .then((response1) => {
-                    lastAppointment.date = response1.data[0].date // Appointment not getting printed
+        if (nextPatients && nextPatients.length > 0) {
+            axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`, { headers })
+                .then(async (response) => {
+                    setNextPatient(response.data);
+                    try {
+                        const response1 = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-last-appointment/${nextPatients[0]}/${getUserIdFromLocalStorage()}`, { headers });
+                        setLastAppointment(response1.data);
+                    } catch (error) {
+                        setLastAppointment("");
+                        console.error("Error fetching last appointment:", error);
+                    }
+                    try {
+                        const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-repeated-patient/${nextPatients[0]}/${getUserIdFromLocalStorage()}`, { headers });
+                        if(response2.data === true)
+                            setRepeat("Yes")
+                        else
+                            setRepeat("No");
+                    } catch (error) {
+                        console.error("Error fetching last appointment:", error);
+                    }
                 })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-                console.log("end first one")
-            })
-                .catch((error) => {
-                    console.log(error);
-                })
+                .catch(error => {
+                    console.error("Error fetching next patient:", error);
+                    // Handle error fetching next patient
+                });
         }
     }, [nextPatients]);
+
 
     const [patientQueue, setPatientQueue] = useState([]);
     useEffect(() => {
@@ -430,7 +439,7 @@ function DashboardHelper() {
                                 <tr key={index}>
                                     <td><img className="patient-photo" src={patient.img_url} alt="Patient" /></td>
                                     <td>{patient.firstName+" "+ patient.lastName}</td>
-                                    {/*<td>{patient}</td>*/}
+                                    <td>{repeatQueue[index]}</td>
                                 </tr>
                             ))}
                             </tbody>
@@ -454,16 +463,16 @@ function DashboardHelper() {
                             <table className="custom-table-2">
                                 <thead>
                                 <tr>
-                                    {/*<th>Repeat</th>*/}
-                                    <th>Last Appointment</th>
                                     <th>Gender</th>
+                                    <th>Repeat</th>
+                                    <th>Last Appointment</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    {/*<td>{nextPatient.patient_type}</td>*/}
-                                    <td>{lastAppointment.date}</td>
                                     <td>{(nextPatient.gender).toUpperCase()}</td>
+                                    <td>{repeat}</td>
+                                    <td>{lastAppointment}</td>
 
                                 </tr>
                                 </tbody>
@@ -471,8 +480,8 @@ function DashboardHelper() {
                             <table className="custom-table-2">
                                 <thead>
                                 <tr>
-                                    <th>Weight</th>
                                     <th>Height</th>
+                                    <th>Weight</th>
                                     <th>Blood Group</th>
                                 </tr>
                                 </thead>

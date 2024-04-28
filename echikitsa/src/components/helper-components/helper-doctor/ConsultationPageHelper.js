@@ -25,6 +25,7 @@ function ConsultationPageHelper(effect, deps) {
     const [prescription, setPrescription] = useState([]);
     const [addMedicines, setAddMedicines] = useState([]);
     const [prescriptionUrl, setPrescriptionUrl] = useState("");
+    const [patientData, setPatientData] = useState({});
 
 
     const liveClock = () => {
@@ -60,126 +61,85 @@ function ConsultationPageHelper(effect, deps) {
     const [consentGiven, setConsentGiven] = useState("");
     const [patientId, setPatientId] = useState("");
 
-    let currDate = new Date().toLocaleDateString();
-    let startTime = new Date().toLocaleTimeString();
-
-    function getDuration(startTime) {
-        // Parse start time string into Date object
-        const start = new Date(startTime);
-
-        // Initialize end time as the current time
-        const end = new Date();
-
-        // Calculate the difference in milliseconds between end and start
-        const durationMs = end.getTime() - start.getTime();
-
-        // Convert milliseconds to hours, minutes, and seconds
-        const hours = Math.floor(durationMs / (1000 * 60 * 60));
-        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((durationMs % (1000 * 60)) / 1000);
-
-        // Construct the duration string in the format PT{hours}H{minutes}M{seconds}S
-        return `PT${hours}H${minutes}M${seconds}S`;
-    }
-
-    let record;
-    let recordId;
-    const addRecord = async () => {
-        try {
-            record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
-                date: currDate,
-                duration: "",
-                time: startTime,
-                reason: diagnosisSummary,
-                patient_id: 13,
-                doctor_id: getUserIdFromLocalStorage(),
-                follow_up_date: suggestDate,
-                patient_type: "R",
-                prescription_url: prescriptionUrl
-            },{headers});
-            recordId = record.ehr_id;
+    useEffect(() => {
+        if(prescriptionUrl !== "") {
+            try {
+                const addPrescrptionDetail = async () => {
+                    try {
+                        await axios.put('https://localhost:8083/file-handle/ehr/add-prescription-detail', {
+                            ehr_id: patientData.ehrId,
+                            reason: diagnosisSummary,
+                            follow_up_date: suggestDate,
+                            patient_type: "",
+                            prescription_url: prescriptionUrl
+                        }, {headers});
+                    } catch (error) {
+                        alert("Error in adding record" + error);
+                    }
+                }
+                addPrescrptionDetail();
+            } catch (error) {
+                alert("Error uploading prescription details " + error);
+            }
         }
-        catch(error){
-            alert("Error in adding record" + error);
-        }
-    }
+    }, [prescriptionUrl]);
 
-    const addDuration = async() =>{
-        try {
-            await axios.put('https://localhost:8083/file-handle/ehr/add-duration', {
-                ehr_id: recordId,
-                date: currDate,
-                duration: getDuration(startTime),
-                time: startTime,
-                reason: diagnosisSummary,
-                patient_id: 13,
-                doctor_id: getUserIdFromLocalStorage(),
-                follow_up_date: suggestDate,
-                patient_type: "R",
-                prescription_url: prescriptionUrl
-            },{headers});
-        }
-        catch(error){
-            alert("Error in adding record" + error);
-        }
-    }
-
-    // Prescription WebSocket connection setup
-    // const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
-    // stompClient.connect({}, ()=> {
-    //     const waiting = `/topic/send-data-req/${getUserIdFromLocalStorage()}`;
-    //     stompClient.subscribe(waiting,  (message) => {
-    //         console.log(message);
-    //         return generatePDF(message.body);
-    //
-    //     })
-    // })
 
     // Function to upload PDF file to Firebase Storage
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
-    const generatePDF = async () => {
-        try {
-            const response = await axios.post('https://localhost:8083/file-handle/prescription/generate_pdf', {
-                patient_id:2,
-                doctor_id:1,
-                instructions:prescription,
-                medication:addMedicines,
-                diagnosis:diagnosisSummary,
-                nextdate:suggestDate
-            }, {headers,
-                responseType: 'blob' // Set response type to blob
-            });
 
-            // Create a blob URL for the PDF data
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const prescriptionRef = ref(storage, `echikitsa/Patient/2/${"2"+Date.now().toLocaleString()}`);
+    useEffect(() => {
+        if (patientData && Object.keys(patientData).length !== 0) { // Check if patientData exists and is not empty
+            try {
+                const generatePDF = async () => {
+                    try {
+                        const response = await axios.post('https://localhost:8083/file-handle/prescription/generate_pdf', {
+                            patient_id: patientData.patientId,
+                            doctor_id: getUserIdFromLocalStorage(),
+                            instructions: prescription,
+                            medication: addMedicines,
+                            diagnosis: diagnosisSummary,
+                            nextdate: suggestDate
+                        }, {
+                            headers,
+                            responseType: 'blob' // Set response type to blob
+                        });
 
-            await uploadBytes(prescriptionRef, blob)
-                .then((snapshot) => {
-                    return getDownloadURL(snapshot.ref);
-                })
-                .then((url) => {
-                    // Optionally, you can also update state or perform other actions here
-                    alert("Prescription Uploaded");
-                    setPrescriptionUrl(url);
-                    return url;
-                })
-            const pdfUrl = URL.createObjectURL(blob);
+                        // Create a blob URL for the PDF data
+                        const blob = new Blob([response.data], { type: 'application/pdf' });
+                        const prescriptionRef = ref(storage, `echikitsa/prescriptions/${Date.now().toLocaleString()}`);
 
-            // Open the PDF in a new window/tab
-            window.open(pdfUrl);
+                        await uploadBytes(prescriptionRef, blob)
+                            .then((snapshot) => {
+                                return getDownloadURL(snapshot.ref);
+                            })
+                            .then((url) => {
+                                // Optionally, you can also update state or perform other actions here
+                                alert("Prescription Uploaded");
+                                setPrescriptionUrl(url);
+                                return url;
+                            });
 
-        } catch (error) {
-            alert('Error generating PDF:' + error);
-            throw error;
+                    } catch (error) {
+                        alert('Error generating PDF:' + error);
+                    }
+                }
+
+                // Call the generatePDF function
+                generatePDF();
+            } catch (error) {
+                alert("Patient ID is not assigned");
+            }
         }
-    };
+    }, [patientData]);
+
+
+
 
     const handleClick = async () => {
         try {
             // Call the generatePDF function
-            await generatePDF();
         } catch (error) {
             // Handle error
             alert("Error generating, uploading PDF, and adding data:" + error);
@@ -771,6 +731,9 @@ function ConsultationPageHelper(effect, deps) {
             stompClient.subscribe(getPrescriptionRequest, async (message) => {
                 // Here put methods Like creating prescription & clearing fields
                 // Here you will also get EHR Id
+                setPatientData(JSON.parse(message.body));
+                console.log(message.body)
+
                 console.log(message);
             })
         });
