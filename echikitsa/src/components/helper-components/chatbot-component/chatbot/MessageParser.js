@@ -1,20 +1,20 @@
-import React from 'react';
+// MessageParser starter code in MessageParser.js
+class MessageParser {
+    constructor(actionProvider) {
+        this.actionProvider = actionProvider;
+    }
 
-const MessageParser = ({ children, actions }) => {
-    const parse = (message) => {
-        console.log(message);
-    };
+    parse(message) {
+        const lowerCaseMessage = message.toLowerCase();
 
-    return (
-        <div>
-            {React.Children.map(children, (child) => {
-                return React.cloneElement(child, {
-                    parse: parse,
-                    actions: {},
-                });
-            })}
-        </div>
-    );
-};
+        if (lowerCaseMessage.includes("hello")) {
+            this.actionProvider.greet();
+        }
+
+        if (lowerCaseMessage.includes("hospital")) {
+            this.actionProvider.handleJavascriptList();
+        }
+    }
+}
 
 export default MessageParser;
