@@ -301,8 +301,15 @@ function CallPageHelper(effect, deps) {
             const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
             const response = await axios.get(`https://localhost:8083/echikitsa-backend/user/get-user-name/${params.userId}`,{headers});
             console.log(response);
-            let name = "";
-            name = (response.data.role === 'DOCTOR' ? "Dr. " : "") + response.data.firstName + " " + response.data.lastName;
+            let name = response.data.firstName + " " + response.data.lastName;
+            if(response.data.role === 'DOCTOR') {
+                if(response.data.SeniorityLevel === 'senior') {
+                    name = "SDr. " + name;
+                }
+                else {
+                    name = "Dr. " + name;
+                }
+            }
             if (params.kind === 'audio') {
                 console.log('Middle1');
                 //append to the audio container
