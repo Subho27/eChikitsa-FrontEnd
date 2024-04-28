@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import "../../../css/helper-components/helper-doctor/doc-monitor-style.css";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
 const DocMonitorHelper = () => {
+    const navigate = useNavigate();
     const [seniorDoctorCallHistory, setSeniorDoctorCallHistory] = useState([
         { id: 1, status: "not joined" }, // Example history item
         // Add more history items as needed
@@ -33,14 +34,13 @@ const DocMonitorHelper = () => {
             try {
                 const responses = await axios.get(
                     `https://localhost:8083/echikitsa-backend/ehr/get-record-senior-doctor-monitoring/${docId}`,{headers}
-
                 );
+                console.log(responses.data);
                 setDoctorPatientData(responses.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-
         getMonitoringPageData();
     }, []);
 
@@ -79,6 +79,10 @@ const DocMonitorHelper = () => {
         const updatedCurrentPosts = filteredData.slice(indexOfFirstPost, indexOfLastPost);
         setCurrentPosts(updatedCurrentPosts);
     }, [filteredData, currentPage, hospitalsPerPage])
+
+    const handleMonitorCall = (callPatientId, assignedDoctorId) => {
+        navigate(`/monitor-call`, { replace: true, state : {callPatientId, assignedDoctorId} });
+    }
 
     return (
         <div className="MonitorContainer">
@@ -130,10 +134,10 @@ const DocMonitorHelper = () => {
                                         </div>
                                         <div className="column-super-call">
                                             <div className="table-cell-call">{item.reason}</div>
-                                            <div className={`table-cell-call ${(item.callStatus  ==="ongoing")?`present`:`past`}`}>{item.callStatus}</div>
+                                            <div className="table-cell-call">CALL ONGOING</div>
+                                            {/*<div className={`table-cell-call ${(item.callStatus  ==="ongoing")?`present`:`past`}`}>{item.callStatus}</div>*/}
                                             {/*<div className="table-cell-call">{item.callStatus === "ongoing" && <button className="monitor-call-now">JOIN CALL</button>}</div>*/}
-                                            {/*<div className="table-cell-call"> <button className="monitor-call-now">JOIN CALL</button></div>*/}
-
+                                            <div className="table-cell-call"> <button className="monitor-call-now" onClick={() => handleMonitorCall(item.patientId, item.doctorId)}>JOIN CALL</button></div>
                                         </div>
                                     </div>
                                     <hr className="monitor-table-row-divider"/>
