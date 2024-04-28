@@ -567,29 +567,30 @@ function CallPageHelper(effect, deps) {
 
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+    const addRecord = async () => {
+        try {
+            const record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
+                date: currDate,
+                duration: "",
+                time: startTime,
+                reason: "",
+                patient_id: getUserIdFromLocalStorage(),
+                doctor_id: location.state.assignedDoctorId,
+                follow_up_date: "",
+                patient_type: "",
+                prescription_url: ""
+            },{headers});
+            setEhrId(record.ehr_id);
+        }
+        catch(error){
+            console.log("Error in adding record" + error);
+        }
+    }
     const confirmJoin = () => {
 
         // Put record in EHR Table
-        const addRecord = async () => {
-            try {
-                const record = await axios.post('https://localhost:8083/file-handle/ehr/record', {
-                    date: currDate,
-                    duration: "",
-                    time: startTime,
-                    reason: "",
-                    patient_id: getUserIdFromLocalStorage(),
-                    doctor_id: location.state.assignedDoctorId,
-                    follow_up_date: "",
-                    patient_type: "",
-                    prescription_url: ""
-                },{headers});
-                setEhrId(record.ehr_id);
-            }
-            catch(error){
-                console.log("Error in adding record" + error);
-            }
-        }
-        awaddRecord();
+         addRecord();
+
         // const room = window.location.pathname.split("/")[2];
         const room = location.state.assignedDoctorId.toString();
         console.log(room);
@@ -893,7 +894,7 @@ function CallPageHelper(effect, deps) {
                                 trigger={<button className="call-buttons">
                                     <img className="button-icon"
                                          src={require("../../../images/doctor-page-images/call-end-icon.png")}
-                                         onClick={addDuration}
+                                         // onClick={addDuration}
                                          alt="End"/>
                                 </button>}
                                 modal
