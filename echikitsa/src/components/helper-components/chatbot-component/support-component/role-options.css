@@ -1,0 +1,15 @@
+.role-options-container {
+    display: flex !important;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.role-option-button {
+    width: fit-content !important;
+    color: black;
+    padding: 5px 10px !important;
+    border-radius: 25px;
+    background: transparent;
+    border: 1px solid green;
+    margin: 3px;
+}
