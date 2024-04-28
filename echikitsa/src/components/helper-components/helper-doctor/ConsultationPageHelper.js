@@ -89,54 +89,50 @@ function ConsultationPageHelper(effect, deps) {
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
 
-    // useEffect(() => {
-    //     if (patientData && Object.keys(patientData).length !== 0) { // Check if patientData exists and is not empty
-    //         try {
-    //             const generatePDF = async () => {
-    //                 try {
-    //                     const response = await axios.post('https://localhost:8083/file-handle/prescription/generate_pdf', {
-    //                         patient_id: patientData.patientId,
-    //                         doctor_id: getUserIdFromLocalStorage(),
-    //                         instructions: prescription,
-    //                         medication: addMedicines,
-    //                         diagnosis: diagnosisSummary,
-    //                         nextdate: suggestDate
-    //                     }, {
-    //                         headers,
-    //                         responseType: 'blob' // Set response type to blob
-    //                     });
-    //
-    //                     // Create a blob URL for the PDF data
-    //                     const blob = new Blob([response.data], { type: 'application/pdf' });
-    //                     const prescriptionRef = ref(storage, `echikitsa/Patient/2/${"2" + Date.now().toLocaleString()}`);
-    //
-    //                     await uploadBytes(prescriptionRef, blob)
-    //                         .then((snapshot) => {
-    //                             return getDownloadURL(snapshot.ref);
-    //                         })
-    //                         .then((url) => {
-    //                             // Optionally, you can also update state or perform other actions here
-    //                             alert("Prescription Uploaded");
-    //                             setPrescriptionUrl(url);
-    //                             console.log(prescriptionUrl);
-    //                             return url;
-    //                         });
-    //                     const pdfUrl = URL.createObjectURL(blob);
-    //
-    //                     // Open the PDF in a new window/tab
-    //                     window.open(pdfUrl);
-    //                 } catch (error) {
-    //                     alert('Error generating PDF:' + error);
-    //                 }
-    //             }
-    //
-    //             // Call the generatePDF function
-    //             generatePDF();
-    //         } catch (error) {
-    //             alert("Patient ID is not assigned");
-    //         }
-    //     }
-    // }, [patientData]);
+    useEffect(() => {
+        if (patientData && Object.keys(patientData).length !== 0) { // Check if patientData exists and is not empty
+            try {
+                const generatePDF = async () => {
+                    try {
+                        const response = await axios.post('https://localhost:8083/file-handle/prescription/generate_pdf', {
+                            patient_id: patientData.patientId,
+                            doctor_id: getUserIdFromLocalStorage(),
+                            instructions: prescription,
+                            medication: addMedicines,
+                            diagnosis: diagnosisSummary,
+                            nextdate: suggestDate
+                        }, {
+                            headers,
+                            responseType: 'blob' // Set response type to blob
+                        });
+
+                        // Create a blob URL for the PDF data
+                        const blob = new Blob([response.data], { type: 'application/pdf' });
+                        const prescriptionRef = ref(storage, `echikitsa/prescriptions/${Date.now().toLocaleString()}`);
+
+                        await uploadBytes(prescriptionRef, blob)
+                            .then((snapshot) => {
+                                return getDownloadURL(snapshot.ref);
+                            })
+                            .then((url) => {
+                                // Optionally, you can also update state or perform other actions here
+                                alert("Prescription Uploaded");
+                                setPrescriptionUrl(url);
+                                return url;
+                            });
+
+                    } catch (error) {
+                        alert('Error generating PDF:' + error);
+                    }
+                }
+
+                // Call the generatePDF function
+                generatePDF();
+            } catch (error) {
+                alert("Patient ID is not assigned");
+            }
+        }
+    }, [patientData]);
 
 
 
