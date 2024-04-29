@@ -24,6 +24,7 @@ function DashboardHelper() {
     const [twoStar, setTwoStar] = useState(totalTwoStar/totalPatient)
     const [oneStar, setOneStar] = useState(totalOneStar/totalPatient)
     const [patientsInQueue, setPatientsInQueue] = useState([])
+
     const [lastPatient, setLastPatient] = useState({})
     const [noOfPatient,setNoOfPatient] = useState("");
     const [noOfPatientToday,setNoOfPatientToday] = useState("");
@@ -48,6 +49,7 @@ function DashboardHelper() {
     const [lastAppointment, setLastAppointment] = useState("");
     const [repeat, setRepeat] = useState("");
     const [patientss, setPatientss] = useState([])
+    const [ratingDoctor,setRatingDoctor] = useState([]);
     const navigate = useNavigate();
     let notifyCount = 0;
     const token = getJwtTokenFromLocalStorage();
@@ -83,16 +85,32 @@ function DashboardHelper() {
 
                 );
                 setTodayDate(response.data);
+                const allratings = await axios.get(
+                    `https://localhost:8083/echikitsa-backend/feedback//get-feedback-by-id/${docId}`,{headers}
+
+                );
+                setRatingDoctor(allratings.data);
+
+
 
             } catch (error) {
                 console.log("Error fetching data:", error);
             }
+
         };
+        console.log(ratingDoctor);
+
+
 
         getNoOfPatient();
     }, []);
     useEffect(() => {
         //Set dummy values
+        // setFiveStar(ratingDoctor.fiveStar)
+        // setFourStar(ratingDoctor.fourStar)
+        // setThreeStar(ratingDoctor.threeStar)
+        // setTwoStar(ratingDoctor.twoStar);
+        // setOneStar()
         let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
         setRating(Number(average.toFixed(1)));
         setPatient(totalPatient);
