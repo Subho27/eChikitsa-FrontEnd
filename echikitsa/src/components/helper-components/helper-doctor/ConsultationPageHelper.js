@@ -70,7 +70,6 @@ function ConsultationPageHelper(effect, deps) {
                             ehr_id: patientData.ehrId,
                             reason: diagnosisSummary,
                             follow_up_date: suggestDate,
-                            patient_type: "",
                             prescription_url: prescriptionUrl
                         }, {headers});
                         await onCallEndClearData();
@@ -134,6 +133,8 @@ function ConsultationPageHelper(effect, deps) {
             }
         }
     }, [patientData]);
+
+
 
 
 
