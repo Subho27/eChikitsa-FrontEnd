@@ -73,6 +73,7 @@ function ConsultationPageHelper(effect, deps) {
                             patient_type: "",
                             prescription_url: prescriptionUrl
                         }, {headers});
+                        await onCallEndClearData();
                     } catch (error) {
                         alert("Error in adding record" + error);
                     }
@@ -164,7 +165,7 @@ function ConsultationPageHelper(effect, deps) {
     const [mediaStream, setMediaStream] = useState(null);
     //endregion
 
-    const writePrescription = () => {
+    const writePrescription = async () => {
         const newPrescribe = document.getElementById("chat-field").value;
         setPrescription(prevPrescription => [...prevPrescription, newPrescribe]);
     }
@@ -176,7 +177,7 @@ function ConsultationPageHelper(effect, deps) {
         });
     }
 
-    const submittedMedicines = () => {
+    const submittedMedicines = async () => {
         const medicineName = document.getElementById("medicine").value;
         const afterBefore = document.getElementById("after-before").value;
         const dosage1 = document.getElementById("dosage-1").value;
@@ -201,7 +202,7 @@ function ConsultationPageHelper(effect, deps) {
         });
     }
 
-    const summaryDiagnosis = () => {
+    const summaryDiagnosis = async () => {
         const diagnosis = document.getElementById("diagnosis-summary").value;
         setDiagnosisSummary(diagnosis);
         document.getElementById("diagnosis-submit").disabled = true;
@@ -213,7 +214,7 @@ function ConsultationPageHelper(effect, deps) {
         document.getElementById("diagnosis-submit").style.cursor = "pointer";
     }
 
-    const suggestADate = () => {
+    const suggestADate = async () => {
         const suggestedDate = document.getElementById("next-date").value;
         setSuggestDate(suggestedDate);
     };
@@ -730,11 +731,8 @@ function ConsultationPageHelper(effect, deps) {
             });
             stompClient.subscribe(getPrescriptionRequest, async (message) => {
                 // Here put methods Like creating prescription & clearing fields
-                // Here you will also get EHR Id
+                // Here you will also get EHR ID
                 setPatientData(JSON.parse(message.body));
-                console.log(message.body)
-
-                console.log(message);
             })
         });
     }, [])
@@ -758,6 +756,38 @@ function ConsultationPageHelper(effect, deps) {
             mediaStream.getVideoTracks()[0].enabled = hasVideo;
         }
     }, [hasVideo]);
+
+    const [openConsent, setOpenConsent] = useState(false);
+    const [openSuggestDate, setOpenSuggestDate] = useState(false);
+    const [openDiagnosis, setOpenDiagnosis] = useState(false);
+    const [openMedicine, setOpenMedicine] = useState(false);
+    const [openChatBox, setOpenChatBox] = useState(false);
+
+    const onCallEndClearData = async () => {
+        setSuggestDate("");
+        setDiagnosisSummary("");
+        setMedicines([]);
+        setPrescription([]);
+        setHasConsent(false);
+        setWaitingConsent(false);
+        setOpenConsent(false);
+        setOpenSuggestDate(false);
+        setOpenDiagnosis(false);
+        setOpenMedicine(false);
+        setOpenChatBox(false);
+
+        document.getElementById("medicine").value = "Medicine 1";
+        document.getElementById("after-before").value = "After";
+        document.getElementById("dosage-1").value = "0";
+        document.getElementById("dosage-2").value = "0";
+        document.getElementById("dosage-3").value = "0";
+
+        document.getElementById("diagnosis-summary").value = "";
+
+        document.getElementById("next-date").value = "";
+
+        document.getElementById("chat-field").value = "";
+    }
 
     return (
         <div className="consult-page-container">
@@ -821,7 +851,8 @@ function ConsultationPageHelper(effect, deps) {
                 <div className="activity-section">
                     <div>
                         <Collapsible trigger="Ask for previous record" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
+                                     open={openConsent} handleTriggerClick={() => setOpenConsent(!openConsent)}>
                             <div>
                                 {!hasConsent && !waitingConsent &&
                                     <div>
@@ -855,7 +886,8 @@ function ConsultationPageHelper(effect, deps) {
                     </div>
                     <div>
                         <Collapsible trigger="Suggest next date" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
+                                     open={openSuggestDate} handleTriggerClick={() => setOpenSuggestDate(!openSuggestDate)}>
                             <div className="next-date-section">
                                 <input className="next-date" type="date" id="next-date" name="next-date" min={today} />
                                 <button className="next-date-submit" onClick={suggestADate}>Suggest</button>
@@ -865,7 +897,8 @@ function ConsultationPageHelper(effect, deps) {
                     </div>
                     <div>
                         <Collapsible trigger="Add single word diagnosis" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
+                                     open={openDiagnosis} handleTriggerClick={() => setOpenDiagnosis(!openDiagnosis)}>
                             <div className="next-date-section">
                                 <input className="diagnosis-field" type="text" id="diagnosis-summary" name="diagnosis-summary" />
                                 <button className="next-date-submit" id="diagnosis-submit" onClick={summaryDiagnosis}>Submit</button>
@@ -876,7 +909,8 @@ function ConsultationPageHelper(effect, deps) {
                     </div>
                     <div>
                         <Collapsible trigger="Choose medicine and dosage" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
+                                     open={openMedicine} handleTriggerClick={() => setOpenMedicine(!openMedicine)}>
                             <div className="next-date-section dosage-section">
                                 <select className="medicine" id="medicine" name="medicine" >
                                     <option>Medicine 1</option>
@@ -933,7 +967,8 @@ function ConsultationPageHelper(effect, deps) {
                     </div>
                     <div>
                         <Collapsible trigger="Write prescription" className="ask-record" openedClassName="ask-record-open"
-                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger">
+                                     triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
+                                     open={openChatBox} handleTriggerClick={() => setOpenChatBox(!openChatBox)}>
                             <div className="chat-box">
                                 {prescription.map((prescription, index) => (
                                     <p key={index}>
