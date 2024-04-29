@@ -782,12 +782,8 @@ function CallPageHelper(effect, deps) {
     const StarRating = ({ totalStars }) => {
          const [rating, setRating] = useState(0);
 
-
-
         const handleStarClick = (star) => {
             setRating(star);
-            rating1 = star;
-
         };
 
         return (
