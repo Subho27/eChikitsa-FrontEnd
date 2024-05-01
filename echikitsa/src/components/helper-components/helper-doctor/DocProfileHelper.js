@@ -167,7 +167,7 @@ function DocProfilePage() {
                         <p className="profile-info">{((tmp.seniority_level === 'senior' ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
                         <p className="address-info">{tmp.city +", "+ tmp.state}</p>
                         {/*<p className="address-info">{profile.hospital}</p>*/}
-                        <p className="address-info">{tmp.age}</p>
+                        {/*<p className="address-info">{tmp.age}</p>*/}
                         <p className="address-info">Rating : {tmp.rating}/5</p>
                     </div>
                     <div className="update-picture-button-section">
