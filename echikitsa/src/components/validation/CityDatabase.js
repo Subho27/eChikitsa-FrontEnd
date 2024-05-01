@@ -1,4 +1,3 @@
-
 const cityData = [
     {
         "id": "1",

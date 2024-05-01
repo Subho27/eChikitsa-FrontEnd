@@ -6,12 +6,19 @@ import * as Constant from '../../resources/constant.js';
 import '../../css/helper-components/header-style.css'
 import {Link, useLocation} from "react-router-dom";
 import '../helper-components/helper-patient/WelcomeHelper'
-import {removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
-import {removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
+import {getUserIdFromLocalStorage, removeUserIdFromLocalStorage} from "../../resources/userIdManagement";
+import {getJwtTokenFromLocalStorage, removeJwtTokenFromLocalStorage} from "../../resources/storageManagement";
+import axios from "axios";
 
 function AdminHeaderHelper(props) {
 
     const handleLogout = () => {
+        let token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        const response = axios.get(`https://localhost:8083/user-handle/auth/logout`,{headers}).then((response) => {
+            // console.log(response)
+
+        });
         removeUserIdFromLocalStorage()
         removeJwtTokenFromLocalStorage()
 

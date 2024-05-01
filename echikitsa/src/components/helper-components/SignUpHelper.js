@@ -357,8 +357,8 @@ const SignUpHelper = () => {
 
     const uploadFiles = () => {
         console.log(imageUpload)
-        if (imageUpload == null) return Promise.reject("No image to upload");
-
+        // if (imageUpload == null) return Promise.reject("No image to upload");
+        if (imageUpload == null) return notify_error("No image to upload");
         const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
 
         return uploadBytes(imageRef, imageUpload)
