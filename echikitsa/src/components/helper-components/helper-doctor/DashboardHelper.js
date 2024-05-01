@@ -86,7 +86,7 @@ function DashboardHelper() {
                 );
                 setTodayDate(response.data);
                 const allratings = await axios.get(
-                    `https://localhost:8083/echikitsa-backend/feedback//get-feedback-by-id/${docId}`,{headers}
+                    `https://localhost:8083/echikitsa-backend/feedback/get-feedback-by-id/${docId}`,{headers}
 
                 );
                 setRatingDoctor(allratings.data);
@@ -256,19 +256,19 @@ function DashboardHelper() {
                 <tbody>
                 <tr>
                     <td>Patient Name : </td>
-                    <td>Rishav Chandel</td>
+                    <td>{nextPatient.firstName + " " + nextPatient.lastName}</td>
                 </tr>
                 <tr>
                     <td>Gender : </td>
-                    <td>Male</td>
+                    <td>{(nextPatient.gender).toUpperCase()}</td>
                 </tr>
                 <tr>
                     <td>Age : </td>
-                    <td>21</td>
+                    <td>{nextPatient.age}</td>
                 </tr>
                 <tr>
                     <td>Repeat : </td>
-                    <td>No</td>
+                    <td>{repeat}</td>
                 </tr>
                 </tbody>
             </table>

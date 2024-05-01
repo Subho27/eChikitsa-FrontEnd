@@ -604,7 +604,14 @@ function CallPageHelper(effect, deps) {
             alert("Error in adding record" + error);
         }
     }
-    const confirmJoin = () => {
+    let repeat;
+    const confirmJoin =async () => {
+
+        const response2 = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-repeated-patient/${getUserIdFromLocalStorage()}/${location.state.assignedDoctorId}`, { headers });
+        if(response2.data === true)
+           repeat ='R'
+        else
+            repeat = 'N'
 
 
         try {
@@ -616,7 +623,7 @@ function CallPageHelper(effect, deps) {
                 patient_id: getUserIdFromLocalStorage(),
                 doctor_id: location.state.assignedDoctorId,
                 follow_up_date: "",
-                patient_type: "",
+                patient_type: repeat,
                 prescription_url: ""
             },{headers} ).then(async (response) =>{
                 console.log(response);
