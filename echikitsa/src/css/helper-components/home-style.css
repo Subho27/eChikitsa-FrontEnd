@@ -184,8 +184,8 @@
 }
 
 .chat-box-button {
-    height: 80px;
-    width: 80px;
+    height: 100px;
+    width: 100px;
     border-color: #13C5DD;
     background: white;
     border-width: 3px;
@@ -266,4 +266,55 @@
     background: url(../../images/Logo/chat-head.png) !important;
     background-size: cover !important;
     border-radius: 10px !important;
+}
+
+.home-page-stat-section {
+    text-align: center;
+}
+
+.home-images-section {
+    position: absolute;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    padding-top: 5%;
+    box-shadow: 0 0 5px 0 #ababab;
+    right: 0;
+    bottom: 0;
+}
+
+.home-images {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+}
+
+.home-page-stat {
+    font-size: 120px;
+    font-weight: 14;
+    opacity: 0.4;
+}
+
+.home-page-desc {
+}
+
+.live-icon{
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+}
+
+.home-stat-image {
+    width: 70%;
+    position: relative;
+    margin: auto;
+}
+
+.stat-heading {
+    font-weight: bold;
+    font-size: 20px;
+    color: #1D2A4D;
 }

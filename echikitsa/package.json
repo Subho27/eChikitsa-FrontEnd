@@ -2,7 +2,7 @@
   "name": "echikitsa",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:3000",
+  "proxy": "http://192.168.0.110:3000",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
@@ -24,6 +24,7 @@
     "react-collapsible": "^2.10.0",
     "react-dom": "^18.2.0",
     "react-id-swiper": "^4.0.0",
+    "react-lottie": "^1.2.4",
     "react-router-dom": "^6.21.2",
     "react-router-hash-link": "^2.4.3",
     "react-scripts": "5.0.1",
