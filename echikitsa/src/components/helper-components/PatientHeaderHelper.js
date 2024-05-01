@@ -38,6 +38,13 @@ function PatientHeaderHelper(props) {
 
     }, []);
     const handleLogout = () => {
+
+        let token = getJwtTokenFromLocalStorage();
+        const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
+        const response = axios.get(`https://localhost:8083/user-handle/auth/logout`,{headers}).then((response) => {
+            // console.log(response)
+
+        });
         removeUserIdFromLocalStorage()
         removeJwtTokenFromLocalStorage()
 
