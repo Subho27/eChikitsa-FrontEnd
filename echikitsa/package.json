@@ -2,7 +2,7 @@
   "name": "echikitsa",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://192.168.0.110:3000",
+  "proxy": "http://127.0.0.1:3000",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",

@@ -659,10 +659,11 @@ function CallPageHelper(effect, deps) {
         else room = roomName;
         if(socket !== null) {
             await socket.disconnect();
-            await localStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-
+            if(localStream) {
+                await localStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+            }
         }
         const token = getJwtTokenFromLocalStorage();
         const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };

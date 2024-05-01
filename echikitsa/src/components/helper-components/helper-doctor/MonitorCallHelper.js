@@ -525,9 +525,11 @@ function MonitorCallHelper(effect, deps) {
     const handleCallEnd = async () => {
         if(socket !== null) {
             await socket.disconnect();
-            await localStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
+            if(!localStream) {
+                await localStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+            }
         }
         navigate("/monitor");
     }

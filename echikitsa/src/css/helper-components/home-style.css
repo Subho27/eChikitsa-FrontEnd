@@ -138,6 +138,7 @@
 
 .custom-container {
     height: 700px;
+    margin-bottom: 30px;
 }
 
 .slick-slide > div {

@@ -194,6 +194,17 @@ function HospitalHelper (props) {
         })
     }
 
+    useEffect(() => {
+        const stompClient = over(new SockJS('http://localhost:9193/ws-endpoint'));
+        stompClient.connect({}, async () => {
+            const waiting = `/topic/doctor-exited/${getUserIdFromLocalStorage()}`
+            stompClient.subscribe(waiting, (message) => {
+                alert("Your chosen doctor has exited for now. You can chose another doctor or come later. Sorry for you inconvenience.");
+                setIsWaiting(false);
+            })
+        });
+    }, [])
+
     return (
         <div>
             {isWaiting && (<div id="overlay-waiting">

@@ -162,8 +162,31 @@
     position: fixed;
     right: 75px;
     bottom: 75px;
+    background-color: #b1efb1;
     border-color: black;
     border-width: 3px;
     border-radius: 50%;
+    z-index: 2000;
     cursor: pointer;
+}
+
+.join-stop-button {
+    height: 100px;
+    width: 100px;
+    background-color: rgba(255, 255, 255, 0);
+    position: fixed;
+    right: 75px;
+    bottom: 195px;
+    background-color: #f87e7e;
+    border-color: black;
+    border-width: 3px;
+    border-radius: 50%;
+    z-index: 2000;
+    cursor: pointer;
+}
+
+.join-dash-image {
+    height: 70px;
+    width: 70px;
+    margin: auto;
 }
