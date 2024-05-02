@@ -164,7 +164,7 @@ function DocProfilePage() {
                 <div className="leftSideContents">
                     <img className="profile-picture" src={tmp.img_url} alt="Profile"/>
                     <div>
-                        <p className="profile-info">{((tmp.seniority_level === 'senior' ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
+                        <p className="profile-info">{((tmp.seniorityLevel === 'senior' ) ? "SDr. " : "JDr. ") + tmp.firstName + " " + tmp.lastName}</p>
                         <p className="address-info">{tmp.city +", "+ tmp.state}</p>
                         {/*<p className="address-info">{profile.hospital}</p>*/}
                         {/*<p className="address-info">{tmp.age}</p>*/}
@@ -246,14 +246,14 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Address : </span>
-                                    <input className="user-data-value editable" type="text" onChange={(e) => tmp.state(e.target.value)} placeholder={tmp.state} readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => setTmp(prevState => ({ ...prevState, state: e.target.value }))} placeholder={tmp.state} readOnly={true}/>
                                     <i className="fa fa-pencil 4" onClick={makeEditable}></i>
                                 </div>
                             </td>
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Password : </span>
-                                    <input className="user-data-value editable" type="text" onChange={(e) => tmp.password(e.target.value)}placeholder="   ****    " readOnly={true}/>
+                                    <input className="user-data-value editable" type="text" onChange={(e) => tmp.password(e.target.value)}placeholder="***********" readOnly={true}/>
                                 </div>
                             </td>
                         </tr>
@@ -261,8 +261,8 @@ function DocProfilePage() {
                             <td>
                                 <div className="user-data">
                                     <span className="user-data-label">Specialization : </span>
-                                    <input className="user-data-value editable" type="text"  onChange={(e) => setTmp(prevState => ({ ...prevState, specialization: e.target.value }))} placeholder={tmp.specialization} readOnly={true}/>
-                                    <i className="fa fa-pencil 6" onClick={makeEditable}></i>
+                                    <input className="user-data-value " type="text"  onChange={(e) => setTmp(prevState => ({ ...prevState, specialization: e.target.value }))} placeholder={tmp.specialization} readOnly={true}/>
+
                                 </div>
                             </td>
                             <td>

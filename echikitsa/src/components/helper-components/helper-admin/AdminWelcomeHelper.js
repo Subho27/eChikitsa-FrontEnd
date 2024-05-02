@@ -262,7 +262,7 @@ function AdminWelcomeHelper(props) {
 
     const uploadFiles = () => {
         console.log(imageUpload)
-        if (imageUpload == null) return Promise.reject("No image to upload");
+        if (imageUpload == null) return notify_error("No image to upload");
 
         const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
 
@@ -337,7 +337,8 @@ function AdminWelcomeHelper(props) {
                         ...prevState,
                         ...updatedData
                     }));
-                    hospitalName.specializationss  = updatedData.departments.map(department => department.department_name);
+
+                     hospitalName.specializationss  = updatedData.departments.map(department => department.department_name);
 
                 }
                 else {
@@ -346,7 +347,7 @@ function AdminWelcomeHelper(props) {
 
             });
         } catch (error) {
-            await notify_error('Error: ', error);
+            await notify_error('Error: ', error.data);
 
         }
 
@@ -367,7 +368,7 @@ function AdminWelcomeHelper(props) {
     }
 
     const handleAddDoctor = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         if (isTokenExpired()) {
             // Token has expired, handle accordingly (e.g., redirect to login)
             navigate("/login")
@@ -649,7 +650,7 @@ function AdminWelcomeHelper(props) {
                                     <span>Upload your Photo</span>
                                 </div>
                                 {/*<input type="file" name="file" className="file-input" value={formData.img_url} onChange={handleInputChange}/>*/}
-                                <input type="file" name="file" className="file-input" onChange={(event) => {
+                                <input type="file" name="file" className="file-input" required onChange={(event) => {
                                     setImageUpload(event.target.files[0]);
                                 }}/>
                             </div>

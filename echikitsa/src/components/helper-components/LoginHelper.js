@@ -353,9 +353,9 @@ const LoginHelper = () => {
                             {/*    <input type="submit" onClick={() => {verifyOtp();}} value="Verify"/>*/}
 
                             {/*</div>*/}
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
+                            {/*<div id="resend-otp">*/}
+                            {/*    <p>OTP not received <button onClick={onClickSendOtpMobile}>Resend OTP</button></p>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                 )}

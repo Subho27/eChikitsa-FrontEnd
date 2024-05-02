@@ -987,8 +987,8 @@ function CallPageHelper(effect, deps) {
                             <div>
                                 <div id="dialogBox" className="dialog">
                                     <div className="dialog-content">
-                                        <div className="doctor-icon">Dr. {consentFromDoctor}</div>
-                                        <p className="request">is requesting access to your medical records.</p>
+                                        {/*<div className="doctor-icon">Dr</div>*/}
+                                        <p className="request">Doctor is requesting access to your medical records.</p>
                                         <div className="button-container">
                                             <button id="allowButton" onClick={allowConsent}>Allow</button>
                                             <button id="cancelButton" onClick={cancelConsent}>Cancel</button>

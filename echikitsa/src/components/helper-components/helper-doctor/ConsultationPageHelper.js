@@ -68,22 +68,16 @@ function ConsultationPageHelper(effect, deps) {
     useEffect(() => {
         if(prescriptionUrl !== "") {
             try {
-                const addPrescrptionDetail = async () => {
-                    try {
-                        await axios.put('https://localhost:8083/file-handle/ehr/add-prescription-detail', {
-                            ehr_id: patientData.ehrId,
-                            reason: diagnosisSummary,
-                            follow_up_date: suggestDate,
-                            prescription_url: prescriptionUrl
-                        }, {headers});
-                        await onCallEndClearData();
-                    } catch (error) {
-                        alert("Error in adding record" + error);
-                    }
-                }
-                addPrescrptionDetail();
+                axios.put('https://localhost:8083/file-handle/ehr/add-prescription-detail', {
+                    ehr_id: patientData.ehrId,
+                    reason: diagnosisSummary,
+                    follow_up_date: suggestDate,
+                    prescription_url: prescriptionUrl
+                }, {headers}).then((response)=>{
+                    onCallEndClearData();
+                });
             } catch (error) {
-                alert("Error uploading prescription details " + error);
+                alert("Error in adding record" + error);
             }
         }
     }, [prescriptionUrl]);
@@ -792,11 +786,21 @@ function ConsultationPageHelper(effect, deps) {
         setOpenMedicine(false);
         setOpenChatBox(false);
 
-        document.getElementById("diagnosis-summary").value = "";
+        if(document.getElementById("diagnosis-summary")) {
+            document.getElementById("diagnosis-summary").value = "";
+        }
 
-        document.getElementById("next-date").value = "";
+        if(document.getElementById("next-date")) {
+            document.getElementById("next-date").value = "";
+        }
 
-        document.getElementById("chat-field").value = "";
+        if(document.getElementById("chat-field")) {
+            document.getElementById("chat-field").value = "";
+        }
+
+        if(document.getElementById("diagnosis-submit")) {
+            document.getElementById("diagnosis-submit").enabled = true;
+        }
     }
 
     // const StyledPopup = styled(Popup)`

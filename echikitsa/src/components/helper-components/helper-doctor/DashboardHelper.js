@@ -102,6 +102,7 @@ function DashboardHelper() {
         getNoOfPatient();
     }, [])
 
+
     useEffect(() => {
         if(ratingDoctor) {
             let five = ratingDoctor.fiveStar;
@@ -116,7 +117,9 @@ function DashboardHelper() {
             setTwoStar(two/total);
             setOneStar(one/total);
             let average = (5 * five + 4 * four + 3 * three + 2 * two + one) / total;
-            setRating(Number(average.toFixed(1)));
+            if(average > 0) {
+                setRating(Number(average.toFixed(1)));
+            }
             setPatient(total);
             console.log(ratingDoctor);
         }

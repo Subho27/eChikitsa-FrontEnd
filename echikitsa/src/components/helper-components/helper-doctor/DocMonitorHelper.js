@@ -58,7 +58,7 @@ const DocMonitorHelper = () => {
                     const waiting = `/topic/senior-monitor/${doctorPatientData[i].doctorId}`;
                     stompClient.subscribe(waiting, async (message) => {
                         console.log(message);
-                        document.getElementById("monitor-" + message.body).innerText = "Already Senior doctor added"
+                        if(document.getElementById("monitor-" + message.body))document.getElementById("monitor-" + message.body).innerText = "Already Senior doctor added"
                     });
                 }
             }

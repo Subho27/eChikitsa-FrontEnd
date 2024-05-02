@@ -507,9 +507,9 @@ const SignUpHelper = () => {
                             <div className="field">
                                 <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(0);}}/>
                             </div>
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
+                            {/*<div id="resend-otp">*/}
+                            {/*    <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                     <div className="fg">
@@ -542,9 +542,9 @@ const SignUpHelper = () => {
                             <div className="field">
                                 <input type="submit" value={`Verify`} onClick={() => {verifyOtp(1);}}/>
                             </div>
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
+                            {/*<div id="resend-otp">*/}
+                            {/*    <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                     <div className="fg">
@@ -676,9 +676,9 @@ const SignUpHelper = () => {
                             <div className="field">
                                 <input type="submit" value={`Verify`} onClick={() => {verifyOtpEmail(2);}}/>
                             </div>
-                            <div id="resend-otp">
-                                <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>
-                            </div>
+                            {/*<div id="resend-otp">*/}
+                            {/*    <p>OTP will expire in 56 sec. <a href="/">Resend OTP</a></p>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                     <div className="fg">
