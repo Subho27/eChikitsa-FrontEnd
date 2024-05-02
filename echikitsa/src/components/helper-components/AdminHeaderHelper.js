@@ -61,7 +61,7 @@ function AdminHeaderHelper(props) {
             <div className="container-fluid sticky-top bg-white shadow-sm">
                 <div className="container">
                     <nav className="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
-                        <Link to="/" className="navbar-brand">
+                        <Link to="/admin" className="navbar-brand">
                             <h1 className="m-0 text-primary full-logo-container">
                                 <div className="logo-container">
                                     <img className="logo-photo" src={require("./../../images/Logo/logo-circular.png")} alt="Logo" />
@@ -74,7 +74,7 @@ function AdminHeaderHelper(props) {
                         </button>
                         <div className="collapse navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav ms-auto py-0">
-                                <Link to="/welcome" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
+                                <Link to="/admin" className={`nav-item nav-link ${props.data === 'welcome' ? 'active' : ''}`} >Home</Link>
                                 <Link to="/" onClick={handleLogout} className="nav-item nav-link" >Logout</Link>
                             </div>
                         </div>
