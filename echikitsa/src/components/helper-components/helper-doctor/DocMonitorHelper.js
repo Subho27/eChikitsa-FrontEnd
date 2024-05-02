@@ -4,6 +4,9 @@ import {Link, useNavigate} from "react-router-dom";
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import axios from "axios";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
+import SockJS from "sockjs-client";
+import {over} from "stompjs";
+import doctorQuery from "../chatbot-component/support-component/DoctorQuery";
 
 const DocMonitorHelper = () => {
     const navigate = useNavigate();
@@ -25,6 +28,7 @@ const DocMonitorHelper = () => {
             });
         });
     };
+
     const [doctorPatientData,setDoctorPatientData] = useState([]);
     const token = getJwtTokenFromLocalStorage();
     const headers = { 'Content-Type' : 'application/json' ,'Authorization': `Bearer ${token}` }
@@ -43,6 +47,24 @@ const DocMonitorHelper = () => {
         };
         getMonitoringPageData();
     }, []);
+
+
+    useEffect(() => {
+        let sock = new SockJS('http://localhost:9193/ws-endpoint');
+        const stompClient = over(sock);
+        stompClient.connect({}, () => {
+            if(doctorPatientData && doctorPatientData.length>0) {
+                for (let i = 0; i < doctorPatientData.length; i++) {
+                    const waiting = `/topic/senior-monitor/${doctorPatientData[i].doctorId}`;
+                    stompClient.subscribe(waiting, async (message) => {
+                        console.log(message);
+                        document.getElementById("monitor-" + message.body).innerText = "Already Senior doctor added"
+                    });
+                }
+            }
+        });
+    }, [doctorPatientData])
+
 
     const [filteredData, setFilteredData] = useState([]);
     useEffect(() => {
@@ -81,6 +103,11 @@ const DocMonitorHelper = () => {
     }, [filteredData, currentPage, hospitalsPerPage])
 
     const handleMonitorCall = (callPatientId, assignedDoctorId) => {
+        let sock = new SockJS('http://localhost:9193/ws-endpoint');
+        const stompClient = over(sock);
+        stompClient.connect({}, () => {
+            stompClient.send(`/app/monitor-start/${assignedDoctorId}`);
+        });
         navigate(`/monitor-call`, { replace: true, state : {callPatientId, assignedDoctorId} });
     }
 
@@ -134,10 +161,13 @@ const DocMonitorHelper = () => {
                                         </div>
                                         <div className="column-super-call">
                                             <div className="table-cell-call">{item.reason}</div>
-                                            <div className="table-cell-call">CALL ONGOING</div>
-                                            {/*<div className={`table-cell-call ${(item.callStatus  ==="ongoing")?`present`:`past`}`}>{item.callStatus}</div>*/}
+                                            <div className={`table-cell-call ${(item.duration  === "PT0S")?`present`:`past`}`}>{(item.duration  === "PT0S")?`Call Ongoing`:`Call Ended`}</div>
                                             {/*<div className="table-cell-call">{item.callStatus === "ongoing" && <button className="monitor-call-now">JOIN CALL</button>}</div>*/}
-                                            <div className="table-cell-call"> <button className="monitor-call-now" onClick={() => handleMonitorCall(item.patientId, item.doctorId)}>JOIN CALL</button></div>
+                                            <div className="table-cell-call" id={"monitor-" + item.doctorId} >
+                                                {(item.duration  !== "PT0S")? <div></div>:
+                                                    <button className="monitor-call-now" onClick={() => handleMonitorCall(item.patientId, item.doctorId)}>JOIN CALL</button>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                     <hr className="monitor-table-row-divider"/>

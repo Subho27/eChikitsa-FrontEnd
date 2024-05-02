@@ -18,13 +18,13 @@ function DashboardHelper() {
     const [rating, setRating] = useState(0)
     const [patient, setPatient] = useState(0)
     const [stompClient, setStompClient] = useState(null);
-    const [fiveStar, setFiveStar] = useState(totalFiveStar/totalPatient)
-    const [fourStar, setFourStar] = useState(totalFourStar/totalPatient)
-    const [threeStar, setThreeStar] = useState(totalThreeStar/totalPatient)
-    const [twoStar, setTwoStar] = useState(totalTwoStar/totalPatient)
-    const [oneStar, setOneStar] = useState(totalOneStar/totalPatient)
+    const [fiveStar, setFiveStar] = useState(0)
+    const [fourStar, setFourStar] = useState(0)
+    const [threeStar, setThreeStar] = useState(0)
+    const [twoStar, setTwoStar] = useState(0)
+    const [oneStar, setOneStar] = useState(0)
     const [patientsInQueue, setPatientsInQueue] = useState([])
-
+    const [callReady, setCallReady] = useState(false);
     const [lastPatient, setLastPatient] = useState({})
     const [noOfPatient,setNoOfPatient] = useState("");
     const [noOfPatientToday,setNoOfPatientToday] = useState("");
@@ -49,7 +49,7 @@ function DashboardHelper() {
     const [lastAppointment, setLastAppointment] = useState("");
     const [repeat, setRepeat] = useState("");
     const [patientss, setPatientss] = useState([])
-    const [ratingDoctor,setRatingDoctor] = useState([]);
+    const [ratingDoctor,setRatingDoctor] = useState({});
     const navigate = useNavigate();
     let notifyCount = 0;
     const token = getJwtTokenFromLocalStorage();
@@ -98,12 +98,30 @@ function DashboardHelper() {
             }
 
         };
-        console.log(ratingDoctor);
-
-
 
         getNoOfPatient();
-    }, []);
+    }, [])
+
+    useEffect(() => {
+        if(ratingDoctor) {
+            let five = ratingDoctor.fiveStar;
+            let four = ratingDoctor.fourStar;
+            let three = ratingDoctor.threeStar;
+            let two = ratingDoctor.twoStar;
+            let one = ratingDoctor.oneStar;
+            let total = ratingDoctor.no_of_reviews
+            setFiveStar(five/total);
+            setFourStar(four/total);
+            setThreeStar(three/total);
+            setTwoStar(two/total);
+            setOneStar(one/total);
+            let average = (5 * five + 4 * four + 3 * three + 2 * two + one) / total;
+            setRating(Number(average.toFixed(1)));
+            setPatient(total);
+            console.log(ratingDoctor);
+        }
+    }, [ratingDoctor])
+
     useEffect(() => {
         //Set dummy values
         // setFiveStar(ratingDoctor.fiveStar)
@@ -111,9 +129,6 @@ function DashboardHelper() {
         // setThreeStar(ratingDoctor.threeStar)
         // setTwoStar(ratingDoctor.twoStar);
         // setOneStar()
-        let average = (5 * totalFiveStar + 4 * totalFourStar + 3 * totalThreeStar + 2 * totalTwoStar + totalOneStar) / totalPatient;
-        setRating(Number(average.toFixed(1)));
-        setPatient(totalPatient);
         setPatientsInQueue(patientQueue);
         setLastPatient(nextPatient);
 
@@ -223,10 +238,7 @@ function DashboardHelper() {
                 const callTopic = `/topic/call-incoming/${getUserIdFromLocalStorage()}`;
                 stompC.subscribe(callTopic, async (message) => {
                     // console.log(message);
-                    if(notifyCount === 0) {
-                        notify();
-                        notifyCount++;
-                    }
+                    setCallReady(true);
                 });
                 const nextTopic = `/topic/next-patients/${getUserIdFromLocalStorage()}`;
                 stompC.subscribe(nextTopic, async (message) => {
@@ -246,7 +258,7 @@ function DashboardHelper() {
 
     const toastId = React.useRef(null);
 
-    const notify = () => {
+    const notify = (patient) => {
         toastId.current = toast( <div className="call-notification">
             <audio controls={false} autoPlay loop>
                 <source src={require('../../../images/Logo/call-sound.mp3')}  type="audio/mpeg"/>
@@ -256,20 +268,20 @@ function DashboardHelper() {
                 <tbody>
                 <tr>
                     <td>Patient Name : </td>
-                    <td>{nextPatient.firstName + " " + nextPatient.lastName}</td>
+                    <td>{patient.firstName + " " + patient.lastName}</td>
                 </tr>
                 <tr>
                     <td>Gender : </td>
-                    <td>{(nextPatient.gender).toUpperCase()}</td>
+                    <td>{(patient.gender).toUpperCase()}</td>
                 </tr>
                 <tr>
                     <td>Age : </td>
-                    <td>{nextPatient.age}</td>
+                    <td>{patient.age}</td>
                 </tr>
-                <tr>
-                    <td>Repeat : </td>
-                    <td>{repeat}</td>
-                </tr>
+                {/*<tr>*/}
+                {/*    <td>Repeat : </td>*/}
+                {/*    <td>{repeat}</td>*/}
+                {/*</tr>*/}
                 </tbody>
             </table>
             <div className="call-handle-buttons">
@@ -302,12 +314,18 @@ function DashboardHelper() {
             })
     }, [])
 
-    console.log(nextPatients);
+    // console.log(nextPatients);
 
     useEffect(() => {
         if (nextPatients && nextPatients.length > 0) {
             axios.get(`https://localhost:8083/echikitsa-backend/user/get-user/${nextPatients[0]}`, { headers })
                 .then(async (response) => {
+                    if(callReady) {
+                        if(notifyCount === 0) {
+                            notify(response.data);
+                        }
+                        setCallReady(false);
+                    }
                     setNextPatient(response.data);
                     try {
                         const response1 = await axios.get(`https://localhost:8083/echikitsa-backend/ehr/get-last-appointment/${nextPatients[0]}/${getUserIdFromLocalStorage()}`, { headers });
@@ -387,10 +405,31 @@ function DashboardHelper() {
             setRepeatQueue([]);
         }
     }, [nextPatients]);
+
+    const handleStopTakingCall = () => {
+        axios.post("http://localhost:9193/global/stop-call", {
+            patientId: null,
+            doctorId: getUserIdFromLocalStorage()
+        }).then((response) => {
+            if(response.data === "true") {
+                notify_success("You have stopped taking more call.")
+            }
+        }).catch(() => {
+            console.log("Could not stop, Sorry :(");
+        })
+    }
+
+    const notify_success = async (response) =>{
+        toast.success(
+            <div>{response}</div>
+        );
+    }
+
     return (
         <div>
             {/*<ToastContainer autoClose={false} closeButton={CloseButton} limit={1}/>*/}
-            <button className="join-later-button" onClick={handleJoinCall}><img className="join-later-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
+            <button className="join-stop-button" onClick={handleStopTakingCall}><img className="join-dash-image" src={require("../../../images/doctor-page-images/call-stop.png")} alt="Call Stop"/></button>
+            <button className="join-later-button" onClick={handleJoinCall}><img className="join-dash-image" src={require("../../../images/doctor-page-images/call-icon.png")} alt="Call"/></button>
             <div className="dashboard-container">
                 <div className="dashboard-container-1 dashboard-container-common">
                     <div className="total-patients common-tab-1">
@@ -550,19 +589,19 @@ function DashboardHelper() {
 //     "repeat": 10,
 //     "non_repeat": 5
 // };
+//
+// const ratingNumber = 4.3;
+// const totalPatient = 42;
+// const totalFiveStar = 9;
+// const totalFourStar = 13;
+// const totalThreeStar = 11;
+// const totalTwoStar = 7;
+// const totalOneStar = 2;
 
-const ratingNumber = 4.3;
-const totalPatient = 42;
-const totalFiveStar = 9;
-const totalFourStar = 13;
-const totalThreeStar = 11;
-const totalTwoStar = 7;
-const totalOneStar = 2;
-
-const patientQueue = [
-    {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
-    {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
-];
+// const patientQueue = [
+//     {"photo": "2.jpg", "name": "Suraj Subedi", "repeat": "No"},
+//     {"photo": "3.jpg", "name": "Rishav Chandel", "repeat": "Yes"}
+// ];
 
 // const nextPatient = {
 //     "name": "Subhodip Rudra", "photo": "1.jpg", "diagnosis": "Kamzori",

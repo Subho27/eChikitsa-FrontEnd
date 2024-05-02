@@ -5,13 +5,16 @@ import Collapsible from "react-collapsible";
 import 'firebase/compat/database';
 import {Device} from "mediasoup-client";
 import io from "socket.io-client";
-
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import styled from 'styled-components';
 import axios, {get} from 'axios';
+import Select from "react-select";
 import {firebaseConfig, storage} from "../../firebase-config/firebaseConfigProfileImages";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-
 import {over} from "stompjs";
 import SockJS from "sockjs-client";
+import medicineData from "../../validation/MedicineDatabase"
 import {getUserIdFromLocalStorage} from "../../../resources/userIdManagement";
 import {getJwtTokenFromLocalStorage} from "../../../resources/storageManagement";
 
@@ -26,6 +29,7 @@ function ConsultationPageHelper(effect, deps) {
     const [addMedicines, setAddMedicines] = useState([]);
     const [prescriptionUrl, setPrescriptionUrl] = useState("");
     const [patientData, setPatientData] = useState({});
+    const [isOpenMedicineSelect, setIsOpenMedicineSelect] = useState(false);
 
 
     const liveClock = () => {
@@ -178,12 +182,12 @@ function ConsultationPageHelper(effect, deps) {
         });
     }
 
-    const submittedMedicines = async () => {
-        const medicineName = document.getElementById("medicine").value;
-        const afterBefore = document.getElementById("after-before").value;
-        const dosage1 = document.getElementById("dosage-1").value;
-        const dosage2 = document.getElementById("dosage-2").value;
-        const dosage3 = document.getElementById("dosage-3").value;
+    const addMedicineFromList = async () => {
+        const medicineName = selectedMedicine.value;
+        const afterBefore = selectedAfterBefore.value;
+        const dosage1 = selectedDosage1.value;
+        const dosage2 = selectedDosage2.value;
+        const dosage3 = selectedDosage3.value;
         const prescribe = {
             "name" : medicineName,
             "food" : afterBefore,
@@ -201,7 +205,15 @@ function ConsultationPageHelper(effect, deps) {
             updatedMedicines.splice(id, 1);
             return updatedMedicines;
         });
+
+        setAddMedicines(prevAddMedicines => {
+            const updatedAddMedicines = [...prevAddMedicines];
+            updatedAddMedicines.splice(id, 1);
+            return updatedAddMedicines;
+        });
     }
+    console.log(medicines);
+    console.log(addMedicines);
 
     const summaryDiagnosis = async () => {
         const diagnosis = document.getElementById("diagnosis-summary").value;
@@ -650,9 +662,11 @@ function ConsultationPageHelper(effect, deps) {
         //await addRecord();
         if(socket !== null) {
             await socket.disconnect();
-            await localStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
+            if(!localStream) {
+                await localStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+            }
         }
         navigate("/dashboard");
     }
@@ -768,6 +782,7 @@ function ConsultationPageHelper(effect, deps) {
         setSuggestDate("");
         setDiagnosisSummary("");
         setMedicines([]);
+        setAddMedicines([]);
         setPrescription([]);
         setHasConsent(false);
         setWaitingConsent(false);
@@ -777,12 +792,6 @@ function ConsultationPageHelper(effect, deps) {
         setOpenMedicine(false);
         setOpenChatBox(false);
 
-        document.getElementById("medicine").value = "Medicine 1";
-        document.getElementById("after-before").value = "After";
-        document.getElementById("dosage-1").value = "0";
-        document.getElementById("dosage-2").value = "0";
-        document.getElementById("dosage-3").value = "0";
-
         document.getElementById("diagnosis-summary").value = "";
 
         document.getElementById("next-date").value = "";
@@ -790,30 +799,25 @@ function ConsultationPageHelper(effect, deps) {
         document.getElementById("chat-field").value = "";
     }
 
+    // const StyledPopup = styled(Popup)`
+    //   // use your custom style for ".popup-overlay"
+    //   &-overlay {
+    //     ...;
+    //   }
+    //   // use your custom style for ".popup-content"
+    //   &-content {
+    //     ...;
+    //   }
+    // `;
+
+    const [selectedMedicine, setSelectedMedicine] = useState(null);
+    const [selectedAfterBefore, setSelectedAfterBefore] = useState(null);
+    const [selectedDosage1, setSelectedDosage1] = useState(null);
+    const [selectedDosage2, setSelectedDosage2] = useState(null);
+    const [selectedDosage3, setSelectedDosage3] = useState(null);
+
     return (
         <div className="consult-page-container">
-            <div className="upcoming-container">
-                <div className="in-queue-section">
-                    <span className="in-queue-text">IN-QUEUE : 18</span>
-                </div>
-                <div className="next-in-queue-section">
-                    <div>
-                        <span className="next-in-queue-text">NEXT IN QUEUE : <span className="next-value">SURAJ SUBEDI</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">AGE : <span className="next-value">25</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">GENDER : <span className="next-value">MALE</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">DIAGNOSIS : <span className="next-value">HEALTH CHECKUP</span></span>
-                    </div>
-                    <div>
-                        <span className="next-in-queue-text">REVISIT : <span className="next-value">NO</span></span>
-                    </div>
-                </div>
-            </div>
             <div className="call-container">
                 <div className="video-call-section">
                     <div className="video-section">
@@ -913,56 +917,109 @@ function ConsultationPageHelper(effect, deps) {
                                      triggerClassName="ask-record-closed-trigger" triggerOpenedClassName="ask-record-open-trigger"
                                      open={openMedicine} handleTriggerClick={() => setOpenMedicine(!openMedicine)}>
                             <div className="next-date-section dosage-section">
-                                <select className="medicine" id="medicine" name="medicine" >
-                                    <option>Medicine 1</option>
-                                    <option>Medicine 2</option>
-                                    <option>Medicine 3</option>
-                                    <option>Medicine 4</option>
-                                    <option>Medicine 5</option>
-                                    <option>Medicine 6</option>
-                                </select>
-                                <select className="after-before" id="after-before" name="after-before" >
-                                    <option>After</option>
-                                    <option>Before</option>
-                                </select>
-                                <select className="dosage" id="dosage-1" name="dosage-1" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                                <span style={{ color:"black", fontWeight:"bolder" }}>-</span>
-                                <select className="dosage" id="dosage-2" name="dosage-2" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                                <span style={{ color:"black", fontWeight:"bolder" }}>-</span>
-                                <select className="dosage" id="dosage-3" name="dosage-3" >
-                                    <option>0</option>
-                                    <option>1</option>
-                                </select>
-                            </div>
-                            <button className="next-date-submit" onClick={submittedMedicines}>Submit</button>
-                            <div className="dosage-result">
-                                {medicines.length === 0 ? "" :
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Medicine Name</th>
-                                            <th>After/Before food</th>
-                                            <th>Dosage</th>
-                                            <th>Cancel</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {medicines.map((medicine, index) => (
-                                            <tr key={index}>
-                                                <td>{medicine.name}</td>
-                                                <td>{medicine.food}</td>
-                                                <td>{medicine.dos1}-{medicine.dos2}-{medicine.dos3}</td>
-                                                <td className="cancel-summary" onClick={() => cancelMedicine(index)}>X</td>
+                                <Popup
+                                    trigger={<button className="button"> Open to Select Medicine </button>}
+                                    position="center" modal>
+                                    <table className="medicine-select-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicine Name</th>
+                                                <th>After/Before Food</th>
+                                                <th>Dosage 1</th>
+                                                <th>Dosage 2</th>
+                                                <th>Dosage 3</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table> }
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <Select name="medicine"
+                                                        defaultValue={selectedMedicine}
+                                                        onChange={setSelectedMedicine}
+                                                        options={medicineData}
+                                                        required />
+                                                </td>
+                                                <td>
+                                                    <Select
+                                                        name="after-before"
+                                                        defaultValue={selectedAfterBefore}
+                                                        onChange={setSelectedAfterBefore}
+                                                        options={[
+                                                            { value: 'after', label: 'After Food' },
+                                                            { value: 'before', label: 'Before Food' }
+                                                        ]}
+                                                        required
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <Select
+                                                        name="dosage-1"
+                                                        defaultValue={selectedDosage1}
+                                                        onChange={setSelectedDosage1}
+                                                        options={[
+                                                            { value: '1', label: 'Yes' },
+                                                            { value: '0', label: 'No' }
+                                                        ]}
+                                                        required
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <Select
+                                                        name="dosage-2"
+                                                        defaultValue={selectedDosage2}
+                                                        onChange={setSelectedDosage2}
+                                                        options={[
+                                                            { value: '1', label: 'Yes' },
+                                                            { value: '0', label: 'No' }
+                                                        ]}
+                                                        required
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <Select
+                                                        name="dosage-3"
+                                                        defaultValue={selectedDosage3}
+                                                        onChange={setSelectedDosage3}
+                                                        options={[
+                                                            { value: '1', label: 'Yes' },
+                                                            { value: '0', label: 'No' }
+                                                        ]}
+                                                        required
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <img onClick={addMedicineFromList} src={require("../../../images/doctor-page-images/add.png")} alt="ADD" style={{ width:"30px", height:"30px", margin:"auto", cursor:"pointer" }}/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                                <td style={{ padding:"0" }}><hr/></td>
+                                            </tr>
+                                            {medicines && medicines.length > 0 &&
+                                                medicines.map((medicine, index) => (
+                                                <tr key={index}>
+                                                    <td>{medicine.name}</td>
+                                                    <td>{medicine.food}</td>
+                                                    <td>{medicine.dos1}</td>
+                                                    <td>{medicine.dos2}</td>
+                                                    <td>{medicine.dos3}</td>
+                                                    <td>
+                                                        <div>
+                                                            <img onClick={() => {cancelMedicine(index)}} src={require("../../../images/doctor-page-images/minus.png")} alt="ADD" style={{ width:"30px", height:"30px", margin:"auto", cursor:"pointer" }}/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </Popup>
                             </div>
                         </Collapsible>
                     </div>
