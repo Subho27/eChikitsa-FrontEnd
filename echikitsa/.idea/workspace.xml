@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e2218e98-e5be-4a22-b107-181d2db67225" name="Changes" comment="Fixed Final Issues" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$/.." source="develop" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="develop" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+  }
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+        <option value="develop" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="Subho27" />
+        <option name="repository" value="eChikitsa-FrontEnd" />
+      </RepoCoordinatesHolder>
+    </option>
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="b08387a1-5a18-41a1-892f-df1ddbe399d6" />
+        <option name="url" value="https://github.com/Subho27/eChikitsa-FrontEnd.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/components/helper-components/DoctorHeaderHelper.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2awUPNazn7bGbq9WtmmUYQfRc6g" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;F:/Github/eChikitsa-BackEnd APIs/File-Handle-API/file-handle-api&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2023.2.3\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\components\helper-components\chatbot-component" />
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\images\Logo" />
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\images\patient_landing_page" />
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\components\doctor-components" />
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\components\helper-components\helper-doctor" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\components\helper-components" />
+      <recent name="F:\Github\eChikitsa-FrontEnd\echikitsa\src\components\common-components" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e2218e98-e5be-4a22-b107-181d2db67225" name="Changes" comment="" />
+      <created>1705229110740</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1705229110740</updated>
+      <workItem from="1705229111852" duration="863000" />
+      <workItem from="1705420940022" duration="3455000" />
+      <workItem from="1705498347496" duration="19407000" />
+      <workItem from="1707194003789" duration="19922000" />
+      <workItem from="1707369417208" duration="48000" />
+      <workItem from="1707369519025" duration="316000" />
+      <workItem from="1707372579091" duration="83000" />
+      <workItem from="1707401679974" duration="67000" />
+      <workItem from="1707896024943" duration="19708000" />
+      <workItem from="1707972973935" duration="82000" />
+      <workItem from="1707999330267" duration="84000" />
+      <workItem from="1708002492463" duration="58000" />
+      <workItem from="1708428935879" duration="1901000" />
+      <workItem from="1708449878907" duration="9218000" />
+      <workItem from="1708505375315" duration="33317000" />
+      <workItem from="1708587171254" duration="9440000" />
+      <workItem from="1708767947573" duration="8376000" />
+      <workItem from="1708858529617" duration="9286000" />
+      <workItem from="1708894667584" duration="10000" />
+      <workItem from="1708894691022" duration="1229000" />
+      <workItem from="1708931253334" duration="4644000" />
+      <workItem from="1708938098320" duration="1722000" />
+      <workItem from="1708939930470" duration="121000" />
+      <workItem from="1708940056242" duration="500000" />
+      <workItem from="1708941319666" duration="29002000" />
+      <workItem from="1709136115702" duration="4681000" />
+      <workItem from="1709211315259" duration="2830000" />
+      <workItem from="1709715652759" duration="19195000" />
+      <workItem from="1710849195588" duration="8771000" />
+      <workItem from="1710924012196" duration="30307000" />
+      <workItem from="1711477751735" duration="9550000" />
+      <workItem from="1711526011894" duration="382000" />
+      <workItem from="1711526403225" duration="7451000" />
+      <workItem from="1711535307334" duration="2000" />
+      <workItem from="1711562583414" duration="7265000" />
+      <workItem from="1711607051072" duration="2272000" />
+      <workItem from="1711634803168" duration="10022000" />
+      <workItem from="1711701846254" duration="26387000" />
+      <workItem from="1711871847194" duration="2476000" />
+      <workItem from="1712245625479" duration="10686000" />
+      <workItem from="1712294259133" duration="17230000" />
+      <workItem from="1712383720439" duration="18803000" />
+      <workItem from="1712467303573" duration="29570000" />
+      <workItem from="1712558602522" duration="27110000" />
+      <workItem from="1712651983266" duration="18110000" />
+      <workItem from="1712679623239" duration="11937000" />
+      <workItem from="1712746984996" duration="28087000" />
+      <workItem from="1712816941202" duration="23266000" />
+      <workItem from="1712921705025" duration="2831000" />
+      <workItem from="1713168510418" duration="1426000" />
+      <workItem from="1713270059139" duration="10330000" />
+      <workItem from="1713336055307" duration="1334000" />
+      <workItem from="1713338256215" duration="18679000" />
+      <workItem from="1713440079917" duration="16067000" />
+      <workItem from="1713874018876" duration="23403000" />
+      <workItem from="1713962263275" duration="7791000" />
+      <workItem from="1714047948998" duration="18007000" />
+      <workItem from="1714130563697" duration="18231000" />
+      <workItem from="1714203810558" duration="25865000" />
+      <workItem from="1714282681535" duration="684000" />
+      <workItem from="1714326554850" duration="1980000" />
+      <workItem from="1714379395774" duration="19079000" />
+      <workItem from="1714558966294" duration="24331000" />
+      <workItem from="1714635269910" duration="797000" />
+      <workItem from="1714645086922" duration="2399000" />
+      <workItem from="1714658447323" duration="674000" />
+      <workItem from="1714660707311" duration="13018000" />
+    </task>
+    <task id="LOCAL-00001" summary="Routing enabled and added initial components">
+      <option name="closed" value="true" />
+      <created>1705424436698</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1705424436698</updated>
+    </task>
+    <task id="LOCAL-00002" summary="unused &quot;props&quot; removed">
+      <option name="closed" value="true" />
+      <created>1705424505610</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1705424505610</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Header and Footer added">
+      <option name="closed" value="true" />
+      <created>1705601509524</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1705601509524</updated>
+    </task>
+    <task id="LOCAL-00004" summary="After getting SignUp page fixed it">
+      <option name="closed" value="true" />
+      <created>1707242406005</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1707242406005</updated>
+    </task>
+    <task id="LOCAL-00005" summary="After getting Landing page, fixed it">
+      <option name="closed" value="true" />
+      <created>1707933843761</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1707933843761</updated>
+    </task>
+    <task id="LOCAL-00006" summary="login page link added">
+      <option name="closed" value="true" />
+      <created>1707934651850</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1707934651850</updated>
+    </task>
+    <task id="LOCAL-00007" summary="login page button fixed">
+      <option name="closed" value="true" />
+      <created>1707937415752</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1707937415752</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Flow image added">
+      <option name="closed" value="true" />
+      <created>1708002523968</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1708002523968</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Flow image added">
+      <option name="closed" value="true" />
+      <created>1708888336776</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1708888336776</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Link setup">
+      <option name="closed" value="true" />
+      <created>1708895609160</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1708895609160</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Fixed patient Landing Page and Link setup">
+      <option name="closed" value="true" />
+      <created>1708979202380</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1708979202380</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Deleted extra files and Link setup">
+      <option name="closed" value="true" />
+      <created>1708979928667</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1708979928667</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Finalized UI">
+      <option name="closed" value="true" />
+      <created>1710966057745</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1710966057745</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Call settings for both Doctor &amp; Patient">
+      <option name="closed" value="true" />
+      <created>1711534096199</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1711534096199</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Mobile otp verification with firebase">
+      <option name="closed" value="true" />
+      <created>1711648811126</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1711648811126</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Validation in signup patient">
+      <option name="closed" value="true" />
+      <created>1711871957791</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1711871957791</updated>
+    </task>
+    <task id="LOCAL-00017" summary="SFU call changes">
+      <option name="closed" value="true" />
+      <created>1712310241893</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1712310241893</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Call changes working in doctor and patient">
+      <option name="closed" value="true" />
+      <created>1712500193030</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1712500193030</updated>
+    </task>
+    <task id="LOCAL-00019" summary="random call finalized and some issues fixed">
+      <option name="closed" value="true" />
+      <created>1712679459086</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1712679459086</updated>
+    </task>
+    <task id="LOCAL-00020" summary="photos and music added">
+      <option name="closed" value="true" />
+      <created>1712679540606</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1712679540606</updated>
+    </task>
+    <task id="LOCAL-00021" summary="conflict resolving">
+      <option name="closed" value="true" />
+      <created>1712680618819</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1712680618819</updated>
+    </task>
+    <task id="LOCAL-00022" summary="conflict resolving">
+      <option name="closed" value="true" />
+      <created>1712682366580</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1712682366580</updated>
+    </task>
+    <task id="LOCAL-00023" summary="add doctor specialization selection">
+      <option name="closed" value="true" />
+      <created>1712688990342</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1712688990342</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Doctor monitor and Patient records table fixed">
+      <option name="closed" value="true" />
+      <created>1712780254924</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1712780254924</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Doctor monitor and Patient records table fixed">
+      <option name="closed" value="true" />
+      <created>1712870164648</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1712870164648</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Doctor records page style fixed">
+      <option name="closed" value="true" />
+      <created>1713350985254</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1713350985254</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Consent changes">
+      <option name="closed" value="true" />
+      <created>1713376764484</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1713376764484</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Cancel Waiting done and call buttons done">
+      <option name="closed" value="true" />
+      <created>1713469585038</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1713469585038</updated>
+    </task>
+    <task id="LOCAL-00029" summary="validation changes">
+      <option name="closed" value="true" />
+      <created>1713889599069</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1713889599069</updated>
+    </task>
+    <task id="LOCAL-00030" summary="call limit 3, top-left userid, room name removed from url">
+      <option name="closed" value="true" />
+      <created>1713965393800</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1713965393800</updated>
+    </task>
+    <task id="LOCAL-00031" summary="call limit 3, top-left userid, room name removed from url">
+      <option name="closed" value="true" />
+      <created>1713969889977</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1713969889977</updated>
+    </task>
+    <task id="LOCAL-00032" summary="call limit 3, top-left userid, room name removed from url">
+      <option name="closed" value="true" />
+      <created>1714069102011</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1714069102011</updated>
+    </task>
+    <task id="LOCAL-00033" summary="call limit 3, top-left userid, room name removed from url">
+      <option name="closed" value="true" />
+      <created>1714069128642</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1714069128642</updated>
+    </task>
+    <task id="LOCAL-00034" summary="call specific doctor fixed">
+      <option name="closed" value="true" />
+      <created>1714071740022</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1714071740022</updated>
+    </task>
+    <task id="LOCAL-00035" summary="call specific doctor fixed">
+      <option name="closed" value="true" />
+      <created>1714080860936</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1714080860936</updated>
+    </task>
+    <task id="LOCAL-00036" summary="chatbot changes">
+      <option name="closed" value="true" />
+      <created>1714204030401</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1714204030401</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Prescription changes">
+      <option name="closed" value="true" />
+      <created>1714209475306</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1714209475306</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Dashboard fix changes">
+      <option name="closed" value="true" />
+      <created>1714218448591</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1714218448591</updated>
+    </task>
+    <task id="LOCAL-00039" summary="monitor call working">
+      <option name="closed" value="true" />
+      <created>1714242683431</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1714242683431</updated>
+    </task>
+    <task id="LOCAL-00040" summary="chat bot working">
+      <option name="closed" value="true" />
+      <created>1714282717864</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1714282717864</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Field reset">
+      <option name="closed" value="true" />
+      <created>1714387467302</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1714387467302</updated>
+    </task>
+    <task id="LOCAL-00042" summary="home page">
+      <option name="closed" value="true" />
+      <created>1714561881398</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1714561881398</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Fixed Final Issues">
+      <option name="closed" value="true" />
+      <created>1714594314353</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1714594314353</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Fixed Final Issues">
+      <option name="closed" value="true" />
+      <created>1714679261575</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1714679261575</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Call settings for both" />
+    <MESSAGE value="Call settings for both Doctor &amp; Patient" />
+    <MESSAGE value="Mobile otp verification with firebase" />
+    <MESSAGE value="Validation in signup patient" />
+    <MESSAGE value="SFU call changes" />
+    <MESSAGE value="Call changes working in doctor and patient" />
+    <MESSAGE value="random call finalized and some issues fixed" />
+    <MESSAGE value="photos and music added" />
+    <MESSAGE value="conflict resolving" />
+    <MESSAGE value="add doctor specialization selection" />
+    <MESSAGE value="Doctor monitor and Patient records table fixed" />
+    <MESSAGE value="Doctor records page style fixed" />
+    <MESSAGE value="Consent changes" />
+    <MESSAGE value="Cancel Waiting done and call buttons done" />
+    <MESSAGE value="validation changes" />
+    <MESSAGE value="call limit 3, top-left userid, room name removed from url" />
+    <MESSAGE value="call specific doctor fixed" />
+    <MESSAGE value="chatbot changes" />
+    <MESSAGE value="Prescription changes" />
+    <MESSAGE value="Dashboard fix changes" />
+    <MESSAGE value="monitor call working" />
+    <MESSAGE value="chat bot working" />
+    <MESSAGE value="Field reset" />
+    <MESSAGE value="home page" />
+    <MESSAGE value="Fixed Final Issues" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Final Issues" />
+  </component>
+</project>
